@@ -1,0 +1,538 @@
+#install.packages("compositions")  
+library(compositions)
+library(stringr)
+library(janitor)
+library(ggplot2)
+library(janitor)
+library(dplyr)
+library(compositions)
+library(ghibli)
+library(factoextra)
+library(patchwork)
+library(pheatmap)
+library(ComplexHeatmap)
+install.packages("coloRamPalette")
+library(colorRampPalette)
+# Install the circlize package if not already installed
+if (!requireNamespace("circlize", quietly = TRUE)) {
+  install.packages("circlize")
+}
+library(rstatix)
+library(ggpubr)
+library(FSA)
+library(circlize)
+library(ggforce)
+library(vegan)
+if(!require(ggplot2)) install.packages("ggplot2")
+if(!require(factoextra)) install.packages("factoextra")
+library(gridExtra)
+library(ggplot2)
+library(factoextra)
+install.packages("kableExtra")
+library(kableExtra)
+#install.packages("devtools")
+#devtools::install_github("pmartinezarbizu/pairwiseAdonis", force = TRUE)
+library(pairwiseAdonis)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+#install.packages("ggalluvial")
+library(ggalluvial)
+#install.packages("ggsankey")
+library(ggsankey)
+#install.packages("networkD3")
+library(networkD3)
+library(htmlwidgets)
+library(purrr)
+library(cowplot)
+#############################
+meta <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/meta_insilico.csv")
+meta <- meta[,-c(7,8)]
+#############################
+aff <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/AFF/gbm/modules.tsv", header=TRUE)
+fs <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/FS/gbm/modules.tsv", header = TRUE)
+paula <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/Paula/gbm/modules.tsv", header = TRUE)
+mk <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/milk_kefir/gbm/modules.txt", header = TRUE)
+
+colnames(mk) <- gsub("\\.", "-", colnames(mk))
+
+wk <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/wk_final_run/waterkefir/modules.tsv", header = TRUE)
+wk <- wk[, !grepl("^WK.*T", colnames(wk))]
+kom <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/kombucha/gbm/modules.tsv", header = TRUE)
+kinema <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/kinema/gbm/modules.tsv", header = TRUE)
+baijiu <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/baijiu/gbm/modules.tsv", header = TRUE)
+################
+all <- list(aff, fs, paula, mk, wk, kom, kinema, baijiu)
+all <- reduce(all, full_join, by = "Module")
+###############################
+###############################
+names(all) <- sapply(names(all), function(col) {
+  # Replace dots with hyphens for WK columns
+  if (startsWith(col, "WK")) {
+    col <- gsub("\\.", "-", col)
+  }
+  if (startsWith(col, "WKMedia")) {
+    col <- gsub("\\_", "-", col)
+  }
+  
+  # Special case for WKMedia
+  if (startsWith(col, "WKMedia")) {
+    col <- substr(col, 1, 15)
+  } else if (startsWith(col, "AF") || startsWith(col, "FS")) {
+    col <- substr(col, 1, 4)
+  } else if (startsWith(col, "WK")) {
+    col <- substr(col, 1, 13)
+  } else if (startsWith(col, "PFG")) {
+    col <- substr(col, 1, 14)
+  } else if (startsWith(col, "SRR11")) {
+    col <- substr(col, 1, 11)
+  } else if (startsWith(col, "SRR88")) {
+    col <- substr(col, 1, 10)
+  } else if (startsWith(col, "K")) {
+    col <- substr(col, 1, 2)
+  } else {
+    col <- substr(col, 1, 6)
+  }
+  
+  # Remove trailing underscore
+  col <- sub("_$", "", col)
+  col <- sub("-$", "", col)
+  return(col)
+})
+
+
+colnames(all)
+##############################
+# Trim whitespace from both column names and meta IDs
+clean_colnames <- trimws(colnames(all))
+clean_meta_ids <- trimws(meta$ID)
+
+# Find columns that are not in meta$ID
+invalid_cols <- setdiff(clean_colnames, clean_meta_ids)
+
+# View them
+invalid_cols
+##############################################################
+PA <- all
+PA <- as.data.frame(PA)
+PA[is.na(PA)] <- 0
+PA[,-1] <- ifelse(all[-1] > 0,1,0)
+PA[is.na(PA)] <- 0
+richness <- c("Richness", colSums(PA[-1]))
+pa <- rbind(PA, richness)
+
+pa <- pa[44,]
+pa <- t(pa)
+pa <- as.data.frame(pa)
+colnames(pa) -> Null
+colnames(pa)[1] <- "Richness"
+pa <- rownames_to_column(pa, var = "Module")
+pa <- pa[-1,]
+colnames(pa)[1] <- "ID"
+pa$ID <- gsub("\\.", "-", pa$ID)
+
+richness <- merge(pa, meta, by ="ID")
+
+############################################################
+
+# Your custom substrate colors
+substrate_colors <- c(
+  "Dairy" = "#1f77b4", "Sugar" = "#ff7f0e", "Brine" = "#1b9e77",
+  "Soy" = "#d62728", "Coconut Dairy" = "#9467bd", "Cereal" = "#8c564b",
+  "Root and tuber" = "#e41a1c", "Seed" = "#7f7f7f",  "Palm Tree" = "#B565A7"
+)
+richness$Richness <- as.numeric(as.character(richness$Richness))
+# Jitter plot: Substrate vs Richness
+p <- ggplot(richness, aes(x = Substrate, y = Richness, color = Substrate)) +
+  geom_jitter(width = 0.2, size = 3, alpha = 0.8) +
+  scale_color_manual(values = substrate_colors) +
+  labs(title = "Richness by Substrate (Jitter Plot)",
+       x = "Substrate",
+       y = "Richness") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+##################################
+#trying to capture what I did before
+# Ensure Richness is numeric and remove NAs
+richness$Richness <- as.numeric(as.character(richness$Richness))
+richness_clean <- richness[!is.na(richness$Richness), ]
+
+# Violin + Jitter plot
+library(ggplot2)
+library(ggpubr)
+kw_test <- kruskal.test(Richness ~ Substrate, data = richness_clean)
+kw_p <- format.pval(kw_test$p.value, digits = 3, eps = 0.001)
+kw_label <- paste0("Effect of substrate on GBM richness\np = ", kw_p)
+p1<- ggplot(richness_clean, aes(x = Substrate, y = Richness, fill = Substrate)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.6, color = "black") +
+  geom_jitter(
+    shape = 21, width = 0.2, size = 2.5, alpha = 0.5,
+    color = "black", stroke = 0.4, aes(fill = Substrate)
+  ) +
+  scale_fill_manual(values = substrate_colors) +
+  labs(
+    title = "",
+    x = "",
+    y = "Richness"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    axis.text.x = element_text(angle = 0, hjust = 0.6),
+    legend.position = "none"
+  ) +
+  annotate("label", 
+           x = 4, 
+           y = max(richness_clean$Richness) - 2, 
+           label = kw_label,
+           size = 4, fontface = "bold", fill = "white", color = "black") +
+  scale_y_continuous(
+    limits = c(0, NA),
+    expand = expansion(mult = c(0.06, 0.05))
+  )
+
+
+
+
+#stat test
+shapiro.test(richness$Richness)
+kruskal.test(Richness ~ Substrate, data = richness)
+kruskal.test(Richness ~ State, data = richness)
+kruskal.test(Type.of.fermentation ~ Substrate, data = richness)
+dunn_result <- dunnTest(Richness ~ Substrate, data = richness, method = "bh")
+# Extract and clean results
+sig_pairs <- dunn_result$res %>%                                      # only significant
+  separate(Comparison, into = c("group1", "group2"), sep = " - ") %>%
+  mutate(
+    label = case_when(
+      P.adj < 0.001 ~ "***",
+      P.adj < 0.01 ~ "**",
+      P.adj < 0.05 ~ "*",  
+      P.adj > 0.05 ~ "NS"
+    ),
+    y.position = 20 + row_number()  # adjust Y positions if needed
+  )
+
+p2 <-  ggplot(sig_pairs, aes(x = group1, y = group2, fill = label)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = label), color = "black", size = 3) +
+  scale_fill_manual(values = c(
+    "NS" = "white", 
+    "*" = "lightyellow", 
+    "**" = "yellow", 
+    "***" = "gold"
+  )) +
+  labs(title = "Pairwise Significance between substrates",
+       x = " ",
+       y = "",
+       fill = "Significance") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 0, hjust = 1, size = 8),   # smaller axis text
+    axis.text.y = element_text(size = 8),
+    plot.margin = margin(-150,2,2,2)  # smaller margins
+  ) +
+  coord_fixed(ratio = 0.18) 
+P <- p1/p2 + plot_layout(heights = c(3, 3))
+P
+
+
+#ggboxplot(richness, x = "Substrate", y = "Richness", color = "Substrate", add = "jitter") +
+#stat_compare_means(method = "kruskal.test") 
+#######
+# Pairwise Wilcoxon test with p-value adjustment
+pairwise_results <- richness %>%
+  pairwise_wilcox_test(Richness ~ Substrate, p.adjust.method = "BH")
+write.csv(pairwise_results, "pairwise_result_effect_of_substrate_GBM.csv")
+########################################
+# Determine plot height cap and spacing
+y_max_data <- max(richness_clean$Richness, na.rm = TRUE)  # max value of actual data
+y_cap <- 37  # maximum y-axis limit (your preference)
+n_comparisons <- nrow(sig_pairs)
+
+# Dynamic spacing to fit all comparisons within y_cap
+spacing <- (y_cap - y_max_data - 1) / (n_comparisons + 1)  # 1 buffer
+
+sig_pairs <- sig_pairs %>%
+  mutate(
+    label = case_when(
+      P.adj < 0.001 ~ "***",
+      P.adj < 0.01 ~ "**",
+      P.adj < 0.05 ~ "*"
+    ),
+    y.position = y_max_data + 1 + row_number() * spacing
+  )
+
+######################################
+ggboxplot(richness_clean, x = "Substrate", y = "Richness",
+          color = "Substrate", palette = substrate_colors,
+          add = "jitter", add.params = list(size = 1.5, alpha = 0.4)) +
+  stat_pvalue_manual(sig_pairs,
+                     label = "label",
+                     y.position = "y.position",
+                     step.increase = 0.05,
+                     bracket.size = 0.3,
+                     tip.length = 0.005,
+                     size = 4) +
+  
+  scale_y_continuous(
+    breaks = seq(0, 37, by = 5)  # Only label up to 37
+  ) +
+  
+  coord_cartesian(ylim = c(0, 55)) +  # Extend axis to fit significance lines
+  
+  labs(title = "Impact of substrate on GBM Richness",
+       x = "Substrate", y = "Richness") +
+  
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.major = element_blank(),  # remove major grid lines
+    panel.grid.minor = element_blank(),  # remove minor grid lines
+    panel.background = element_blank(),  # remove background color
+    axis.line = element_line(color = "black"),  # keep axes
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(face = "bold", size = 16),
+    legend.position = "none"
+  )
+#############################
+#gmm time
+#############################
+meta <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/meta_insilico.csv")
+meta <- meta[,-c(7,8)]
+#############################
+aff <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/AFF/gmm/modules.tsv", header=TRUE)
+fs <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/FS/gmm/modules.tsv", header = TRUE)
+paula <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/Paula/gmm/modules.tsv", header = TRUE)
+mk <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/milk_kefir/gmm/modules.txt", header = TRUE)
+
+colnames(mk) <- gsub("\\.", "-", colnames(mk))
+
+wk <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/wk_final_run/gmm/modules.tsv", header = TRUE)
+wk <- wk[, !grepl("^WK.*T", colnames(wk))]
+kom <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/kombucha/gmm/modules.tsv", header = TRUE)
+kinema <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/kinema/gmm/modules.tsv", header = TRUE)
+baijiu <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/baijiu/gmm/modules.tsv", header = TRUE)
+################
+all <- list(aff, fs, paula, mk, wk, kom, kinema, baijiu)
+all <- reduce(all, full_join, by = "Module")
+###############################
+###############################
+names(all) <- sapply(names(all), function(col) {
+  # Replace dots with hyphens for WK columns
+  if (startsWith(col, "WK")) {
+    col <- gsub("\\.", "-", col)
+  }
+  if (startsWith(col, "WKMedia")) {
+    col <- gsub("\\_", "-", col)
+  }
+  
+  # Special case for WKMedia
+  if (startsWith(col, "WKMedia")) {
+    col <- substr(col, 1, 15)
+  } else if (startsWith(col, "AF") || startsWith(col, "FS")) {
+    col <- substr(col, 1, 4)
+  } else if (startsWith(col, "WK")) {
+    col <- substr(col, 1, 13)
+  } else if (startsWith(col, "PFG")) {
+    col <- substr(col, 1, 14)
+  } else if (startsWith(col, "SRR11")) {
+    col <- substr(col, 1, 11)
+  } else if (startsWith(col, "SRR88")) {
+    col <- substr(col, 1, 10)
+  } else if (startsWith(col, "K")) {
+    col <- substr(col, 1, 2)
+  } else {
+    col <- substr(col, 1, 6)
+  }
+  
+  # Remove trailing underscore
+  col <- sub("_$", "", col)
+  col <- sub("-$", "", col)
+  return(col)
+})
+
+
+colnames(all)
+##############################
+# Trim whitespace from both column names and meta IDs
+clean_colnames <- trimws(colnames(all))
+clean_meta_ids <- trimws(meta$ID)
+
+# Find columns that are not in meta$ID
+invalid_cols <- setdiff(clean_colnames, clean_meta_ids)
+
+# View them
+invalid_cols
+########################################
+########################################
+PA <- all
+PA <- as.data.frame(PA)
+PA[is.na(PA)] <- 0
+PA[,-1] <- ifelse(all[-1] > 0,1,0)
+PA[is.na(PA)] <- 0
+richness <- c("Richness", colSums(PA[-1]))
+pa <- rbind(PA, richness)
+
+pa <- pa[94,]
+pa <- t(pa)
+pa <- as.data.frame(pa)
+colnames(pa) -> Null
+colnames(pa)[1] <- "Richness"
+pa <- rownames_to_column(pa, var = "Module")
+pa <- pa[-1,]
+colnames(pa)[1] <- "ID"
+pa$ID <- gsub("\\.", "-", pa$ID)
+
+richness <- merge(pa, meta, by ="ID")
+#########################################
+substrate_colors <- c(
+  "Dairy" = "#1f77b4", "Sugar" = "#ff7f0e", "Brine" = "#1b9e77",
+  "Soy" = "#d62728", "Coconut Dairy" = "#9467bd", "Cereal" = "#8c564b",
+  "Root and tuber" = "#e41a1c", "Seed" = "#7f7f7f",  "Palm Tree" = "#B565A7"
+)
+richness$Richness <- as.numeric(as.character(richness$Richness))
+richness_clean <- richness[!is.na(richness$Richness), ]
+shapiro.test(richness$Richness)
+kruskal.test(Richness ~ Substrate, data = richness)
+kruskal.test(Richness ~ State, data = richness)
+kruskal.test(Type.of.fermentation ~ Substrate, data = richness)
+dunn_result <- dunnTest(Richness ~ Substrate, data = richness, method = "bh")
+# Extract and clean results
+sig_pairs <- dunn_result$res %>%                                      # only significant
+  separate(Comparison, into = c("group1", "group2"), sep = " - ") %>%
+  mutate(
+    label = case_when(
+      P.adj < 0.001 ~ "***",
+      P.adj < 0.01 ~ "**",
+      P.adj < 0.05 ~ "*",  
+      P.adj > 0.05 ~ "NS"
+    ),
+    y.position = 20 + row_number()  # adjust Y positions if needed
+  )
+#ggboxplot(richness, x = "Substrate", y = "Richness", color = "Substrate", add = "jitter") +
+#stat_compare_means(method = "kruskal.test") 
+#######
+kw_test <- kruskal.test(Richness ~ Substrate, data = richness_clean)
+kw_p <- format.pval(kw_test$p.value, digits = 3, eps = 0.001)
+kw_label <- paste0("Effect of substrate on GMM richness\np = ", kw_p)
+q1 <- ggplot(richness_clean, aes(x = Substrate, y = Richness, fill = Substrate)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.6, color = "black") +
+  geom_jitter(
+    shape = 21, width = 0.2, size = 2.5, alpha = 0.5,
+    color = "black", stroke = 0.4, aes(fill = Substrate)
+  ) +
+  scale_fill_manual(values = substrate_colors) +
+  labs(
+    title = "",
+    x = "",
+    y = "Richness"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    axis.text.x = element_text(angle = 0, hjust = 0.6),
+    legend.position = "none"
+  ) +
+  annotate("label", 
+           x = 4, 
+           y = max(richness_clean$Richness) - 2, 
+           label = kw_label,
+           size = 4, fontface = "bold", fill = "white", color = "black") +
+  scale_y_continuous(
+    limits = c(0, NA),
+    expand = expansion(mult = c(0.06, 0.05))
+  )
+
+q2 <- ggplot(sig_pairs, aes(x = group1, y = group2, fill = label)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = label), color = "black", size = 3) +
+  scale_fill_manual(values = c(
+    "NS" = "white", 
+    "*" = "lightyellow", 
+    "**" = "yellow", 
+    "***" = "gold"
+  )) +
+  labs(title = "Pairwise Significance between substrates",
+       x = " ",
+       y = "",
+       fill = "Significance") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 0, hjust = 1, size = 8),   # smaller axis text
+    axis.text.y = element_text(size = 8),
+    plot.margin = margin(-150,2,2,2)  # smaller margins
+  ) +
+  coord_fixed(ratio = 0.18)  
+
+Q <- q1/q2 + plot_layout(heights = c(3, 4))
+Q
+R <- (P | Q) + plot_layout(heights = c(1, 2))
+
+R
+
+############
+# Pairwise Wilcoxon test with p-value adjustment
+pairwise_results <- richness %>%
+  pairwise_wilcox_test(Richness ~ Substrate, p.adjust.method = "BH")
+write.csv(pairwise_results, "pairwise_result_effect_of_substrate_GMM.csv")
+#############################################################################
+#############################################################################
+# Determine plot height cap and spacing
+y_max_data <- max(richness_clean$Richness, na.rm = TRUE)  # max value of actual data
+y_cap <- 90  # maximum y-axis limit (your preference)
+n_comparisons <- nrow(sig_pairs)
+
+# Dynamic spacing to fit all comparisons within y_cap
+spacing <- (y_cap - y_max_data - 1) / (n_comparisons + 1)  # 1 buffer
+
+sig_pairs <- sig_pairs %>%
+  mutate(
+    label = case_when(
+      P.adj < 0.001 ~ "***",
+      P.adj < 0.01 ~ "**",
+      P.adj < 0.05 ~ "*"
+    ),
+    y.position = y_max_data + 1 + row_number() * spacing
+  )
+
+######################################
+ggboxplot(richness_clean, x = "Substrate", y = "Richness",
+          color = "Substrate", palette = substrate_colors,
+          add = "jitter", add.params = list(size = 1.5, alpha = 0.4)) +
+  stat_pvalue_manual(sig_pairs,
+                     label = "label",
+                     y.position = "y.position",
+                     step.increase = 0.05,
+                     bracket.size = 0.3,
+                     tip.length = 0.005,
+                     size = 4) +
+  
+  scale_y_continuous(
+    breaks = seq(0, 100, by = 10)  # Only label up to 85
+  ) +
+  
+  coord_cartesian(ylim = c(0, 160)) +  # Extend axis to fit significance lines
+  
+  labs(title = "Impact of substrate on GMM richness",
+       x = "Substrate", y = "Richness") +
+  
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.major = element_blank(),  # remove major grid lines
+    panel.grid.minor = element_blank(),  # remove minor grid lines
+    panel.background = element_blank(),  # remove background color
+    axis.line = element_line(color = "black"),  # keep axes
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(face = "bold", size = 16),
+    legend.position = "none"
+  )
+######################
+row_1 <- plot_grid( p1, q1, nrow =1, ncol =2, rel_widths = c(0.5, 0.5), Labels = c("A", "B") )
+row_2 <- plot_grid( p2, q2, nrow =1, ncol =2, rel_heights=c(7,7), rel_widths = c(7, 7), Labels = c("C", "D") )
+plot_grid(
+  row_1, row_2,
+  nrow = 2,
+  rel_heights = c(1, 1.2)  # Adjust vertical space
+)
+
+
