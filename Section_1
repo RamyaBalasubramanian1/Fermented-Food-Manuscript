@@ -46,6 +46,110 @@ library(networkD3)
 library(htmlwidgets)
 library(purrr)
 library(cowplot)
+#install.packages("compositions")  
+library(compositions)
+library(stringr)
+library(janitor)
+library(ggplot2)
+library(janitor)
+library(dplyr)
+library(compositions)
+library(ghibli)
+library(factoextra)
+library(patchwork)
+library(pheatmap)
+library(ComplexHeatmap)
+install.packages("coloRamPalette")
+library(colorRampPalette)
+# Install the circlize package if not already installed
+if (!requireNamespace("circlize", quietly = TRUE)) {
+  install.packages("circlize")
+}
+#install.packages("ggnewscale")
+library(ggnewscale)
+library(pairwiseAdonis)
+library(ggrepel)
+library(ggrepel)#lifesaver
+library(rstatix)
+library(ggpubr)
+library(FSA)
+library(circlize)
+library(ggforce)
+library(vegan)
+if(!require(ggplot2)) install.packages("ggplot2")
+if(!require(factoextra)) install.packages("factoextra")
+library(gridExtra)
+library(ggplot2)
+library(factoextra)
+install.packages("kableExtra")
+library(kableExtra)
+#install.packages("devtools")
+#devtools::install_github("pmartinezarbizu/pairwiseAdonis", force = TRUE)
+library(pairwiseAdonis)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+#install.packages("ggalluvial")
+library(ggalluvial)
+#install.packages("ggsankey")
+library(ggsankey)
+#install.packages("networkD3")
+library(networkD3)
+library(htmlwidgets)
+library(purrr)
+#install.packages("compositions")  
+library(compositions)
+library(stringr)
+library(janitor)
+library(ggplot2)
+library(janitor)
+library(dplyr)
+library(compositions)
+library(ghibli)
+library(factoextra)
+library(patchwork)
+library(pheatmap)
+library(ComplexHeatmap)
+install.packages("coloRamPalette")
+library(colorRampPalette)
+# Install the circlize package if not already installed
+if (!requireNamespace("circlize", quietly = TRUE)) {
+  install.packages("circlize")
+}
+#install.packages("ggnewscale")
+library(ggnewscale)
+library(pairwiseAdonis)
+library(ggrepel)
+library(ggrepel)#lifesaver
+library(rstatix)
+library(ggpubr)
+library(FSA)
+library(circlize)
+library(ggforce)
+library(vegan)
+if(!require(ggplot2)) install.packages("ggplot2")
+if(!require(factoextra)) install.packages("factoextra")
+library(gridExtra)
+library(ggplot2)
+library(factoextra)
+install.packages("kableExtra")
+library(kableExtra)
+#install.packages("devtools")
+#devtools::install_github("pmartinezarbizu/pairwiseAdonis", force = TRUE)
+library(pairwiseAdonis)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+#install.packages("ggalluvial")
+library(ggalluvial)
+#install.packages("ggsankey")
+library(ggsankey)
+#install.packages("networkD3")
+library(networkD3)
+library(htmlwidgets)
+library(purrr)
 #############################
 meta <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/meta_insilico.csv")
 meta <- meta[,-c(7,8)]
@@ -534,7 +638,18 @@ plot_grid(
   nrow = 2,
   rel_heights = c(1, 1.2)  # Adjust vertical space
 )
-
+####################################
+####################################
+####################################
+####################################
+####################################
+####################################
+####################################
+####################################
+####################################
+####################################
+####################################
+###################################
 
 #############################
 meta <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/meta_insilico.csv")
@@ -1205,7 +1320,7 @@ p +
                   nudge_x = 0.1) +
   coord_fixed(ratio = 1) +
   scale_fill_manual(values = substrate_colors)  # Optional: use your predefined colors
-
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/scripts/final_figs/pca_gmm_plot.svg", plot = p, width = 8, height = 6, units = "in")
 
 ##############################
 ##############################
@@ -1271,7 +1386,7 @@ jaccard_df <- merge(jaccard_df, sample_substrate_map, by.x = "Sample", by.y = "I
 colnames(jaccard_df)[colnames(jaccard_df) == "Substrate"] <- "Substrate_category"
 jaccard_df <- jaccard_df[,-4]
 # 6. Plot
-ggplot(jaccard_df, aes(x = Sample, y = Distance, color = Substrate_category)) +
+p2 <- ggplot(jaccard_df, aes(x = Sample, y = Distance, color = Substrate_category)) +
   geom_boxplot(outlier.shape = NA) +
   geom_jitter(width = 0.2, alpha = 0.6, size = 0.9) +
   scale_color_manual(values = substrate_colors) +
@@ -1281,6 +1396,7 @@ ggplot(jaccard_df, aes(x = Sample, y = Distance, color = Substrate_category)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 10),
         legend.title = element_blank()) +
   ggtitle("Within-Substrate Jaccard Distances based on GMM composition")
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/scripts/final_figs/jaccard_gmm_plot.svg", plot = p2, width = 8, height = 6, units = "in")
 #############################################################
 #############################################################
 #stat time to check if there is effect of substrate on GBMand GMM composition
