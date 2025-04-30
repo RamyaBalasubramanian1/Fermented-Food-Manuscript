@@ -1,0 +1,152 @@
+#install.packages("compositions")  
+library(compositions)
+library(janitor)
+library(ggplot2)
+library(janitor)
+library(dplyr)
+library(compositions)
+library(ghibli)
+library(factoextra)
+library(patchwork)
+library(pheatmap)
+library(ComplexHeatmap)
+install.packages("coloRamPalette")
+library(colorRampPalette)
+# Install the circlize package if not already installed
+if (!requireNamespace("circlize", quietly = TRUE)) {
+  install.packages("circlize")
+}
+library(circlize)
+library(ggforce)
+library(vegan)
+if(!require(ggplot2)) install.packages("ggplot2")
+if(!require(factoextra)) install.packages("factoextra")
+library(gridExtra)
+library(ggplot2)
+library(factoextra)
+install.packages("kableExtra")
+library(kableExtra)
+#install.packages("devtools")
+#devtools::install_github("pmartinezarbizu/pairwiseAdonis", force = TRUE)
+library(pairwiseAdonis)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+#install.packages("ggalluvial")
+library(ggalluvial)
+#install.packages("ggsankey")
+library(ggsankey)
+#install.packages("networkD3")
+library(networkD3)
+library(htmlwidgets)
+#install.packages("webshot2")
+library(webshot2)
+#install.packages("rsvg")
+library(rsvg)
+###################################
+setwd("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file")
+#############################################################################
+meta <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/meta_insilico.csv")
+meta <- meta[,-c(7,8)]
+#######################
+
+links <- meta %>%
+  group_by(Substrate, State) %>%
+  summarise(value = n(), .groups = "drop") %>%
+  rename(source = Substrate, target = State) %>%
+  bind_rows(
+    meta %>%
+      group_by(State, Type.of.fermentation) %>%
+      summarise(value = n(), .groups = "drop") %>%
+      rename(source = State, target = Type.of.fermentation)
+  )
+
+
+nodes <- data.frame(
+  name = unique(c(links$source, links$target))
+)
+
+# Step 3: Convert source and target names into indices
+links$IDsource <- match(links$source, nodes$name) - 1
+links$IDtarget <- match(links$target, nodes$name) - 1
+
+# Step 4: Create the Sankey Diagram
+p <- sankeyNetwork(Links = links, Nodes = nodes,
+                   Source = "IDsource", Target = "IDtarget",
+                   Value = "value", NodeID = "name", 
+                   sinksRight = FALSE, fontSize = 12, nodeWidth = 30)
+
+# Step 5: Display the Sankey plot
+p
+
+
+# Save the Sankey plot as an HTML file
+saveWidget(p, file = "sankey_plot.html")
+##########################################################
+
+# Step 1: Create links
+links <- meta %>%
+  group_by(Substrate, State) %>%
+  summarise(value = n(), .groups = "drop") %>%
+  rename(source = Substrate, target = State) %>%
+  bind_rows(
+    meta %>%
+      group_by(State, Type.of.fermentation) %>%
+      summarise(value = n(), .groups = "drop") %>%
+      rename(source = State, target = Type.of.fermentation)
+  )
+
+# Step 2: Count metagenomes per Substrate and label
+substrate_counts <- meta %>%
+  count(Substrate, name = "n") %>%
+  mutate(labeled = paste0(Substrate, " (n = ", n, ")"))
+
+# Step 3: Create nodes and relabel Substrates
+nodes <- data.frame(name = unique(c(links$source, links$target)))
+
+# Map original Substrate names to labeled ones
+nodes <- nodes %>%
+  left_join(substrate_counts, by = c("name" = "Substrate")) %>%
+  mutate(name = ifelse(is.na(labeled), name, labeled)) %>%
+  select(name)
+
+# Step 4: Update links to match updated node labels
+name_map <- nodes %>%
+  mutate(original = gsub(" \\(n =.*\\)", "", name))
+
+links <- links %>%
+  mutate(
+    source = name_map$name[match(source, name_map$original)],
+    target = name_map$name[match(target, name_map$original)]
+  )
+
+# Step 5: Map source/target to indices
+links$IDsource <- match(links$source, nodes$name) - 1
+links$IDtarget <- match(links$target, nodes$name) - 1
+
+# Step 6: Create and display Sankey
+p <- sankeyNetwork(Links = links, Nodes = nodes,
+                   Source = "IDsource", Target = "IDtarget",
+                   Value = "value", NodeID = "name",
+                   sinksRight = FALSE, fontSize = 16, nodeWidth = 30)
+
+# Display Sankey
+p
+##########################################################
+p <- htmlwidgets::onRender(p, '
+  function(el) {
+    // Move text to the left of nodes
+    d3.select(el).selectAll(".node text")
+      .attr("x", -6)
+      .attr("text-anchor", "end");
+
+    // Adjust the SVG margin to prevent text clipping
+    var svg = d3.select(el).select("svg");
+    svg.attr("viewBox", "-150 0 900 500");  // Shift the viewBox left
+  }
+')
+p
+
+htmlwidgets::saveWidget(p, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/sankey_plot.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/sankey_plot.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/sankey_plot.pdf", selector = "pdf")
