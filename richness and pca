@@ -28,7 +28,7 @@ if(!require(factoextra)) install.packages("factoextra")
 library(gridExtra)
 library(ggplot2)
 library(factoextra)
-install.packages("kableExtra")
+#install.packages("kableExtra")
 library(kableExtra)
 #install.packages("devtools")
 #devtools::install_github("pmartinezarbizu/pairwiseAdonis", force = TRUE)
@@ -59,8 +59,7 @@ library(factoextra)
 library(patchwork)
 library(pheatmap)
 library(ComplexHeatmap)
-install.packages("coloRamPalette")
-library(colorRampPalette)
+
 # Install the circlize package if not already installed
 if (!requireNamespace("circlize", quietly = TRUE)) {
   install.packages("circlize")
@@ -269,6 +268,7 @@ library(ggpubr)
 kw_test <- kruskal.test(Richness ~ Substrate, data = richness_clean)
 kw_p <- format.pval(kw_test$p.value, digits = 3, eps = 0.001)
 kw_label <- paste0("Effect of substrate on GBM richness\np = ", kw_p)
+
 p1<- ggplot(richness_clean, aes(x = Substrate, y = Richness, fill = Substrate)) +
   geom_boxplot(outlier.shape = NA, alpha = 0.6, color = "black") +
   geom_jitter(
@@ -296,7 +296,7 @@ p1<- ggplot(richness_clean, aes(x = Substrate, y = Richness, fill = Substrate)) 
     expand = expansion(mult = c(0.06, 0.05))
   )
 
-
+ggsave(filename = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/gbm_richness_plot.svg", plot = p1, width = 8, height = 6, units = "in", dpi = 300, device = "svg")
 
 
 #stat test
@@ -338,9 +338,8 @@ p2 <-  ggplot(sig_pairs, aes(x = group1, y = group2, fill = label)) +
     plot.margin = margin(-150,2,2,2)  # smaller margins
   ) +
   coord_fixed(ratio = 0.18) 
-P <- p1/p2 + plot_layout(heights = c(3, 3))
-P
 
+ggsave(filename = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/gbm_richness_pairwise_plot.svg", plot = p2, width = 8, height = 6, units = "in", dpi = 300, device = "svg")
 
 #ggboxplot(richness, x = "Substrate", y = "Richness", color = "Substrate", add = "jitter") +
 #stat_compare_means(method = "kruskal.test") 
@@ -546,7 +545,7 @@ q1 <- ggplot(richness_clean, aes(x = Substrate, y = Richness, fill = Substrate))
     limits = c(0, NA),
     expand = expansion(mult = c(0.06, 0.05))
   )
-
+ggsave(filename = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/gmm_richness_plot.svg", plot = q1, width = 8, height = 6, units = "in", dpi = 300, device = "svg")
 q2 <- ggplot(sig_pairs, aes(x = group1, y = group2, fill = label)) +
   geom_tile(color = "white") +
   geom_text(aes(label = label), color = "black", size = 3) +
@@ -568,11 +567,7 @@ q2 <- ggplot(sig_pairs, aes(x = group1, y = group2, fill = label)) +
   ) +
   coord_fixed(ratio = 0.18)  
 
-Q <- q1/q2 + plot_layout(heights = c(3, 4))
-Q
-R <- (P | Q) + plot_layout(heights = c(1, 2))
-
-R
+ggsave(filename = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/gmm_richness_pairwise_plot.svg", plot = q2, width = 8, height = 6, units = "in", dpi = 300, device = "svg")
 
 ############
 # Pairwise Wilcoxon test with p-value adjustment
@@ -649,8 +644,8 @@ plot_grid(
 ####################################
 ####################################
 ####################################
-###################################
-
+####################################
+####################################
 #############################
 meta <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/meta_insilico.csv")
 meta <- meta[,-c(7,8)]
@@ -844,8 +839,8 @@ top_features <- head(top_features, 5)
 top_features <- merge(top_features, anno[, c("Module", "Pathway")], by = "Module", all.x = TRUE)
 
 # Scale loadings for plot clarity
-top_features$PC1 <- top_features$PC1 * 5
-top_features$PC2 <- top_features$PC2 * 5
+top_features$PC1 <- top_features$PC1 * 10
+top_features$PC2 <- top_features$PC2 * 10
 
 # Plot PCA with pathway arrows and labels
 
@@ -881,7 +876,7 @@ s1 <- s1 +
   coord_fixed(ratio = 1) +
   scale_fill_manual(values = substrate_colors) +  # <--- apply your custom colors here
   theme_minimal()
-ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/scripts/final_figs/pca_gbm_plot.svg", plot = s1, width = 8, height = 6, units = "in")
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_1/pca_gbm_plot.svg", plot = s1, width = 8, height = 6, units = "in")
 
 ##############################
 ##############################
@@ -1239,11 +1234,13 @@ pca$ID <- rownames(pca)
 
 
 #First, the main plot. Plot the first two components of the PCA
-p <-ggplot(pca, aes(x = PC1, y = PC2, color = Substrate)) +
+
+#First, the main plot. Plot the first two components of the PCA
+s2 <-ggplot(pca, aes(x = PC1, y = PC2, color = Substrate)) +
   geom_point(size = 3, alpha = 0.8) +
   scale_color_manual(values = substrate_colors) +
   labs(
-    title = "Gut-metabolic modules composition of fermented foods",
+    title = "Gut metabolic modules composition of fermented foods",
     x = paste0("PC1 (", pc1, "%)"),
     y = paste0("PC2 (", pc2, "%)")
   ) +
@@ -1256,22 +1253,6 @@ p <-ggplot(pca, aes(x = PC1, y = PC2, color = Substrate)) +
     legend.position = "right"
   )
 #########
-q<- ggplot(pca, aes(x = PC1, y = PC2, color = Substrate, shape = TOF)) +
-  geom_point(size = 3, alpha = 0.8) +
-  scale_color_manual(values = substrate_colors) +
-  labs(
-    title = "PCA of CLR-Transformed Pathways by Substrate and TOF",
-    x = paste0("PC1 (", pc1, "%)"),
-    y = paste0("PC2 (", pc2, "%)")
-  ) +
-  theme_minimal() +
-  theme(
-    axis.text = element_text(size = 10),
-    axis.title = element_text(size = 12, face = "bold"),
-    legend.title = element_text(size = 12),
-    legend.text = element_text(size = 10),
-    legend.position = "right"
-  )
 ##############################
 ##############################
 
@@ -1289,38 +1270,38 @@ top_features <- head(top_features, 10)
 top_features <- merge(top_features, anno[, c("Module", "Pathway")], by = "Module", all.x = TRUE)
 
 # Scale loadings for plot clarity
-top_features$PC1 <- top_features$PC1 * 10
-top_features$PC2 <- top_features$PC2 * 10
+top_features$PC1 <- top_features$PC1 * 15
+top_features$PC2 <- top_features$PC2 * 15
 
-# Plot PCA with pathway arrows and labels
-
-
-# Updated PCA biplot with non-overlapping labels
-p + 
+s2 <- s2 +
   geom_point(aes(fill = Substrate), 
-             shape = 21,          # Circle with border
-             size = 3, 
-             color = "black",     # Outline color
-             stroke = 0.7) +      # Outline thickness
+             shape = 21,    # filled circle with outline
+             size = 3,
+             color = "black",  # black border
+             stroke = 0.7) +
   geom_segment(data = top_features, 
                aes(x = 0, y = 0, xend = PC1, yend = PC2),
                arrow = arrow(length = unit(0.25, "cm"), type = "closed"),
                color = "red", size = 0.9, lineend = "round") +
-  geom_text_repel(data = top_features, 
-                  aes(x = PC1, y = PC2, label = Pathway), 
-                  size = 3.5,
-                  color = "black",
-                  max.overlaps = 50,
-                  box.padding = 0.5,
-                  point.padding = 0.3,
-                  segment.size = 0.3,
-                  segment.color = "grey30",
-                  force = 1.5,
-                  nudge_y = 0.1,
-                  nudge_x = 0.1) +
+  geom_label_repel(
+    data = top_features,
+    aes(x = PC1, y = PC2, label = Pathway),
+    size = 3.5,
+    color = "black",
+    fill = "white",          # white background
+    max.overlaps = 50,
+    box.padding = 0.5,
+    point.padding = 0.3,
+    segment.size = 0.3,
+    segment.color = "grey30",
+    force = 1.5,
+    nudge_y = 0.1,
+    nudge_x = 0.1
+  ) +
   coord_fixed(ratio = 1) +
-  scale_fill_manual(values = substrate_colors)  # Optional: use your predefined colors
-ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/scripts/final_figs/pca_gmm_plot.svg", plot = p, width = 8, height = 6, units = "in")
+  scale_fill_manual(values = substrate_colors) +  # <--- apply your custom colors here
+  theme_minimal()
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_1/pca_gmm_plot.svg", plot = s2, width = 8, height = 6, units = "in")
 
 ##############################
 ##############################
