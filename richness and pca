@@ -11,12 +11,12 @@ library(factoextra)
 library(patchwork)
 library(pheatmap)
 library(ComplexHeatmap)
-install.packages("coloRamPalette")
-library(colorRampPalette)
 # Install the circlize package if not already installed
 if (!requireNamespace("circlize", quietly = TRUE)) {
   install.packages("circlize")
 }
+#install.packages("rcompanion")
+library(rcompanion)
 library(rstatix)
 library(ggpubr)
 library(FSA)
@@ -59,11 +59,6 @@ library(factoextra)
 library(patchwork)
 library(pheatmap)
 library(ComplexHeatmap)
-
-# Install the circlize package if not already installed
-if (!requireNamespace("circlize", quietly = TRUE)) {
-  install.packages("circlize")
-}
 #install.packages("ggnewscale")
 library(ggnewscale)
 library(pairwiseAdonis)
@@ -80,8 +75,6 @@ if(!require(factoextra)) install.packages("factoextra")
 library(gridExtra)
 library(ggplot2)
 library(factoextra)
-install.packages("kableExtra")
-library(kableExtra)
 #install.packages("devtools")
 #devtools::install_github("pmartinezarbizu/pairwiseAdonis", force = TRUE)
 library(pairwiseAdonis)
@@ -110,12 +103,12 @@ library(factoextra)
 library(patchwork)
 library(pheatmap)
 library(ComplexHeatmap)
-install.packages("coloRamPalette")
-library(colorRampPalette)
+#install.packages("coloRamPalette")
+
 # Install the circlize package if not already installed
-if (!requireNamespace("circlize", quietly = TRUE)) {
-  install.packages("circlize")
-}
+#if (!requireNamespace("circlize", quietly = TRUE)) {
+#  install.packages("circlize")
+#}
 #install.packages("ggnewscale")
 library(ggnewscale)
 library(pairwiseAdonis)
@@ -127,12 +120,12 @@ library(FSA)
 library(circlize)
 library(ggforce)
 library(vegan)
-if(!require(ggplot2)) install.packages("ggplot2")
-if(!require(factoextra)) install.packages("factoextra")
+if(!require(ggplot2)) #install.packages("ggplot2")
+if(!require(factoextra)) #install.packages("factoextra")
 library(gridExtra)
 library(ggplot2)
 library(factoextra)
-install.packages("kableExtra")
+#install.packages("kableExtra")
 library(kableExtra)
 #install.packages("devtools")
 #devtools::install_github("pmartinezarbizu/pairwiseAdonis", force = TRUE)
@@ -152,6 +145,7 @@ library(purrr)
 #############################
 meta <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/meta_insilico.csv")
 meta <- meta[,-c(7,8)]
+meta <- meta[meta$Type.of.fermentation != "Not applicable",]
 #############################
 aff <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/AFF/gbm/modules.tsv", header=TRUE)
 fs <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/FS/gbm/modules.tsv", header = TRUE)
@@ -303,8 +297,19 @@ ggsave(filename = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-si
 shapiro.test(richness$Richness)
 kruskal.test(Richness ~ Substrate, data = richness)
 kruskal.test(Richness ~ State, data = richness)
-kruskal.test(Type.of.fermentation ~ Substrate, data = richness)
+kruskal.test(Richness ~ Type.of.fermentation, data = richness)
 dunn_result <- dunnTest(Richness ~ Substrate, data = richness, method = "bh")
+#calculating effect size
+richness %>%
+  kruskal_effsize(Richness ~ Substrate)
+
+# State
+richness %>%
+  kruskal_effsize(Richness ~ State)
+
+# Type of fermentation
+richness %>%
+  kruskal_effsize(Richness ~ Type.of.fermentation)
 # Extract and clean results
 sig_pairs <- dunn_result$res %>%                                      # only significant
   separate(Comparison, into = c("group1", "group2"), sep = " - ") %>%
@@ -340,6 +345,36 @@ p2 <-  ggplot(sig_pairs, aes(x = group1, y = group2, fill = label)) +
   coord_fixed(ratio = 0.18) 
 
 ggsave(filename = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/gbm_richness_pairwise_plot.svg", plot = p2, width = 8, height = 6, units = "in", dpi = 300, device = "svg")
+#######################################
+p1s <- ggplot(richness_clean, aes(x = State, y = Richness, fill = State)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.6, color = "black") +
+  geom_jitter(
+    shape = 21, width = 0.2, size = 2.5, alpha = 0.5,
+    color = "black", stroke = 0.4, aes(fill = Substrate)
+  ) +
+  scale_fill_manual(values = substrate_colors) +
+  labs(
+    title = "",
+    x = "",
+    y = "Richness"
+  ) +
+  theme_minimal(base_size = 14) 
+ggsave(filename = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_1/gbm_richness_sof.svg", plot = p1s, width = 8, height = 6, units = "in", dpi = 300, device = "svg")
+
+p2s <- ggplot(richness_clean, aes(x = Type.of.fermentation, y = Richness, fill =Type.of.fermentation)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.6, color = "black") +
+  geom_jitter(
+    shape = 21, width = 0.2, size = 2.5, alpha = 0.5,
+    color = "black", stroke = 0.4, aes(fill = Substrate)
+  ) +
+  scale_fill_manual(values = substrate_colors) +
+  labs(
+    title = "",
+    x = "",
+    y = "Richness"
+  ) +
+  theme_minimal(base_size = 14) 
+ggsave(filename = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_1/gbm_richness_tof.svg", plot = p2s, width = 8, height = 6, units = "in", dpi = 300, device = "svg")
 
 #ggboxplot(richness, x = "Substrate", y = "Richness", color = "Substrate", add = "jitter") +
 #stat_compare_means(method = "kruskal.test") 
@@ -499,7 +534,23 @@ richness_clean <- richness[!is.na(richness$Richness), ]
 shapiro.test(richness$Richness)
 kruskal.test(Richness ~ Substrate, data = richness)
 kruskal.test(Richness ~ State, data = richness)
-kruskal.test(Type.of.fermentation ~ Substrate, data = richness)
+kruskal.test(Type.of.fermentation ~ Richness, data = richness)
+##################################################################
+##################################################################
+# Substrate
+richness %>%
+  kruskal_effsize(Richness ~ Substrate)
+
+# State
+richness %>%
+  kruskal_effsize(Richness ~ State)
+
+# Type of fermentation
+richness %>%
+  kruskal_effsize(Richness ~ Type.of.fermentation)
+#############
+kruskal.effect.size(Richness ~ Substrate, data = richness)
+
 dunn_result <- dunnTest(Richness ~ Substrate, data = richness, method = "bh")
 # Extract and clean results
 sig_pairs <- dunn_result$res %>%                                      # only significant
@@ -568,6 +619,36 @@ q2 <- ggplot(sig_pairs, aes(x = group1, y = group2, fill = label)) +
   coord_fixed(ratio = 0.18)  
 
 ggsave(filename = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/gmm_richness_pairwise_plot.svg", plot = q2, width = 8, height = 6, units = "in", dpi = 300, device = "svg")
+###############
+q1s <- ggplot(richness_clean, aes(x = State, y = Richness, fill = State)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.6, color = "black") +
+  geom_jitter(
+    shape = 21, width = 0.2, size = 2.5, alpha = 0.5,
+    color = "black", stroke = 0.4, aes(fill = Substrate)
+  ) +
+  scale_fill_manual(values = substrate_colors) +
+  labs(
+    title = "",
+    x = "",
+    y = "Richness"
+  ) +
+  theme_minimal(base_size = 14) 
+ggsave(filename = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_1/gmm_richness_sof.svg", plot = q1s, width = 8, height = 6, units = "in", dpi = 300, device = "svg")
+
+q2s <- ggplot(richness_clean, aes(x = Type.of.fermentation, y = Richness, fill =Type.of.fermentation)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.6, color = "black") +
+  geom_jitter(
+    shape = 21, width = 0.2, size = 2.5, alpha = 0.5,
+    color = "black", stroke = 0.4, aes(fill = Substrate)
+  ) +
+  scale_fill_manual(values = substrate_colors) +
+  labs(
+    title = "",
+    x = "",
+    y = "Richness"
+  ) +
+  theme_minimal(base_size = 14) 
+ggsave(filename = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_1/gmm_richness_tof.svg", plot = p2s, width = 8, height = 6, units = "in", dpi = 300, device = "svg")
 
 ############
 # Pairwise Wilcoxon test with p-value adjustment
@@ -949,7 +1030,7 @@ t1 <- ggplot(jaccard_df, aes(x = Sample, y = Distance, color = Substrate_categor
         legend.title = element_blank()) +
   ggtitle("Within-Substrate Jaccard Distances based on GBM composition")
 
-ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/scripts/final_figs/jaccard_gbm_plot.svg", plot = t1, width = 8, height = 6, units = "in")
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/scripts/final_figs/section_1/jaccard_gbm_plot_boxplot.svg", plot = t1, width = 8, height = 6, units = "in")
 
 ################################################################
 ################################################################
@@ -1038,16 +1119,27 @@ jaccard_coords$ID <- rownames(jaccard_coords)
 # 6. Merge with filtered meta
 pca_df <- left_join(jaccard_coords, meta_pa, by = "ID")
 
+
 # 7. Plot
-ggplot(pca_df, aes(x = PC1, y = PC2, fill = Substrate)) +
-  geom_point(shape = 21, size = 3, alpha = 0.8, color = "black", stroke = 0.6) +
-  labs(
-    title = "GBM composition-Jaccard distance",
-    x = paste0("PCoA 1 (", pc1_var, "%)"),
-    y = paste0("PCoA 2 (", pc2_var, "%)")
-  ) +
+jac_gbm <- ggplot(pca_df, aes(x = PC1, y = PC2, fill = Substrate)) +
+  geom_point(shape = 21, size = 3, alpha = 0.8, stroke = 0.7, color = "black") +
   scale_fill_manual(values = substrate_colors) +
-  theme_minimal()
+  labs(
+    title = "Gut brain modules composition of fermented foods-presence/absence",
+    x = paste0("PC1 (", pc1, "%)"),
+    y = paste0("PC2 (", pc2, "%)")
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12, face = "bold"),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10),
+    legend.position = "right"
+  )
+############################################
+
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_1/jaccard_gbm_pca.svg", plot = jac_gbm, width = 8, height = 6, units = "in")
 
 
 
@@ -1377,7 +1469,7 @@ p2 <- ggplot(jaccard_df, aes(x = Sample, y = Distance, color = Substrate_categor
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 10),
         legend.title = element_blank()) +
   ggtitle("Within-Substrate Jaccard Distances based on GMM composition")
-ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/scripts/final_figs/jaccard_gmm_plot.svg", plot = p2, width = 8, height = 6, units = "in")
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_1/jaccard_gmm_plot.svg", plot = p2, width = 8, height = 6, units = "in")
 #############################################################
 #############################################################
 #stat time to check if there is effect of substrate on GBMand GMM composition
@@ -1468,17 +1560,28 @@ jaccard_coords$ID <- rownames(jaccard_coords)
 pca_df <- left_join(jaccard_coords, meta_pa, by = "ID")
 
 # 7. Plot
-ggplot(pca_df, aes(x = PC1, y = PC2, color = Substrate)) +
-  geom_point(shape = 21, size = 3, alpha = 0.8, color = "black", stroke = 0.6) +
+jac_gmm <- ggplot(pca_df, aes(x = PC1, y = PC2, fill = Substrate)) +
+  geom_point(shape = 21, size = 3, alpha = 0.8, stroke = 0.7, color = "black") +
+  scale_fill_manual(values = substrate_colors) +
   labs(
-    title = "GMM composition-Jaccard distance",
-    x = paste0("PCoA 1 (", pc1_var, "%)"),
-    y = paste0("PCoA 2 (", pc2_var, "%)")
+    title = "Gut metabolic modules composition of fermented foods-presence/absence",
+    x = paste0("PC1 (", pc1, "%)"),
+    y = paste0("PC2 (", pc2, "%)")
   ) +
-  scale_color_manual(values = substrate_colors) +
-  theme_minimal()
+  theme_minimal() +
+  theme(
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12, face = "bold"),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10),
+    legend.position = "right"
+  )
+############################################
+
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_1/jaccard_gmm_pca.svg", plot = jac_gmm, width = 8, height = 6, units = "in")
 
 
+  
 
 #################
 adonis_result <- adonis2(jaccard_dist ~ Substrate + State + Type.of.fermentation,
