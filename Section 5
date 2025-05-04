@@ -1,0 +1,878 @@
+#install.packages("compositions")  # Uncomment if you haven't installed it yet
+library(compositions)
+library(janitor)
+library(ggplot2)
+library(janitor)
+library(dplyr)
+library(compositions)
+library(ghibli)
+library(factoextra)
+library(patchwork)
+library(pheatmap)
+library(ComplexHeatmap)
+# Install the circlize package if not already installed
+if (!requireNamespace("circlize", quietly = TRUE)) {
+  install.packages("circlize")
+}
+# Load the circlize library
+library(circlize)
+library(vegan)
+if(!require(ggplot2)) install.packages("ggplot2")
+if(!require(factoextra)) install.packages("factoextra")
+library(gridExtra)
+# Load the libraries
+library(ggplot2)
+library(factoextra)
+#install.packages("kableExtra")
+library(kableExtra)
+#install.packages("devtools")
+#devtools::install_github("pmartinezarbizu/pairwiseAdonis", force = TRUE)
+library(pairwiseAdonis)
+library(tidyverse)
+############################################################################
+############################################################################
+################################################################################
+################################################################################
+substrate_colors <- c(
+  "Dairy" = "#1f77b4", "Sugar" = "#ff7f0e", "Brine" = "#1b9e77",
+  "Soy" = "#d62728", "Coconut Dairy" = "#9467bd", "Cereal" = "#8c564b",
+  "Root and tuber" = "#e41a1c", "Seed" = "#7f7f7f",  "Palm Tree" = "#B565A7"
+)
+data <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute.csv")
+meta <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute_by_R.csv")
+meta <- meta[,c(1:5)]
+meta <- meta %>%
+  mutate(Type = str_replace(Type, "Coconut mik", "Coconut milk"))
+# Separate the LOD values (last row) from the data
+lod_values <- data[nrow(data), ]
+data <- data[-nrow(data), ]  # Remove the last row to keep only the data
+
+# Identify common columns in `data` and `lod_values`, excluding the first column in `data`
+common_cols <- intersect(names(data)[-c(1,2)], names(lod_values))
+
+# Apply the LOD replacement for each column in `data` that has a corresponding LOD in `lod_values`
+for (col in common_cols) {
+  data[[col]] <- ifelse(as.numeric(data[[col]]) < as.numeric(lod_values[[col]]), 
+                        as.numeric(lod_values[[col]]), 
+                        as.numeric(data[[col]]))
+}
+data <- data %>%
+  column_to_rownames(var = "Customer.ID")
+meta <- meta %>%
+  column_to_rownames(var = "Customer.ID")
+data <- data[,-1]
+
+################################################
+################################################
+
+
+# Apply CLR transformation
+clr_transformed_data <- clr(data)
+clr_transformed_data <- as.data.frame(clr_transformed_data)
+anyNA(clr_transformed_data)
+
+# View the transformed data
+head(clr_transformed_data)
+set.seed(101)
+# Perform PCA
+pca_results <- prcomp(data, scale. = TRUE)
+
+# Define a distinct color palette
+custom_colors_distinct <- c(
+  "#FF5733", "#92A1CF", "#3357FF", "#FF33A8", "#FFD700",
+  "#8B4513", "#40E0D0", "#FF6347", "#6A5ACD", "#7FFF00",
+  "#DC143C", "#00CED1", "#FFDAB9", "#8A2BE2", "#FF4500",
+  "#2E8B57", "#DA70D6", "#9ACD32", "#FF1493", "#000080"
+)
+
+# Create PCA data frame with meta information
+pca_data <- as.data.frame(pca_results$x)
+pca_data <- pca_data[-37,]
+pca_data$Type <- meta$Type
+pca_data$Status <- meta$Status
+pca_data$Substrate <- meta$Substrate
+pca_data$Fermentation_type <- meta$Fermentation_type
+# Adjust the size scale for each Substrate level
+# Calculate the proportion of variance explained by each component
+explained_variance <- round(100 * (pca_results$sdev^2 / sum(pca_results$sdev^2)), 2)
+explained_variance_labels <- paste0("PC", 1:length(explained_variance), " (", explained_variance, "%)")
+# Example plotting code without scale_stroke_manual
+# Plot PCA with explained variance in axis labels
+# Plot PCA with shape for Substrate and size for Status
+
+#######################################
+# Assign colors based on Substrate
+meta$Color <- substrate_colors[meta$Substrate]
+############################################################################
+m <- ggplot(pca_data, aes(x = PC1, y = PC2, fill = Type, shape = Status, size = Status)) +
+  geom_point(color = "black", stroke = 1.5) +  # Black outline for all points
+  scale_fill_manual(values = custom_colors_distinct, 
+                    guide = guide_legend(override.aes = list(shape = 21, size = 6, color = "black"))  # Ensure legend uses correct colors
+  ) +
+  scale_shape_manual(values = c("Fermented" = 21, "Unfermented" = 24), 
+                     guide = guide_legend(override.aes = list(size = 6, fill = NA))) +  # Ensure shape legend is correct
+  scale_size_manual(values = c("Fermented" = 8, "Unfermented" = 5), 
+                    guide = "none") +  # Hides redundant size legend
+  theme_minimal() +
+  labs(
+    title = "PCA Plot Global metabolites",
+    x = explained_variance_labels[1],  # PC1 with % variance
+    y = explained_variance_labels[2]   # PC2 with % variance
+  ) +
+  theme(
+    legend.position = "right",  # Keep legend on the right
+    legend.title = element_text(size = 14, face = "bold"),  # Larger legend title
+    legend.text = element_text(size = 12),  # Larger legend text
+    axis.text.x = element_text(size = 14, face = "bold"),  # Larger x-axis labels
+    axis.title.x = element_text(size = 16, face = "bold"), # Larger x-axis title
+    axis.text.y = element_text(size = 14, face = "bold"),  # Larger y-axis labels
+    axis.title.y = element_text(size = 16, face = "bold")  # Larger y-axis title
+  )
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/pca_global.svg", plot = m, width = 8, height = 6, units = "in")
+#################################################################
+#aligning with the color palette
+
+m <- ggplot(pca_data, aes(x = PC1, y = PC2, fill = Substrate, shape = Status, size = Status)) +
+  geom_point(color = "black", stroke = 1.5) +
+  scale_fill_manual(values = substrate_colors,
+                    guide = guide_legend(override.aes = list(shape = 21, size = 6, color = "black"))) +
+  scale_shape_manual(values = c("Fermented" = 21, "Unfermented" = 24),
+                     guide = guide_legend(override.aes = list(size = 6, fill = NA))) +
+  scale_size_manual(values = c("Fermented" = 8, "Unfermented" = 5), guide = "none") +
+  theme_minimal() +
+  labs(
+    title = "PCA Plot Global Metabolites",
+    x = explained_variance_labels[1],
+    y = explained_variance_labels[2]
+  ) +
+  theme(
+    legend.position = "right",
+    legend.title = element_text(size = 14, face = "bold"),
+    legend.text = element_text(size = 12),
+    axis.text.x = element_text(size = 14, face = "bold"),
+    axis.title.x = element_text(size = 16, face = "bold"),
+    axis.text.y = element_text(size = 14, face = "bold"),
+    axis.title.y = element_text(size = 16, face = "bold")
+  )
+m <- ggplot(pca_data, aes(x = PC1, y = PC2, fill = Substrate, shape = Status, size = Status)) +
+  geom_point(color = "black", stroke = 1.5) +
+  scale_fill_manual(values = substrate_colors,
+                    guide = guide_legend(override.aes = list(shape = 21, size = 6, color = "black"))) +
+  scale_shape_manual(values = c("Fermented" = 21, "Unfermented" = 24),
+                     guide = guide_legend(override.aes = list(size = 6, fill = NA))) +
+  scale_size_manual(values = c("Fermented" = 8, "Unfermented" = 5), guide = "none") +
+  theme_minimal() +
+  labs(
+    title = "PCA Plot Global Metabolites",
+    x = explained_variance_labels[1],
+    y = explained_variance_labels[2]
+  ) +
+  theme(
+    legend.position = "right",
+    legend.title = element_text(size = 14, face = "bold"),
+    legend.text = element_text(size = 12),
+    axis.text.x = element_text(size = 14, face = "bold"),
+    axis.title.x = element_text(size = 16, face = "bold"),
+    axis.text.y = element_text(size = 14, face = "bold"),
+    axis.title.y = element_text(size = 16, face = "bold")
+  )
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/pca_global.svg", plot = m, width = 8, height = 6, units = "in")
+#################################################################
+# Define subsets
+pca_coconut <- pca_data %>% filter(Type %in% c("Coconut milk kefir", "Unfermented Coconut milk"))
+pca_kombucha <- pca_data %>% filter(Type %in% c("Kombucha", "Unfermented tea", "Water kefir", "Unfermented fig"))
+pca_milk <- pca_data %>% filter(Type %in% c("Unfermented Milk", "Milk Kefir"))
+pca_sauerkraut <- pca_data %>% filter(Type %in% c("Sauerkraut", "Sauerkraut Broth", "Kvass", "Kimchi"))
+
+# Function to create PCA plot
+create_pca_plot <- function(pca_subset, title) {
+  ggplot(pca_subset, aes(x = PC1, y = PC2, fill = Type, shape = Status, size = Status)) +
+    geom_point(color = "black", stroke = 1.5) +
+    scale_fill_manual(values = custom_colors_distinct, 
+                      guide = guide_legend(override.aes = list(shape = 21, size = 6, color = "black"))) +
+    scale_shape_manual(values = c("Fermented" = 21, "Unfermented" = 24), 
+                       guide = guide_legend(override.aes = list(size = 6, fill = NA))) +
+    scale_size_manual(values = c("Fermented" = 8, "Unfermented" = 5), guide = "none") +
+    theme_minimal() +
+    labs(title = title,
+         x = explained_variance_labels[1],  
+         y = explained_variance_labels[2]) +
+    theme(
+      legend.position = "right",
+      legend.box = "vertical",
+      legend.spacing.y = unit(0.8, "cm"),
+      legend.title = element_text(size = 14, face = "bold"),
+      legend.text = element_text(size = 12),
+      axis.text.x = element_text(size = 14, face = "bold"),
+      axis.title.x = element_text(size = 16, face = "bold"),
+      axis.text.y = element_text(size = 14, face = "bold"),
+      axis.title.y = element_text(size = 16, face = "bold")
+    )
+}
+
+# Create individual plots
+p1 <- create_pca_plot(pca_coconut, "PCA - Coconut Milk Kefir & Unfermented Coconut Milk")
+p2 <- create_pca_plot(pca_kombucha, "PCA - Kombucha, Water Kefir, Unfermented Tea & Fig")
+p3 <- create_pca_plot(pca_milk, "PCA - Milk & Milk Kefir")
+p4 <- create_pca_plot(pca_sauerkraut, "PCA - Sauerkraut, Kvass, Kimchi & Sauerkraut Broth")
+
+# Combine all plots in a 2x2 layout
+n <- (p1 | p2) /
+  (p3 | p4)
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/pca_global_split.svg", plot = n, width = 12, height = 6, units = "in")
+############################
+
+############################
+meta$Substrate[meta$Type %in% c("Coconut milk kefir", "Unfermented Coconut milk")] <- "Coconut Dairy"
+pca_data$Substrate <- meta$Substrate  # Refresh with the updated Substrate column
+
+# Define subsets by Type (keep this as is)
+pca_coconut <- pca_data %>% filter(Type %in% c("Coconut milk kefir", "Unfermented Coconut milk"))
+pca_kombucha <- pca_data %>% filter(Type %in% c("Kombucha", "Unfermented tea", "Water kefir", "Unfermented fig"))
+pca_milk <- pca_data %>% filter(Type %in% c("Unfermented Milk", "Milk Kefir"))
+pca_sauerkraut <- pca_data %>% filter(Type %in% c("Sauerkraut", "Sauerkraut Broth", "Kvass", "Kimchi"))
+
+# Updated PCA plotting function using Substrate for fill
+create_pca_plot <- function(pca_subset, title) {
+  ggplot(pca_subset, aes(x = PC1, y = PC2, fill = Substrate, shape = Status, size = Status)) +
+    geom_point(color = "black", stroke = 0.5) +
+    scale_fill_manual(values = substrate_colors,
+                      guide = guide_legend(override.aes = list(shape = 21, size = 6, color = "black"))) +
+    scale_shape_manual(values = c("Fermented" = 21, "Unfermented" = 24),
+                       guide = guide_legend(override.aes = list(size = 6, fill = NA))) +
+    scale_size_manual(values = c("Fermented" = 4, "Unfermented" = 4), guide = "none") +
+    theme_minimal() +
+    labs(title = title,
+         x = explained_variance_labels[1],  
+         y = explained_variance_labels[2]) +
+    theme(
+      legend.position = "right",
+      legend.box = "vertical",
+      legend.spacing.y = unit(0.8, "cm"),
+      legend.title = element_text(size = 14, face = "bold"),
+      legend.text = element_text(size = 12),
+      axis.text.x = element_text(size = 14, face = "bold"),
+      axis.title.x = element_text(size = 16, face = "bold"),
+      axis.text.y = element_text(size = 14, face = "bold"),
+      axis.title.y = element_text(size = 16, face = "bold")
+    )
+}
+
+# Create individual plots using updated function
+p1 <- create_pca_plot(pca_coconut, "PCA - Coconut Milk Kefir & Unfermented Coconut Milk")
+p2 <- create_pca_plot(pca_kombucha, "PCA - Kombucha, Water Kefir, Unfermented Tea & Fig")
+p3 <- create_pca_plot(pca_milk, "PCA - Milk & Milk Kefir")
+p4 <- create_pca_plot(pca_sauerkraut, "PCA - Sauerkraut, Kvass, Kimchi & Sauerkraut Broth")
+
+# Combine all plots in a 2x2 layout using patchwork
+N <- (p1 | p2) /
+  (p3 | p4)
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/pca_global_split.svg", plot = N, width = 12, height = 6, units = "in")
+########################################################################
+########################################################################
+########################################################################
+########################################################################
+#stat
+clr_transformed_data <- clr_transformed_data[-37,]
+meta_ <- meta[rownames(clr_transformed_data), ] 
+adonis_results <- adonis2(
+  clr_transformed_data ~ Substrate + Status + Fermentation_type,
+  data = meta,
+  method = "euclidean",
+  permutations = 999
+)
+
+###########################################################
+#including binaries in the same script
+#towards binaries
+
+# Extract the LOD row (assumed to be the last row)
+lod <- data[nrow(data), -1]  # Remove the first column (Customer.ID)
+
+# Remove the LOD row from the original data to focus on samples only
+data_samples <- data[-nrow(data), ]
+
+# Apply the condition: if value > LOD, set to 1; otherwise, set to 0
+binary_data <- data_samples
+# Binarize based on LOD values (skipping the first column if needed)
+binary_data <- lapply(2:ncol(data_samples), function(i) {
+  ifelse(data_samples[[i]] > lod[[i - 1]], 1, 0)
+})
+
+# Convert to data frame
+binary_df <- as.data.frame(do.call(cbind, binary_data))
+
+# Preserve column and row names
+colnames(binary_df) <- colnames(data_samples)[-1]
+rownames(binary_df) <- rownames(data_samples)
+###########################################
+###########################################
+
+binary_df$id <- rownames(binary_df)
+binary_df$Richness <- rowSums(binary_df[, !colnames(binary_df) %in% c("id")])
+meta$Customer.ID <- rownames(meta)
+meta_richness <- merge(meta, binary_df[, c("id", "Richness")], by.x = "Customer.ID", by.y = "id")
+
+print(unique(meta_richness$Substrate))
+
+# Shapiro-Wilk test for normality of Richness
+shapiro_test <- shapiro.test(meta_richness$Richness)
+print(shapiro_test)
+# Convert categorical variables to factors
+meta_richness$Substrate <- as.factor(meta_richness$Substrate)
+meta_richness$Fermentation_type <- as.factor(meta_richness$Fermentation_type)
+
+# Ensure 'Richness' is numeric
+meta_richness$Richness <- as.numeric(meta_richness$Richness)
+
+print(str(meta_richness))  # Ensure proper structure
+
+kruskal.test(Richness ~ Substrate, data = meta_richness)
+kruskal.test(Richness ~ Fermentation_type, data = meta_richness)
+kruskal.test(Richness ~ Status, data = meta_richness)
+
+##########################
+# Fix label for coconut samples
+meta_richness$Substrate[meta_richness$Substrate == "Dairy alternate"] <- "Coconut Dairy"
+
+# Combine all relevant color palettes
+substrate_colors <- c(
+  "Dairy" = "#1f77b4", "Sugar" = "#ff7f0e", "Brine" = "#1b9e77",
+  "Coconut Dairy" = "#9467bd", "Soy" = "#d62728", "Cereal" = "#8c564b",
+  "Root and tuber" = "#e41a1c", "Seed" = "#7f7f7f", "Palm Tree" = "#B565A7"
+)
+
+type_colors <- c(
+  "Sauerkraut" = "#1b9e77", "Sauerkraut Broth" = "#1b9e77", "Kvass" = "#1b9e77", "Kimchi" = "#1b9e77",
+  "Kombucha" = "#ff7f0e", "Water kefir" = "#ff7f0e", "Unfermented fig" = "#ff7f0e", "Unfermented tea" = "#ff7f0e",
+  "Milk Kefir" = "#1f77b4", "Unfermented Milk" = "#1f77b4",
+  "Coconut milk kefir" = "#9467bd", "Unfermented Coconut milk" = "#9467bd"
+)
+
+status_colors <- c("Fermented" = "#1f78b4", "Unfermented" = "#a6cee3")
+
+all_colors <- c(substrate_colors, type_colors, status_colors)
+
+# Pivot to long format for faceting
+meta_richness_long <- meta_richness %>%
+  tidyr::pivot_longer(
+    cols = c("Substrate", "Status", "Type"),
+    names_to = "Factor",
+    values_to = "Category"
+  )
+
+# Plot
+library(ggplot2)
+
+P <- ggplot(meta_richness_long, aes(x = Category, y = Richness, fill = Category)) +
+  geom_boxplot(alpha = 0.5, outlier.shape = NA) +
+  geom_jitter(width = 0.2, size = 3, alpha = 0.7, color = "black", show.legend = FALSE) +
+  facet_wrap(~ Factor, scales = "free_x", labeller = label_value) +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Effect of Substrate, Status, and Type on Neuromodulatory Metabolite Richness",
+    x = NULL,
+    y = "Number of Neuromodulatory Metabolites"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    panel.border = element_rect(color = "black", fill = NA, size = 1),
+    strip.background = element_rect(fill = "gray80", color = "black", size = 1),
+    strip.text = element_text(face = "bold", size = 12)
+  ) +
+  scale_fill_manual(
+    values = all_colors,
+    guide = guide_legend(override.aes = list(size = 6))
+  )
+
+print(P)
+
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/global_richness.svg", plot = P, width = 12, height = 6, units = "in")
+########################################################################
+########################################################################
+########################################################################
+#work from now
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#######################################################################
+#NEURO TIME
+#######################################
+data_o <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/neurometabolites.csv", header = FALSE)
+colnames(data_o) <- as.character(data_o[1, ])
+data_o <- data_o[-1, ]  # Remove the first row
+meta <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute_by_R.csv")
+meta <- meta[,c(1:5)]
+meta <- meta %>%
+  mutate(Type = str_replace(Type, "Coconut mik", "Coconut milk"))
+meta_neuro <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/neuro_meta.csv")
+data <- data_o
+##################################
+
+filtered_metabolites <- meta_neuro %>%
+  filter(Level %in% c("1", "2a", "2b")) %>%
+  pull(Metabolite)
+
+
+filtered_data <- data %>%
+  select(id, `Study group`, all_of(filtered_metabolites))
+
+head(filtered_data)
+######################################
+#sanity check to see only level 122b metabolites are reained in the data and meta_neuro
+# Extract the column names from filtered_data, excluding the first two columns
+filtered_data_metabolites <- colnames(filtered_data)[-c(1,2)]
+
+filtered_meta_neuro_metabolites <- meta_neuro %>%
+  filter(Level %in% c("1", "2a", "2b")) %>%
+  pull(Metabolite)
+
+matching_metabolites <- filtered_meta_neuro_metabolites %in% filtered_data_metabolites
+
+mismatched_metabolites <- filtered_meta_neuro_metabolites[!matching_metabolites]
+
+if (length(mismatched_metabolites) > 0) {
+  cat("Metabolites in meta_neuro that do NOT match column names in filtered_data:\n")
+  print(mismatched_metabolites)
+} else {
+  cat("All metabolite names in meta_neuro match the column names in filtered_data.\n")
+}
+#################################################################################
+rownames(filtered_data) <- NULL
+rownames(filtered_data) <- filtered_data[,1]
+meta <- meta %>% rename(id = Customer.ID)
+merge <- merge(filtered_data, meta, by = "id")
+rownames(merge) <- merge[,1]
+nmeta <- merge[,c(1,2, 89:92)]
+merge_data <- merge[,-c(1,2, 89:92)]
+###################################
+clr <- clr(merge_data)
+clr <- as.data.frame(clr)
+###########
+pca_results <- prcomp(clr, scale. = TRUE)
+
+
+custom_colors_distinct <- c(
+  "#FF5733", "#92A1CF", "#3357FF", "#FF33A8", "#FFD700",
+  "#8B4513", "#40E0D0", "#FF6347", "#6A5ACD", "#7FFF00",
+  "#DC143C", "#00CED1", "#FFDAB9", "#8A2BE2", "#FF4500",
+  "#2E8B57", "#DA70D6", "#9ACD32", "#FF1493", "#000080"
+)
+
+pca_data <- as.data.frame(pca_results$x)
+pca_data$Type <- nmeta$Type
+pca_data$Status <- nmeta$Status
+pca_data$Substrate <- nmeta$Substrate
+pca_data$Fermentation_type <- nmeta$Fermentation_type
+
+explained_variance <- round(100 * (pca_results$sdev^2 / sum(pca_results$sdev^2)), 2)
+explained_variance_labels <- paste0("PC", 1:length(explained_variance), " (", explained_variance, "%)")
+# Example plotting code without scale_stroke_manual
+# Plot PCA with explained variance in axis labels
+# Plot PCA with shape for Substrate and size for Status
+
+meta$Substrate[meta$Type %in% c("Milk Kefir", "Unfermented Milk")] <- "Dairy"
+meta$Substrate[meta$Type %in% c("Coconut milk kefir", "Unfermented Coconut milk")] <- "Coconut Dairy"
+meta$Substrate[meta$Type %in% c("Kimchi", "Sauerkraut", "Sauerkraut Broth", "Kvass")] <- "Brine"
+meta$Substrate[meta$Type %in% c("Kombucha", "Water kefir", "Unfermented fig", "Unfermented tea")] <- "Sugar"
+
+meta$Color <- substrate_colors[meta$Substrate]
+pca_data$Substrate <- nmeta$Substrate
+##################
+create_pca_plot <- function(pca_subset, title) {
+  ggplot(pca_subset, aes(x = PC1, y = PC2, fill = Substrate, shape = Status, size = Status)) +
+    geom_point(color = "black", stroke = 1.5) +
+    scale_fill_manual(values = substrate_colors, 
+                      guide = guide_legend(override.aes = list(shape = 21, size = 6, color = "black"))) +
+    scale_shape_manual(values = c("Fermented" = 21, "Unfermented" = 24), 
+                       guide = guide_legend(override.aes = list(size = 6, fill = NA))) +
+    scale_size_manual(values = c("Fermented" = 8, "Unfermented" = 5), guide = "none") +
+    theme_minimal() +
+    labs(title = title,
+         x = explained_variance_labels[1],  
+         y = explained_variance_labels[2]) +
+    theme(plot.title = element_text(size=8,face="bold", hjust = 0.5),
+          legend.position = "right",
+          legend.box = "vertical",
+          legend.spacing.y = unit(0.8, "cm"),
+          legend.title = element_text(size = 8, face = "bold"),
+          legend.text = element_text(size = 8),
+          axis.text.x = element_text(size = 8, face = "bold"),
+          axis.title.x = element_text(size = 8, face = "bold"),
+          axis.text.y = element_text(size = 8, face = "bold"),
+          axis.title.y = element_text(size = 8, face = "bold")
+    )
+}
+p <- create_pca_plot(pca_data, "PCA - Global Representation of Neuromodulatory Metabolites")
+p1 <- create_pca_plot(pca_coconut, "PCA - Coconut Milk Kefir & Unfermented Coconut Milk")
+p2 <- create_pca_plot(pca_kombucha, "PCA - Kombucha, Water Kefir, Unfermented Tea & Fig")
+p3 <- create_pca_plot(pca_milk, "PCA - Milk & Milk Kefir")
+p4 <- create_pca_plot(pca_sauerkraut, "PCA - Sauerkraut, Kvass, Kimchi & Sauerkraut Broth")
+
+(p1 +p2) / (p3 | p4)
+
+####################################################################################################################################
+#######################################
+#######################################
+data_o <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/neurometabolites.csv", header = FALSE)
+colnames(data_o) <- as.character(data_o[1, ])
+data_o <- data_o[-1, ]  # Remove the first row
+meta <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute_by_R.csv")
+meta <- meta[,c(1:5)]
+meta_2 <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/neuro_meta.csv")
+data <- data_o
+meta <- meta %>%
+  mutate(Type = str_replace(Type, "Coconut mik", "Coconut milk"))
+##################################
+####################################
+####################################
+####################################
+#only keeping level 1 and level 2
+
+# Keep only rows where Level is 1, 2a, or 2b
+meta_2 <- meta_2 %>%
+  filter(Level %in% c("1", "2a", "2b"))
+
+data_o <- data_o %>%
+  select(id, any_of(meta_2$Metabolite))
+###########################################################
+#including binaries in the same script
+#towards binaries
+
+# Extract the LOD row (assumed to be the last row)
+lod <- data_o[nrow(data_o), -1]  # Remove the first column (Customer.ID)
+
+# Remove the LOD row from the original data to focus on samples only
+data_samples <- data_o[-nrow(data_o), ]
+
+# Apply the condition: if value > LOD, set to 1; otherwise, set to 0
+binary_data <- data_samples
+binary_data[,-1] <- lapply(2:ncol(data_samples), function(i) ifelse(data_samples[[i]] > lod[[i-1]], 1, 0))
+# Remove the Customer.ID column for calculations
+rownames(binary_data) <- NULL
+binary_data <- column_to_rownames(binary_data, var = "id")
+binary_matrix <- binary_data
+############################################################################################################
+############################################################################################################
+# Convert row names to a column named "id" if needed
+binary_data <- data.frame(id = rownames(binary_data), binary_data, row.names = NULL)
+
+# Check if 'id' column exists
+head(binary_data)  # Ensure 'id' is present
+
+# Calculate richness (number of detected metabolites per sample)
+binary_data$Richness <- rowSums(binary_data[, -1])  # Exclude only the first column ('id')
+
+
+# Merge metadata with richness
+meta_richness <- merge(meta, binary_data[, c("id", "Richness")], by.x = "Customer.ID", by.y = "id")
+
+# Check unique substrates
+unique(meta_richness$Substrate)
+
+shapiro_test <- shapiro.test(meta_richness$Richness)
+shapiro_test
+#data:  meta_richness$Richness
+#W = 0.95523, p-value = 0.1527
+#normally distributed
+#perform lavene
+library(car)
+leveneTest(Richness ~ Substrate, data = meta_richness)
+
+##############################################################################################
+##############################################################################################
+
+
+meta_richness_long <- tidyr::pivot_longer(meta_richness, 
+                                          cols = c("Substrate", "Status", "Type"), 
+                                          names_to = "Factor", 
+                                          values_to = "Category")
+meta_richness$Substrate[meta_richness$Substrate == "Dairy alternate"] <- "Coconut Dairy"
+meta_richness_long <- meta_richness %>%
+  pivot_longer(cols = c("Substrate", "Status", "Type"), 
+               names_to = "Factor", values_to = "Category")
+substrate_colors <- c(
+  "Dairy" = "#1f77b4",
+  "Sugar" = "#ff7f0e",
+  "Brine" = "#1b9e77",
+  "Coconut Dairy" = "#9467bd",
+  "Soy" = "#d62728",
+  "Cereal" = "#8c564b",
+  "Root and tuber" = "#e41a1c",
+  "Seed" = "#7f7f7f",
+  "Palm Tree" = "#B565A7"
+)
+# Create ggplot with boxed facet panels
+P <- ggplot(meta_richness_long, aes(x = Category, y = Richness, fill = Category)) +
+  geom_boxplot(alpha = 0.5, outlier.shape = NA) +  # Boxplot without outlier dots
+  geom_jitter(width = 0.2, size = 3, alpha = 0.7) +  # Scatter points for individual samples
+  facet_wrap(~ Factor, scales = "free_x") +  # Two side-by-side facets for Substrate & Status
+  theme_minimal(base_size = 14) +
+  labs(title = "Effect of Substrate and Fermentation Status on Metabolite Richness",
+       x = "",
+       y = "Number of Neuromodulatory Metabolites") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis labels
+        panel.border = element_rect(color = "black", fill = NA, size = 1),  # Add box around each panel
+        strip.background = element_rect(fill = "gray80", color = "black", size = 1),  # Boxed facet labels
+        strip.text = element_text(face = "bold", size = 12))  # Bold facet labels
+#############################################################
+type_colors <- c(
+  # Brine types
+  "Sauerkraut" = "#1b9e77",
+  "Sauerkraut Broth" = "#1b9e77",
+  "Kvass" = "#1b9e77",
+  "Kimchi" = "#1b9e77",
+  
+  # Sugar types
+  "Kombucha" = "#ff7f0e",
+  "Water kefir" = "#ff7f0e",
+  "Unfermented fig" = "#ff7f0e",
+  "Unfermented tea" = "#ff7f0e",
+  
+  # Dairy types
+  "Milk Kefir" = "#1f77b4",
+  "Unfermented Milk" = "#1f77b4",
+  
+  # Coconut/Dairy alternate
+  "Coconut milk kefir" = "#9467bd",
+  "Unfermented Coconut milk" = "#9467bd"
+)
+#####
+status_colors <- c(
+  "Fermented" = "#1f78b4",    # Dark blue
+  "Unfermented" = "#a6cee3"   # Light blue
+)
+
+P <- ggplot(meta_richness_long, aes(x = Category, y = Richness, fill = Category)) +
+  geom_boxplot(alpha = 0.5, outlier.shape = NA) +
+  geom_jitter(aes(x = Category, y = Richness), 
+              width = 0.2, size = 3, alpha = 0.7, color = "black", show.legend = FALSE) +
+  facet_wrap(~ Factor, scales = "free_x") +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Effect of Substrate, Status, and Type on Neuromodulatory Metabolite Richness",
+    x = "",
+    y = "Number of Neuromodulatory Metabolites"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    panel.border = element_rect(color = "black", fill = NA, size = 1),
+    strip.background = element_rect(fill = "gray80", color = "black", size = 1),
+    strip.text = element_text(face = "bold", size = 12)
+  ) +
+  scale_fill_manual(
+    values = c(
+      substrate_colors,
+      type_colors,
+      status_colors
+    ),
+    guide = guide_legend(override.aes = list(size = 6))
+  )
+# Convert categorical variables to factors
+meta_richness$Substrate <- as.factor(meta_richness$Substrate)
+meta_richness$Fermentation_type <- as.factor(meta_richness$Fermentation_type)
+
+# Ensure 'Richness' is numeric
+meta_richness$Richness <- as.numeric(meta_richness$Richness)
+
+print(str(meta_richness))  # Ensure proper structure
+
+kruskal.test(Richness ~ Substrate, data = meta_richness)
+kruskal.test(Richness ~ Fermentation_type, data = meta_richness)
+kruskal.test(Richness ~ Status, data = meta_richness)
+
+
+############################################################################
+############doing this for all metabolites###################################
+############################################################################
+#######refer tot he other script box for global metabolites#################
+######both should give same results#########################################
+############################################################################
+data <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute.csv")
+meta <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute_by_R.csv")
+meta <- meta[,c(1:5)]
+meta <- meta %>%
+  mutate(Type = str_replace(Type, "Coconut mik", "Coconut milk"))
+# Separate the LOD values (last row) from the data
+lod_values <- data[nrow(data)-1, ]
+#lod_values <- lod_values[,-c(1,2)]
+data <- data[-nrow(data), ] 
+data <- data[-nrow(data), ] # Remove the last row to keep only the data
+####################################################################################
+
+lod_values <- as.data.frame(lod_values)  # Convert to data frame
+data_samples <- data
+######################
+# Ensure LOD values and data_samples have matching columns (excluding metadata)
+common_cols <- intersect(colnames(data_samples)[-c(1,2)], colnames(lod_values))
+
+# Subset both dataframes to retain only matching columns
+data_filtered <- data_samples[, c("Customer.ID", "Study.group", common_cols)]
+lod_filtered <- lod_values[, common_cols]
+
+# Convert data_samples into binary data using LOD values
+binary_data <- data_filtered
+binary_data[, common_cols] <- lapply(common_cols, function(col) {
+  ifelse(data_filtered[[col]] > as.numeric(lod_filtered[[col]]), 1, 0)
+})
+
+# Print check summary
+print(dim(binary_data))  # Check dimensions
+print(head(binary_data)) # Preview binary data
+
+binary_data <- binary_data[,-2]
+
+
+##########################################################################################
+##############################################################################################
+# Calculate richness (number of detected metabolites per sample)
+binary_data$Richness <- rowSums(binary_data[, -1,])  # Exclude only the first column ('id')
+# Ensure column names match before merging
+colnames(binary_data)[1] <- "id"  # Ensure 'id' matches 'Customer.ID' in meta
+
+# Merge metadata with richness data
+meta_richness <- merge(meta, binary_data[, c("id", "Richness")], 
+                       by.x = "Customer.ID", by.y = "id")
+
+
+# Check unique substrates
+unique(meta_richness$Substrate)
+
+shapiro_test <- shapiro.test(meta_richness$Richness)
+#normally distributed
+#moving to two way anova
+meta_richness$Substrate[meta_richness$Substrate == "Dairy alternate"] <- "Coconut Dairy"
+
+##########################################################################
+
+
+meta_richness_long <- tidyr::pivot_longer(meta_richness, 
+                                          cols = c("Substrate", "Status", "Type"), 
+                                          names_to = "Factor", 
+                                          values_to = "Category")
+meta_richness$Substrate[meta_richness$Substrate == "Dairy alternate"] <- "Coconut Dairy"
+meta_richness_long <- meta_richness %>%
+  pivot_longer(cols = c("Substrate", "Status", "Type"), 
+               names_to = "Factor", values_to = "Category")
+substrate_colors <- c(
+  "Dairy" = "#1f77b4",
+  "Sugar" = "#ff7f0e",
+  "Brine" = "#1b9e77",
+  "Coconut Dairy" = "#9467bd",
+  "Soy" = "#d62728",
+  "Cereal" = "#8c564b",
+  "Root and tuber" = "#e41a1c",
+  "Seed" = "#7f7f7f",
+  "Palm Tree" = "#B565A7"
+)
+type_colors <- c(
+  # Brine types
+  "Sauerkraut" = "#1b9e77",
+  "Sauerkraut Broth" = "#1b9e77",
+  "Kvass" = "#1b9e77",
+  "Kimchi" = "#1b9e77",
+  
+  # Sugar types
+  "Kombucha" = "#ff7f0e",
+  "Water kefir" = "#ff7f0e",
+  "Unfermented fig" = "#ff7f0e",
+  "Unfermented tea" = "#ff7f0e",
+  
+  # Dairy types
+  "Milk Kefir" = "#1f77b4",
+  "Unfermented Milk" = "#1f77b4",
+  
+  # Coconut/Dairy alternate
+  "Coconut milk kefir" = "#9467bd",
+  "Unfermented Coconut milk" = "#9467bd"
+)
+status_colors <- c(
+  "Fermented" = "#1f78b4",    # Dark blue
+  "Unfermented" = "#a6cee3"   # Light blue
+)
+
+p <- ggplot(meta_richness_long, aes(x = Category, y = Richness, fill = Category)) +
+  geom_boxplot(alpha = 0.5, outlier.shape = NA) +
+  geom_jitter(aes(x = Category, y = Richness), 
+              width = 0.2, size = 3, alpha = 0.7, color = "black", show.legend = FALSE) +
+  facet_wrap(~ Factor, scales = "free_x") +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Effect of Substrate, Status, and Type on Neuromodulatory Metabolite Richness",
+    x = "",
+    y = "Number of Neuromodulatory Metabolites"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    panel.border = element_rect(color = "black", fill = NA, size = 1),
+    strip.background = element_rect(fill = "gray80", color = "black", size = 1),
+    strip.text = element_text(face = "bold", size = 12)
+  ) +
+  scale_fill_manual(
+    values = c(
+      substrate_colors,
+      type_colors,
+      status_colors
+    ),
+    guide = guide_legend(override.aes = list(size = 6))
+  )
+# Custom facet labels
+facet_labels <- c(
+  "Substrate" = "Effect of Substrate", 
+  "Status" = "Effect of Fermentation Type",
+  "Type" = "Food Type"
+)
+
+# Plot
+p <- ggplot(meta_richness_long, aes(x = Category, y = Richness, fill = Category)) +
+  geom_boxplot(alpha = 0.5, outlier.shape = NA) +
+  geom_jitter(aes(x = Category, y = Richness),
+              width = 0.2, size = 3, alpha = 0.7, color = "black", show.legend = FALSE) +
+  facet_wrap(~ Factor, scales = "free_x", labeller = labeller(Factor = facet_labels)) +  # 👈 this line adds custom labels
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Effect of Substrate, Status, and Type on Global Metabolite Richness",
+    x = "",
+    y = "Number of Neuromodulatory Metabolites"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    panel.border = element_rect(color = "black", fill = NA, size = 1),
+    strip.background = element_rect(fill = "gray80", color = "black", size = 1),
+    strip.text = element_text(face = "bold", size = 12)
+  ) +
+  scale_fill_manual(
+    values = c(
+      substrate_colors,
+      type_colors,
+      status_colors
+    ),
+    guide = guide_legend(override.aes = list(size = 6))
+  )
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/richness_global_split.svg", plot = p, width = 12, height = 6, units = "in")
+
+
