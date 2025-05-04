@@ -122,6 +122,9 @@ ko_matrix <- all %>%
 # Make sure it's a data frame and numeric
 ko_matrix <- t(ko_matrix)
 pa <- ko_matrix #using this for pa heatmap lateron
+pa_binary <- pa
+pa_binary[] <- ifelse(pa > 0, 1, 0)#for jaccard lateron
+#####################################
 ko_matrix <- as.data.frame(ko_matrix)
 ko_matrix[] <- lapply(ko_matrix, function(x) as.numeric(as.character(x))) 
 
@@ -188,6 +191,7 @@ p <- ggplot(pca, aes(x = PC1, y = PC2, fill = Substrate)) +
   )
 
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/pca_trypnet_plot.svg", plot = p, width = 8, height = 6, units = "in")
+
 clr_dist <- dist(ko_matrix, method = "euclidean")
 adonis_result <- adonis2(clr_dist ~ Substrate+Type.of.fermentation+State, data = meta_filtered, method = "eucledian", permutations = 999, by = "term")
 print(adonis_result)
@@ -421,3 +425,105 @@ all %>%
 # Type of fermentation
 all %>%
   kruskal_effsize(Richness ~ Type.of.fermentation)
+###############################################################################
+###############################################################################
+p <- ggplot(all, aes(x = State, y = Richness, fill = State)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.6, color = "black") +
+  geom_jitter(
+    shape = 21, width = 0.2, size = 2.5, alpha = 0.5,
+    color = "black", stroke = 0.4, aes(fill = Substrate)
+  ) +
+  scale_fill_manual(values = substrate_colors) +
+  labs(
+    title = "",
+    x = "",
+    y = "Richness"
+  ) +
+  theme_minimal(base_size = 14) 
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/richness_trypnet_state_plot.svg", plot = p, width = 8, height = 6, units = "in")
+######################
+all <- all %>% filter(Type.of.fermentation != "Not applicable" )
+p <- ggplot(all, aes(x = Type.of.fermentation, y = Richness, fill = Type.of.fermentation)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.6, color = "black") +
+  geom_jitter(
+    shape = 21, width = 0.2, size = 2.5, alpha = 0.5,
+    color = "black", stroke = 0.4, aes(fill = Substrate)
+  ) +
+  scale_fill_manual(values = substrate_colors) +
+  labs(
+    title = "",
+    x = "",
+    y = "Richness"
+  ) +
+  theme_minimal(base_size = 14) 
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/richness_trypnet_TOF_plot.svg", plot = p, width = 8, height = 6, units = "in")
+######################################
+# Calculate Jaccard distance matrix
+jaccard_dist <- vegdist(pa_binary, method = "jaccard", binary = TRUE)
+
+# Perform PCoA
+pcoa_result <- cmdscale(jaccard_dist, k = 2, eig = TRUE)
+
+# Create data frame for plotting
+pcoa_df <- data.frame(
+  SampleID = rownames(pcoa_result$points),
+  PC1 = pcoa_result$points[, 1],
+  PC2 = pcoa_result$points[, 2],
+  Substrate = meta_filtered$Substrate
+)
+
+# Plot PCoA
+ggplot(pcoa_df, aes(x = PC1, y = PC2, fill = Substrate)) +
+  geom_point(shape = 21, size = 3, stroke = 0.7, color = "black") +
+  scale_fill_manual(values = substrate_colors) +
+  labs(
+    title = "PCoA (Jaccard distance) of Presence/Absence KO profiles",
+    x = "PCoA Axis 1",
+    y = "PCoA Axis 2"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10),
+    legend.position = "right"
+  )
+
+########################################
+pa_binary <- pa_binary[rowSums(pa_binary) > 0, ]
+
+jaccard_dist <- vegdist(pa_binary, method = "jaccard", binary = TRUE)
+
+meta_filtered <- meta_filtered[meta_filtered$ID %in% rownames(pa_binary), ]
+
+meta_filtered <- meta_filtered[match(rownames(pa_binary), meta_filtered$ID), ]
+
+meta_filtered <- meta_filtered[complete.cases(meta_filtered), ]
+
+pcoa_result <- cmdscale(jaccard_dist, k = 2, eig = TRUE)
+
+pcoa_df <- data.frame(
+  SampleID = rownames(pcoa_result$points),
+  PC1 = pcoa_result$points[, 1],
+  PC2 = pcoa_result$points[, 2],
+  Substrate = meta_filtered$Substrate
+)
+
+p <- ggplot(pcoa_df, aes(x = PC1, y = PC2, fill = Substrate)) +
+  geom_point(shape = 21, size = 3, stroke = 0.7, color = "black") +
+  scale_fill_manual(values = substrate_colors) +
+  labs(
+    title = "PCoA (Jaccard distance) of Presence/Absence KO profiles",
+    x = "PCoA Axis 1",
+    y = "PCoA Axis 2"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10),
+    legend.position = "right"
+  )
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/richness_trypnet_jacc_pca.svg", plot = p, width = 8, height = 6, units = "in")
