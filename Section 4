@@ -1629,4 +1629,219 @@ sankeyNetwork(
   sinksRight = FALSE,
   colourScale = colourScale
 )
+##########################################
+pau_strat <- read.table(
+  "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/paula/strat.txt",
+  header = TRUE,
+  sep = "\t",    # or change to " " if space-delimited
+  fill = TRUE,   # fills missing columns with NAs
+  quote = "",
+  comment.char = ""
+)
+################
+# Keep the first two column names unchanged
+new_names <- colnames(pau_strat)
+new_names[3:length(new_names)] <- substr(new_names[3:length(new_names)], 1, 14)
 
+# Assign the trimmed names back
+colnames(pau_strat) <- new_names
+
+anno <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/tryp_anno.csv")
+tryp_ko <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/tryp_meta.csv")
+tryp <- tryp_ko %>%
+  pivot_longer(
+    cols = starts_with("KO"),
+    names_to = "KO_number",
+    values_to = "KO"
+  ) %>%
+  select(compound, KO) %>%
+  filter(!is.na(KO), KO !="0") 
+##################################################
+##################################################
+pau_strat$KO <- as.character(pau_strat$KO)
+tryp$KO <- as.character(tryp$KO)
+pau_strat_filtered <- pau_strat[pau_strat$KO %in% tryp$KO, ]
+colnames(anno)[colnames(anno)=="KEGG"] <- "compound"
+anno_2 <- merge(anno, tryp, by ="compound")
+anno_2 <- anno_2[,-3]
+##################################################
+##################################################
+
+linked_data <- pau_strat_filtered %>%
+  inner_join(tryp, by = "KO")
+##################
+head(linked_data)
+# Step 2: Join with anno (on compound)
+linked_data <- linked_data %>%
+  inner_join(anno, by = "compound")
+
+abundance_cols <- linked_data %>%
+  select(where(is.numeric)) %>% 
+  colnames()
+
+long_data <- linked_data %>%
+  pivot_longer(
+    cols = all_of(abundance_cols),
+    names_to = "Sample",
+    values_to = "Abundance"
+  ) %>%
+  group_by(Species, Metabolite) %>%
+  summarise(total_abundance = sum(Abundance, na.rm = TRUE), .groups = "drop") %>%
+  filter(total_abundance > 0)
+
+
+# Create nodes
+nodes <- data.frame(name = unique(c(long_data$Species, long_data$Metabolite)))
+
+# Create source/target indices
+long_data$source <- match(long_data$Species, nodes$name) - 1
+long_data$target <- match(long_data$Metabolite, nodes$name) - 1
+
+# Step 1: Label node types
+nodes$type <- ifelse(nodes$name %in% long_data$Species, "Species", "Metabolite")
+
+# Step 2: Assign metabolite-specific colors
+metabolite_colors <- c(
+  "2-Hydroxy-2,4-pentadienoate" = "#66c2a5",
+  "3-Indoleacrylate" = "#fc8d62",
+  "3-Methylindolepyruvate" = "#8da0cb",
+  "4-Hydroxy-2-oxopentanoate" = "#e78ac3",
+  "Acetaldehyde" = "#a6d854",
+  "gamma-Oxalocrotonate" = "#ffd92f",
+  "Indole" = "#e5c494",
+  "Indole-3-acetamide" = "#b3b3b3",
+  "Indole-3-carboxaldehyde" = "#1f78b4",
+  "Indoleacryloyl-CoA" = "#33a02c",
+  "Indolelactate" = "#fb9a99",
+  "Isophenoxazine" = "#cab2d6",
+  "L-Tryptophan" = "#fdbf6f"
+)
+
+# Step 3: Assign a color column to nodes
+nodes$color <- ifelse(
+  nodes$type == "Metabolite" & nodes$name %in% names(metabolite_colors),
+  metabolite_colors[nodes$name],
+  "#B0B0B0" # default gray for species
+)
+
+# Step 4: Create a JS color scale
+# This uses a manual color assignment per node
+colourScale <- paste0(
+  "d3.scaleOrdinal().domain([", 
+  paste0('"', nodes$name, '"', collapse = ","), 
+  "]).range([", 
+  paste0('"', nodes$color, '"', collapse = ","), 
+  "])"
+)
+
+# Step 5: Plot the Sankey
+pau <- sankeyNetwork(
+  Links = long_data %>% select(source, target, value = total_abundance),
+  Nodes = nodes,
+  Source = "source",
+  Target = "target",
+  Value = "value",
+  NodeID = "name",
+  fontSize = 12,
+  nodeWidth = 30,
+  sinksRight = FALSE,
+  colourScale = colourScale
+)
+#########################################
+htmlwidgets::saveWidget(pau, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_pau.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_pau.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_pau.pdf", selector = "pdf")
+##################################
+# Step 1: Recode sample types to MilkType
+data_long <- linked_data %>%
+  pivot_longer(
+    cols = starts_with("PFG"),
+    names_to = "Sample",
+    values_to = "Abundance"
+  ) %>%
+  mutate(
+    MilkType = case_when(
+      grepl("CoM", Sample) ~ "Coconut Milk",
+      grepl("SM", Sample) ~ "Soy Milk",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  filter(!is.na(MilkType))
+
+# Step 2: Join with metabolite annotations
+linked_data_annotated <- data_long %>%
+  inner_join(anno, by = "compound")
+
+# Step 3: Aggregate for Sankey
+sankey_data <- linked_data_annotated %>%
+  group_by(MilkType, Species, Metabolite) %>%
+  summarise(total_abundance = sum(Abundance, na.rm = TRUE), .groups = "drop") %>%
+  filter(total_abundance > 0)
+
+# Step 4: Build nodes
+nodes <- data.frame(name = unique(c(sankey_data$MilkType, sankey_data$Species, sankey_data$Metabolite)))
+
+# Step 5: Map source and target indices
+sankey_links <- bind_rows(
+  sankey_data %>% transmute(source = match(MilkType, nodes$name) - 1,
+                            target = match(Species, nodes$name) - 1,
+                            value = total_abundance),
+  sankey_data %>% transmute(source = match(Species, nodes$name) - 1,
+                            target = match(Metabolite, nodes$name) - 1,
+                            value = total_abundance)
+)
+
+# Step 6: Node type and color
+nodes$type <- case_when(
+  nodes$name %in% sankey_data$MilkType ~ "MilkType",
+  nodes$name %in% sankey_data$Species ~ "Species",
+  nodes$name %in% sankey_data$Metabolite ~ "Metabolite"
+)
+
+metabolite_colors <- c(
+  "2-Hydroxy-2,4-pentadienoate" = "#66c2a5",
+  "3-Indoleacrylate" = "#fc8d62",
+  "3-Methylindolepyruvate" = "#8da0cb",
+  "4-Hydroxy-2-oxopentanoate" = "#e78ac3",
+  "Acetaldehyde" = "#a6d854",
+  "gamma-Oxalocrotonate" = "#ffd92f",
+  "Indole" = "#e5c494",
+  "Indole-3-acetamide" = "#b3b3b3",
+  "Indole-3-carboxaldehyde" = "#1f78b4",
+  "Indoleacryloyl-CoA" = "#33a02c",
+  "Indolelactate" = "#fb9a99",
+  "Isophenoxazine" = "#cab2d6",
+  "L-Tryptophan" = "#fdbf6f"
+)
+
+nodes$color <- ifelse(
+  nodes$type == "Metabolite" & nodes$name %in% names(metabolite_colors),
+  metabolite_colors[nodes$name],
+  ifelse(nodes$type == "MilkType" & nodes$name == "Coconut Milk", "#9467bd",
+         ifelse(nodes$type == "MilkType" & nodes$name == "Soy Milk", "#d62728", "#B0B0B0"))
+)
+
+# Step 7: JavaScript color scale for sankeyNetwork
+colourScale <- paste0(
+  "d3.scaleOrdinal().domain([",
+  paste0('"', nodes$name, '"', collapse = ","),
+  "]).range([",
+  paste0('"', nodes$color, '"', collapse = ","),
+  "])")
+
+# Step 8: Create Sankey plot
+pau_strat  <- sankeyNetwork(
+  Links = sankey_links,
+  Nodes = nodes,
+  Source = "source",
+  Target = "target",
+  Value = "value",
+  NodeID = "name",
+  fontSize = 12,
+  nodeWidth = 30,
+  sinksRight = FALSE,
+  colourScale = colourScale
+)
+
+pau_strat
+htmlwidgets::saveWidget(pau_strat, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_pau.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_pau.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_pau.pdf", selector = "pdf")
