@@ -2055,6 +2055,6 @@ upset(co_occurrence_matrix,
       sets.x.label = "Total Metabolites per Substrate",
       keep.order = TRUE,
       show.numbers = "yes",  # Ensures exact numbers are displayed
-      sets.bar.color = substrate_colors, text.scale = 2)  # Color bars by substrate
-
+      sets.bar.color = substrate_colors, text.scale = 1)  # Color bars by substrate
+#this upset plot tells the common metabolites between substrate category
 write.csv(shared_metabolites, "C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/final/New folder/shared_metabolites.csv")
