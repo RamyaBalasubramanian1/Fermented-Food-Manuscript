@@ -1763,7 +1763,7 @@ binary_color_palette <- colorRampPalette(c("white", "black"))(2)
 
 pheatmap(presence_absence_matrix,
          cluster_rows = TRUE, #Metabolites with similar presence/absence patterns across clusters are grouped together
-         cluster_cols = TRUE, 
+         cluster_cols = FALSE, 
          color = binary_color_palette,  
          main = "Neuromodulatory metabolites driving clustering",
          legend_breaks = c(0, 1),
