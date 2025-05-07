@@ -1430,7 +1430,7 @@ phylo_tree$tip.label <- meta$Substrate[match(phylo_tree$tip.label, meta$Customer
 
 # Assign colors for clusters (halo effect)
 cluster_colors <- setNames(rainbow(num_clusters), unique(meta$Cluster))
-
+cluster_map <- setNames(meta$Cluster, rownames(meta))
 # Create the circular dendrogram **with legend for cluster colors**
 p <- ggtree(phylo_tree, layout = "circular", branch.length = "none") + 
   geom_tiplab(aes(label = label), 
@@ -1510,10 +1510,19 @@ annotation_df <- meta[, c("Type", "Status", "Substrate", "Cluster")]
 
 # Add cluster colors (if needed)
 annotation_colors$Cluster <- setNames(RColorBrewer::brewer.pal(4, "Set2"), unique(annotation_df$Cluster))
+# Define consistent cluster colors (adjust `Set2` or `rainbow` if needed)
+cluster_levels <- sort(unique(meta$Cluster))  # Ensure consistent order
+cluster_colors <- setNames(RColorBrewer::brewer.pal(length(cluster_levels), "Set2"), cluster_levels)
+annotation_colors <- list(
+  Type = type_colors,
+  Status = status_colors, 
+  Substrate = substrate_colors
+)
+annotation_colors$Cluster <- cluster_colors
 
 pheatmap(
   mat = as.matrix(heatmap_data),
-  annotation_row = annotation_df,  # No Customer.ID
+  annotation_row = annotation_df,
   annotation_colors = annotation_colors,
   cluster_rows = TRUE,
   cluster_cols = FALSE,
