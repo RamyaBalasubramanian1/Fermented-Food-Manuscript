@@ -389,29 +389,6 @@ print(P)
 
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/global_richness.svg", plot = P, width = 12, height = 6, units = "in")
 ########################################################################
-########################################################################
-########################################################################
-#work from now
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -482,6 +459,18 @@ custom_colors_distinct <- c(
   "#DC143C", "#00CED1", "#FFDAB9", "#8A2BE2", "#FF4500",
   "#2E8B57", "#DA70D6", "#9ACD32", "#FF1493", "#000080"
 )
+substrate_colors <- c(
+  "Dairy" = "#1f77b4", "Sugar" = "#ff7f0e", "Brine" = "#1b9e77",
+  "Coconut Dairy" = "#9467bd", "Soy" = "#d62728", "Cereal" = "#8c564b",
+  "Root and tuber" = "#e41a1c", "Seed" = "#7f7f7f", "Palm Tree" = "#B565A7"
+)
+
+type_colors <- c(
+  "Sauerkraut" = "#1b9e77", "Sauerkraut Broth" = "#1b9e77", "Kvass" = "#1b9e77", "Kimchi" = "#1b9e77",
+  "Kombucha" = "#ff7f0e", "Water kefir" = "#ff7f0e", "Unfermented fig" = "#ff7f0e", "Unfermented tea" = "#ff7f0e",
+  "Milk Kefir" = "#1f77b4", "Unfermented Milk" = "#1f77b4",
+  "Coconut milk kefir" = "#9467bd", "Unfermented Coconut milk" = "#9467bd"
+)
 
 pca_data <- as.data.frame(pca_results$x)
 pca_data$Type <- nmeta$Type
@@ -527,26 +516,34 @@ create_pca_plot <- function(pca_subset, title) {
           axis.title.y = element_text(size = 8, face = "bold")
     )
 }
+# Define subsets by Type (keep this as is)
+pca_coconut <- pca_data %>% filter(Type %in% c("Coconut milk kefir", "Unfermented Coconut milk"))
+pca_kombucha <- pca_data %>% filter(Type %in% c("Kombucha", "Unfermented tea", "Water kefir", "Unfermented fig"))
+pca_milk <- pca_data %>% filter(Type %in% c("Unfermented Milk", "Milk Kefir"))
+pca_sauerkraut <- pca_data %>% filter(Type %in% c("Sauerkraut", "Sauerkraut Broth", "Kvass", "Kimchi"))
 p <- create_pca_plot(pca_data, "PCA - Global Representation of Neuromodulatory Metabolites")
 p1 <- create_pca_plot(pca_coconut, "PCA - Coconut Milk Kefir & Unfermented Coconut Milk")
 p2 <- create_pca_plot(pca_kombucha, "PCA - Kombucha, Water Kefir, Unfermented Tea & Fig")
 p3 <- create_pca_plot(pca_milk, "PCA - Milk & Milk Kefir")
 p4 <- create_pca_plot(pca_sauerkraut, "PCA - Sauerkraut, Kvass, Kimchi & Sauerkraut Broth")
-
-(p1 +p2) / (p3 | p4)
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/pca_neuro_global.svg", plot = p, width = 12, height = 6, units = "in")
+N <- (p1 | p2) /
+  (p3 | p4)
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/pca_neuro_split.svg", plot = N, width = 12, height = 6, units = "in")
+#
 
 ####################################################################################################################################
 #######################################
 #######################################
-data_o <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/neurometabolites.csv", header = FALSE)
-colnames(data_o) <- as.character(data_o[1, ])
-data_o <- data_o[-1, ]  # Remove the first row
-meta <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute_by_R.csv")
-meta <- meta[,c(1:5)]
-meta_2 <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/neuro_meta.csv")
-data <- data_o
-meta <- meta %>%
-  mutate(Type = str_replace(Type, "Coconut mik", "Coconut milk"))
+# data_o <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/neurometabolites.csv", header = FALSE)
+# colnames(data_o) <- as.character(data_o[1, ])
+# data_o <- data_o[-1, ]  # Remove the first row
+# meta <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute_by_R.csv")
+# meta <- meta[,c(1:5)]
+ meta_2 <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/neuro_meta.csv")
+# data <- data_o
+# meta <- meta %>%
+#   mutate(Type = str_replace(Type, "Coconut mik", "Coconut milk"))
 ##################################
 ####################################
 ####################################
@@ -589,7 +586,7 @@ binary_data$Richness <- rowSums(binary_data[, -1])  # Exclude only the first col
 
 
 # Merge metadata with richness
-meta_richness <- merge(meta, binary_data[, c("id", "Richness")], by.x = "Customer.ID", by.y = "id")
+meta_richness <- merge(meta, binary_data[, c("id", "Richness")], by = "id")
 
 # Check unique substrates
 unique(meta_richness$Substrate)
@@ -600,9 +597,10 @@ shapiro_test
 #W = 0.95523, p-value = 0.1527
 #normally distributed
 #perform lavene
-library(car)
-leveneTest(Richness ~ Substrate, data = meta_richness)
-
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/richness_neuro.svg", plot = P, width = 12, height = 6, units = "in")
+kruskal.test(Richness ~ Substrate, data = meta_richness)
+kruskal.test(Richness ~ Fermentation_type, data = meta_richness)
+kruskal.test(Richness ~ Status, data = meta_richness)
 ##############################################################################################
 ##############################################################################################
 
@@ -692,6 +690,7 @@ P <- ggplot(meta_richness_long, aes(x = Category, y = Richness, fill = Category)
     ),
     guide = guide_legend(override.aes = list(size = 6))
   )
+
 # Convert categorical variables to factors
 meta_richness$Substrate <- as.factor(meta_richness$Substrate)
 meta_richness$Fermentation_type <- as.factor(meta_richness$Fermentation_type)
@@ -704,91 +703,575 @@ print(str(meta_richness))  # Ensure proper structure
 kruskal.test(Richness ~ Substrate, data = meta_richness)
 kruskal.test(Richness ~ Fermentation_type, data = meta_richness)
 kruskal.test(Richness ~ Status, data = meta_richness)
+############################################################################################################
+############################################################################################################
 
-
-############################################################################
-############doing this for all metabolites###################################
-############################################################################
-#######refer tot he other script box for global metabolites#################
-######both should give same results#########################################
-############################################################################
-data <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute.csv")
-meta <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute_by_R.csv")
+meta_ <- meta[rownames(clr), ] 
+adonis_results <- adonis2(
+  clr ~ Substrate + Status + Fermentation_type,
+  data = meta,
+  method = "euclidean",
+  permutations = 999
+)
+#######################################
+#######################################
+data <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute.csv", check.names = FALSE)
+meta <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute_by_R.csv", check.names = FALSE)
 meta <- meta[,c(1:5)]
+
+
+lod_values <- data[nrow(data), ]
+data <- data[-nrow(data), ] #last row has lod
+common_cols <- intersect(names(data)[-c(1,2)], names(lod_values))
+
+# replacing value below lod with lod
+for (col in common_cols) {
+  data[[col]] <- ifelse(as.numeric(data[[col]]) < as.numeric(lod_values[[col]]), 
+                        as.numeric(lod_values[[col]]), 
+                        as.numeric(data[[col]]))
+}
+data <- data %>%
+  column_to_rownames(var = "Customer ID")
 meta <- meta %>%
-  mutate(Type = str_replace(Type, "Coconut mik", "Coconut milk"))
-# Separate the LOD values (last row) from the data
-lod_values <- data[nrow(data)-1, ]
-#lod_values <- lod_values[,-c(1,2)]
-data <- data[-nrow(data), ] 
-data <- data[-nrow(data), ] # Remove the last row to keep only the data
-####################################################################################
+  column_to_rownames(var = "Customer ID")
+data <- data[,-1]
 
-lod_values <- as.data.frame(lod_values)  # Convert to data frame
-data_samples <- data
-######################
-# Ensure LOD values and data_samples have matching columns (excluding metadata)
-common_cols <- intersect(colnames(data_samples)[-c(1,2)], colnames(lod_values))
 
-# Subset both dataframes to retain only matching columns
-data_filtered <- data_samples[, c("Customer.ID", "Study.group", common_cols)]
-lod_filtered <- lod_values[, common_cols]
-
-# Convert data_samples into binary data using LOD values
-binary_data <- data_filtered
-binary_data[, common_cols] <- lapply(common_cols, function(col) {
-  ifelse(data_filtered[[col]] > as.numeric(lod_filtered[[col]]), 1, 0)
+clr_transformed_data <- clr(data)
+clr_transformed_data <- as.data.frame(clr_transformed_data)
+clr_transformed_data$id <- rownames(clr_transformed_data)
+meta$id <- rownames(meta)
+all_data <- merge(meta,clr_transformed_data, by = "id")
+####################################################
+#####################################################
+# checking the impact of substrate on the abundance of each metab
+#i used nova because the data is clr trans
+all_data <- all_data %>% select(-id, -Type, -Status, -Fermentation_type) 
+anova_results <- apply(all_data[, -1], 2, function(metabolite) {
+  aov_res <- aov(metabolite ~ all_data$Substrate)
+  summary(aov_res)[[1]][["Pr(>F)"]][1]
 })
 
-# Print check summary
-print(dim(binary_data))  # Check dimensions
-print(head(binary_data)) # Preview binary data
+# should i use fdr?
+p_values <- as.data.frame(anova_results)
+p_values$Metabolite <- rownames(p_values)
+p_values$p_adj <- p.adjust(p_values$anova_results, method = "bonferroni")
 
-binary_data <- binary_data[,-2]
+# removing ns data
+sig_metabolites <- p_values %>% filter(p_adj < 0.05) %>% select(Metabolite, p_adj)
+# conv to long
+all_long <- all_data %>%
+  select(one_of(sig_metabolites$Metabolite), Substrate) %>%
+  pivot_longer(cols = -Substrate, names_to = "Metabolite", values_to = "Abundance")
+#too many metabolites to display in a page
+#################################################################################################################
+#################################################################################################################
+# faceting per metab
+# #ggplot(all_long, aes(x = Substrate, y = Abundance, fill = Substrate)) +
+#   geom_boxplot() +
+#   facet_wrap(~Metabolite, scales = "free") +
+#   theme_bw() +
+#   labs(title = "Significantly Abundant Metabolites by Substrate", x = "Substrate", y = "CLR Abundance") +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+#maybe split between pages
+#prev plor only will show the global p
+#effect of metabolite er substate
 
-##########################################################################################
-##############################################################################################
-# Calculate richness (number of detected metabolites per sample)
-binary_data$Richness <- rowSums(binary_data[, -1,])  # Exclude only the first column ('id')
-# Ensure column names match before merging
-colnames(binary_data)[1] <- "id"  # Ensure 'id' matches 'Customer.ID' in meta
-
-# Merge metadata with richness data
-meta_richness <- merge(meta, binary_data[, c("id", "Richness")], 
-                       by.x = "Customer.ID", by.y = "id")
-
-
-# Check unique substrates
-unique(meta_richness$Substrate)
-
-shapiro_test <- shapiro.test(meta_richness$Richness)
-#normally distributed
-#moving to two way anova
-meta_richness$Substrate[meta_richness$Substrate == "Dairy alternate"] <- "Coconut Dairy"
-
-##########################################################################
-
-
-meta_richness_long <- tidyr::pivot_longer(meta_richness, 
-                                          cols = c("Substrate", "Status", "Type"), 
-                                          names_to = "Factor", 
-                                          values_to = "Category")
-meta_richness$Substrate[meta_richness$Substrate == "Dairy alternate"] <- "Coconut Dairy"
-meta_richness_long <- meta_richness %>%
-  pivot_longer(cols = c("Substrate", "Status", "Type"), 
-               names_to = "Factor", values_to = "Category")
-substrate_colors <- c(
-  "Dairy" = "#1f77b4",
-  "Sugar" = "#ff7f0e",
-  "Brine" = "#1b9e77",
-  "Coconut Dairy" = "#9467bd",
-  "Soy" = "#d62728",
-  "Cereal" = "#8c564b",
-  "Root and tuber" = "#e41a1c",
-  "Seed" = "#7f7f7f",
-  "Palm Tree" = "#B565A7"
+# # Function to generate paginated plots
+# plot_paginated_facets <- function(page_num) {
+#   ggplot(all_long, aes(x = Substrate, y = Abundance, fill = Substrate)) +
+#     geom_boxplot(alpha = 0.6) + 
+#     ggforce::facet_wrap_paginate(~Metabolite, scales = "free", ncol = 5, nrow = 1, page = page_num) +  # 10 plots per page
+#     theme_minimal(base_size = 14) +
+#     labs(title = paste("Pairwise Comparisons of Metabolite *Median* Abundance (Page", page_num, ")"),
+#          x = "Substrate",
+#          y = "CLR Abundance") +
+#     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  
+#     stat_compare_means(comparisons = pairwise_comparisons, 
+#                        method = "wilcox.test", 
+#                        label = "p.signif", hide.ns = TRUE) }
+# 
+# plot_paginated_facets(1)  
+# plot_paginated_facets(2)  
+# plot_paginated_facets(3)
+# plot_paginated_facets(4)
+# Ensure Substrate is a factor with correct levels
+all_long$Substrate <- factor(all_long$Substrate, levels = c("Brine", "Sugar", "Dairy", "Dairy alternate"))
+# Define pairwise comparisons
+pairwise_comparisons <- list(
+  c("Brine", "Sugar"),
+  c("Brine", "Dairy"),
+  c("Brine", "Dairy alternate"),
+  c("Sugar", "Dairy"),
+  c("Sugar", "Dairy alternate"),
+  c("Dairy", "Dairy alternate")
 )
+shapiro.test(all_long$Abundance)
+#not normal
+
+#######################################################################
+#finding groups that are pairwise different for the significant metabolite in question
+
+
+pairwise_results <- list()
+
+for (met in unique(all_long$Metabolite)) {
+  
+  sub_data <- all_long %>% filter(Metabolite == met)
+  
+  
+  shapiro_p <- shapiro.test(sub_data$Abundance)$p.value
+  
+  test_type <- ifelse(shapiro_p > 0.05, "t-test", "wilcox")
+  
+  if (test_type == "t-test") {
+    test_res <- pairwise.t.test(sub_data$Abundance, sub_data$Substrate, p.adjust.method = "bonferroni")
+  } else {
+    test_res <- pairwise.wilcox.test(sub_data$Abundance, sub_data$Substrate, p.adjust.method = "bonferroni")
+  }
+  test_df <- as.data.frame(as.table(test_res$p.value))
+  colnames(test_df) <- c("Substrate1", "Substrate2", "p_value")
+  test_df$Metabolite <- met
+  test_df$TestType <- test_type
+  
+  pairwise_results[[met]] <- test_df
+}
+#the bove code applies t test whereever normal other wise applied pairwise wilcox
+#need to depo this resultas a csv?
+pairwise_results_df <- bind_rows(pairwise_results)
+
+
+##############################################################################
+##############################################################################
+#########################################################################
+# Create a new column for substrate comparison
+pairwise_results_df <- pairwise_results_df %>%
+  mutate(Comparison = paste(Substrate1, "vs", Substrate2, sep=" "))
+
+# Categorize significance levels as numeric values for Y-axis
+pairwise_results_df <- pairwise_results_df %>%
+  mutate(Significance_Stars = case_when(
+    p_value < 0.001 ~ 3,  # "***"
+    p_value < 0.01  ~ 2,  # "**"
+    p_value < 0.05  ~ 1,  # "*"
+    TRUE ~ 0         # "NS"
+  ))
+
+# Define factor labels for the Y-axis
+significance_labels <- c("NS", "*", "**", "***")
+
+# Dynamically generate colors for all comparisons
+unique_comparisons <- unique(pairwise_results_df$Comparison)
+comparison_colors <- setNames(rainbow(length(unique_comparisons)), unique_comparisons)
+
+# Create the plot
+ggplot(pairwise_results_df, aes(x = Metabolite, y = Significance_Stars, color = Comparison)) +
+  geom_jitter(width = 0.3, height = 0.2, size = 3, alpha = 0.7) +  # Jitter to avoid overlap
+  scale_y_continuous(breaks = 0:3, labels = significance_labels) +  # Set significance levels
+  scale_color_manual(values = comparison_colors) +  # Dynamically map colors
+  theme_minimal() +
+  labs(title = "Significance of Metabolite Differences Across Substrate Comparisons",
+       x = "Metabolite",
+       y = "Significance Level",
+       color = "Substrate Comparison") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+#need to clean row names
+pairwise_results_df_filtered <- pairwise_results_df %>%
+  filter(Significance_Stars > 0)
+p <- ggplot(pairwise_results_df_filtered, aes(x = Metabolite, y = Significance_Stars, color = Comparison)) +
+  geom_jitter(width = 0.3, height = 0.2, size = 3, alpha = 0.7) +  # Jitter to avoid overlap
+  scale_y_continuous(breaks = 0:3, labels = significance_labels) +  # Set significance levels
+  scale_color_manual(values = comparison_colors) +  # Dynamically map colors
+  theme_minimal() +
+  labs(title = "Significance of Metabolite Differences Across Substrate Comparisons",
+       x = "Metabolite",
+       y = "Significance Level",
+       color = "Substrate Comparison") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/pairwise comparison global 122a.svg", plot = p, width = 12, height = 6, units = "in")
+#############################################################################
+#############################################################################
+comparison_summary <- pairwise_results_df_filtered %>%
+  group_by(Comparison) %>%
+  summarise(Total_Significant_Metabolites = n()) %>%
+  arrange(desc(Total_Significant_Metabolites))
+
+comparison_summary
+############################
+############################
+#ONE WAY ANOVA HEATMAP
+#doing the same for all metabolites belonging to levels 1 2 2a
+
+data <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute.csv", check.names = FALSE)
+
+meta <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute_by_R.csv", check.names = FALSE)
+meta <- meta[,c(1:5)]
+
+lod_values <- data[nrow(data) -1, ]
+levels <- data[nrow(data), ]
+data <- data[-nrow(data), ] #last row has lod
+common_cols <- intersect(names(data)[-c(1,2)], names(lod_values))
+# Ensure only numeric values are extracted
+metabolite_levels <- levels[1, ]  # Extract first row (metabolite levels)
+metabolite_levels <- as.numeric(metabolite_levels)  # Convert to numeric, introducing NAs for non-numeric
+names(metabolite_levels) <- colnames(levels)  # Assign metabolite names as keys
+
+# Remove  NAs (non-numeric entries)
+metabolite_levels <- metabolite_levels[!is.na(metabolite_levels)]
+
+
+# replacing value below lod with lod
+for (col in common_cols) {
+  data[[col]] <- ifelse(as.numeric(data[[col]]) < as.numeric(lod_values[[col]]), 
+                        as.numeric(lod_values[[col]]), 
+                        as.numeric(data[[col]]))
+}
+data <- data %>%
+  column_to_rownames(var = "Customer ID")
+meta <- meta %>%
+  column_to_rownames(var = "Customer ID")
+data <- data[,-1]
+
+
+clr_transformed_data <- clr(data)
+clr_transformed_data <- as.data.frame(clr_transformed_data)
+clr_transformed_data$id <- rownames(clr_transformed_data)
+meta$id <- rownames(meta)
+colnames(meta)[colnames(meta) == "id"] <- "Sample_ID"
+colnames(clr_transformed_data)[colnames(clr_transformed_data) == "id"] <- "Sample_ID"
+
+
+all_data <- merge(meta, clr_transformed_data, by = "Sample_ID", all = TRUE)
+
+# Remove "Brine" as we dont have fermented unfermented
+all_data <- all_data %>% filter(Substrate != "Brine")
+meta <- meta %>% filter(Substrate != "Brine")
+all_data <- all_data %>% select(-Sample_ID, -Fermentation_type, -Fermentation_type, -Type) 
+###################
+###################
+perform_t_tests <- function(df) {
+  metabolite_columns <- colnames(df)[!(colnames(df) %in% c("Status", "Substrate"))]  
+  results <- data.frame(Metabolite = character(), p_value = numeric(), stringsAsFactors = FALSE)
+  
+  for (metabolite in metabolite_columns) {
+    values <- df[[metabolite]]
+    if (var(values, na.rm = TRUE) == 0) next  # Skip constant metabolites
+    
+    test <- t.test(values ~ df$Status)
+    results <- rbind(results, data.frame(Metabolite = metabolite, p_value = test$p.value))
+  }
+  
+  results$p_adj <- p.adjust(results$p_value, method = "BH")
+  
+  
+  results <- results %>% mutate(Significant = p_adj < 0.05)
+  
+  return(results %>% filter(Significant == TRUE))  # Return only significant metabolites after correction
+}
+sugar_sig <- perform_t_tests(all_data %>% filter(Substrate == "Sugar"))
+dairy_sig <- perform_t_tests(all_data %>% filter(Substrate == "Dairy"))
+dairy_alt_sig <- perform_t_tests(all_data %>% filter(Substrate == "Dairy alternate"))
+
+sig_metabolites <- unique(c(sugar_sig$Metabolite, dairy_sig$Metabolite, dairy_alt_sig$Metabolite))
+
+
+top_n_metabolites <- function(sig_results, n = 20) {
+  sig_results %>% arrange(p_adj) %>% head(n) %>% pull(Metabolite)
+}
+
+top_sugar_metabolites <- top_n_metabolites(sugar_sig, 20)
+top_dairy_metabolites <- top_n_metabolites(dairy_sig, 20)
+top_dairy_alt_metabolites <- top_n_metabolites(dairy_alt_sig, 20)
+
+sig_metabolites <- unique(c(top_sugar_metabolites, top_dairy_metabolites, top_dairy_alt_metabolites))
+
+heatmap_data <- all_data %>%
+  select(Status, Substrate, all_of(sig_metabolites))
+
+# Create a unique row identifier
+heatmap_data <- heatmap_data %>%
+  mutate(Sample_ID = paste(Status, Substrate, row_number(), sep = "_")) %>%
+  column_to_rownames(var = "Sample_ID")
+
+heatmap_matrix <- as.matrix(heatmap_data[, -c(1,2)])
+
+row_annotation <- data.frame(Substrate = heatmap_data$Substrate, Status = heatmap_data$Status, Type = meta$Type)
+rownames(row_annotation) <- rownames(heatmap_matrix)
+
+annotation_colors <- list(
+  Level = c("1" = "green", "2" = "blue"),  # Metabolite levels
+  Substrate = c("Sugar" = "red", "Dairy" = "blue", "Dairy alternate" = "green"),
+  Status = c("Fermented" = "purple", "Unfermented" = "gray"),
+  Type = c(
+    "Kombucha" = "purple", "Water kefir" = "brown", "Milk Kefir" = "cyan", "Unfermented Milk" = "gray",
+    "Coconut mik kefir" = "blue", "Unfermented Coconut milk" = "black",
+    "Unfermented fig" = "darkgreen", "Unfermented tea" = "darkblue"
+  )  
+)
+
+
+common_metabolites <- intersect(colnames(heatmap_matrix), colnames(levels))
+
+metabolite_levels <- levels[, common_metabolites, drop = FALSE]  # Select only matching columns
+metabolite_levels <- as.numeric(metabolite_levels[1, ])  # Convert the first row to numeric
+names(metabolite_levels) <- common_metabolites  # Assign metabolite names as keys
+
+column_annotation <- data.frame(Level = metabolite_levels)
+
+# Ensure  names in heatmap
+rownames(column_annotation) <- names(metabolite_levels)
+
+column_annotation$Level <- as.factor(column_annotation$Level)
+
+print(head(column_annotation))
+# Define colors for metabolite levels (modify as needed)
+annotation_colors <- list(
+  Level = c("1" = "green", "2" = "blue")
+)
+
+
+pheatmap(
+  heatmap_matrix, 
+  scale = "column",
+  clustering_distance_rows = "euclidean", 
+  clustering_distance_cols = "euclidean",
+  clustering_method = "ward.D2",
+  color = colorRampPalette(c("blue", "white", "red"))(50),
+  annotation_col = column_annotation,  # Metabolite levels annotation
+  annotation_row = row_annotation,  # Multiple row annotations (Substrate, Status, Type)
+  annotation_colors = annotation_colors,  # Custom colors
+  border_color = "black",
+  fontsize_col = 8,show_rownames =FALSE,
+  main = "Heatmap of Significant Metabolites with Substrate, Status & Type"
+)
+##############################
+########thomaz suggestion#####
+##############################
+#doing the same for all metabolites belonging to levels 1 2 2a
+set.seed(123)
+data <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute.csv", check.names = FALSE)
+
+meta <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute_by_R.csv", check.names = FALSE)
+meta <- meta[,c(1:5)]
+
+lod_values <- data[nrow(data) -1, ]
+levels <- data[nrow(data), ]
+data <- data[-nrow(data), ] #last row has lod
+common_cols <- intersect(names(data)[-c(1,2)], names(lod_values))
+# Ensure only numeric values are extracted
+metabolite_levels <- levels[1, ]  # Extract first row (metabolite levels)
+metabolite_levels <- as.numeric(metabolite_levels)  # Convert to numeric, introducing NAs for non-numeric
+names(metabolite_levels) <- colnames(levels)  # Assign metabolite names as keys
+
+# Remove  NAs (non-numeric entries)
+metabolite_levels <- metabolite_levels[!is.na(metabolite_levels)]
+
+
+# replacing value below lod with lod
+for (col in common_cols) {
+  data[[col]] <- ifelse(as.numeric(data[[col]]) < as.numeric(lod_values[[col]]), 
+                        as.numeric(lod_values[[col]]), 
+                        as.numeric(data[[col]]))
+}
+data <- data %>%
+  column_to_rownames(var = "Customer ID")
+meta <- meta %>%
+  column_to_rownames(var = "Customer ID")
+data <- data[,-1]
+
+
+clr_transformed_data <- clr(data)
+
+clr_transformed_data <- clr_transformed_data / log(2)
+clr_transformed_data <- scale(clr_transformed_data, center = TRUE, scale = FALSE) 
+meta$id <- rownames(meta)
+clr_transformed_data <- as.data.frame(clr_transformed_data)
+clr_transformed_data$id <- rownames(clr_transformed_data)
+colnames(meta)[colnames(meta) == "id"] <- "Sample_ID"
+colnames(clr_transformed_data)[colnames(clr_transformed_data) == "id"] <- "Sample_ID"
+
+
+all_data <- merge(meta, clr_transformed_data, by = "Sample_ID", all = TRUE)
+
+
+# Remove "Brine" as we dont have fermented unfermented
+all_data <- all_data %>% filter(Substrate != "Brine")
+meta <- meta %>% filter(Substrate != "Brine")
+all_data <- all_data %>% select(-Sample_ID, -Fermentation_type, -Fermentation_type, -Type) 
+###################
+###################
+perform_t_tests <- function(df) {
+  metabolite_columns <- colnames(df)[!(colnames(df) %in% c("Status", "Substrate"))]  
+  results <- data.frame(Metabolite = character(), p_value = numeric(), stringsAsFactors = FALSE)
+  
+  for (metabolite in metabolite_columns) {
+    values <- df[[metabolite]]
+    if (var(values, na.rm = TRUE) == 0) next  # Skip constant metabolites
+    
+    test <- t.test(values ~ df$Status)
+    results <- rbind(results, data.frame(Metabolite = metabolite, p_value = test$p.value))
+  }
+  
+  results$p_adj <- p.adjust(results$p_value, method = "BH")
+  
+  
+  results <- results %>% mutate(Significant = p_adj < 0.05)
+  
+  return(results %>% filter(Significant == TRUE))  # Return only significant metabolites after correction
+}
+sugar_sig <- perform_t_tests(all_data %>% filter(Substrate == "Sugar"))
+dairy_sig <- perform_t_tests(all_data %>% filter(Substrate == "Dairy"))
+dairy_alt_sig <- perform_t_tests(all_data %>% filter(Substrate == "Dairy alternate"))
+
+sig_metabolites <- unique(c(sugar_sig$Metabolite, dairy_sig$Metabolite, dairy_alt_sig$Metabolite))
+
+
+top_n_metabolites <- function(sig_results, n = 20) {
+  sig_results %>% arrange(p_adj) %>% head(n) %>% pull(Metabolite)
+}
+
+top_sugar_metabolites <- top_n_metabolites(sugar_sig, 20)
+top_dairy_metabolites <- top_n_metabolites(dairy_sig, 20)
+top_dairy_alt_metabolites <- top_n_metabolites(dairy_alt_sig, 20)
+
+sig_metabolites <- unique(c(top_sugar_metabolites, top_dairy_metabolites, top_dairy_alt_metabolites))
+
+heatmap_data <- all_data %>%
+  select(Status, Substrate, all_of(sig_metabolites))
+
+# Create a unique row identifier
+heatmap_data <- heatmap_data %>%
+  mutate(Sample_ID = paste(Status, Substrate, row_number(), sep = "_")) %>%
+  column_to_rownames(var = "Sample_ID")
+
+heatmap_matrix <- as.matrix(heatmap_data[, -c(1,2)])
+
+row_annotation <- data.frame(Substrate = heatmap_data$Substrate, Status = heatmap_data$Status, Type = meta$Type)
+rownames(row_annotation) <- rownames(heatmap_matrix)
+
+annotation_colors <- list(
+  Level = c("1" = "green", "2" = "blue"),  # Metabolite levels
+  Substrate = c("Sugar" = "red", "Dairy" = "blue", "Dairy alternate" = "green"),
+  Status = c("Fermented" = "purple", "Unfermented" = "gray"),
+  Type = c(
+    "Kombucha" = "purple", "Water kefir" = "brown", "Milk Kefir" = "cyan", "Unfermented Milk" = "gray",
+    "Coconut mik kefir" = "blue", "Unfermented Coconut milk" = "black",
+    "Unfermented fig" = "darkgreen", "Unfermented tea" = "darkblue"
+  )  
+)
+
+
+common_metabolites <- intersect(colnames(heatmap_matrix), colnames(levels))
+
+metabolite_levels <- levels[, common_metabolites, drop = FALSE]  # Select only matching columns
+metabolite_levels <- as.numeric(metabolite_levels[1, ])  # Convert the first row to numeric
+names(metabolite_levels) <- common_metabolites  # Assign metabolite names as keys
+
+column_annotation <- data.frame(Level = metabolite_levels)
+
+# Ensure  names in heatmap
+rownames(column_annotation) <- names(metabolite_levels)
+
+column_annotation$Level <- as.factor(column_annotation$Level)
+
+print(head(column_annotation))
+# Define colors for metabolite levels (modify as needed)
+annotation_colors <- list(
+  Level = c("1" = "green", "2" = "blue")
+)
+svg("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/pheatmap_metabolites_pairwise_metabolites_da_Substrate.svg", width = 12, height = 8)  # Adjust width/height as needed
+############################################################
+m <- pheatmap(
+  heatmap_matrix, 
+  scale = "column",
+  clustering_distance_rows = "euclidean", 
+  clustering_distance_cols = "euclidean",
+  clustering_method = "ward.D2",
+  color = colorRampPalette(c("blue", "white", "red"))(50),
+  annotation_col = column_annotation,
+  annotation_row = row_annotation,
+  annotation_colors = annotation_colors,
+  border_color = "black",
+  fontsize_col = 6,
+  show_rownames = FALSE,
+  main = "Heatmap of Significant Metabolites with Substrate, Status & Type"
+)
+
+# Close the device
+dev.off()
+#########################################
+#########################################
+#NEUROMODULATORY METABOLITES HEATMAP
+#########################################
+data_o <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/neurometabolites.csv", header = FALSE)
+colnames(data_o) <- as.character(data_o[1, ])
+data_o <- data_o[-1, ]  # Remove the first row
+meta <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute_by_R.csv")
+meta <- meta[,c(1:5)]
+meta_2 <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/neuro_meta.csv")
+data <- data_o
+####################################################################################
+####################################################################################
+# Keep only rows where Level is 1, 2a, or 2b
+meta_2 <- meta_2 %>%
+  filter(Level %in% c("1", "2a", "2b"))
+
+data_o <- data_o %>%
+  select(id, any_of(meta_2$Metabolite))
+
+
+
+###################################
+# Separate the LOD values (last row) from the data
+rownames(data) <- NULL
+rownames(data) <- data$id
+lod_values <- data[nrow(data), ]
+
+# Separate the LOD values (last row) from the data
+lod_values <- data[nrow(data), ]
+data <- data[-nrow(data), ]  # Remove the last row to keep only the data
+
+# Identify common columns in `data` and `lod_values`, excluding the first column in `data`
+common_cols <- intersect(names(data)[-c(1,2)], names(lod_values))
+
+# Apply the LOD replacement for each column in `data` that has a corresponding LOD in `lod_values`
+for (col in common_cols) {
+  data[[col]] <- ifelse(as.numeric(data[[col]]) < as.numeric(lod_values[[col]]), 
+                        as.numeric(lod_values[[col]]), 
+                        as.numeric(data[[col]]))
+}
+data <- data[,-c(1,2)]
+set.seed(123)
+############################
+# Apply CLR transformation
+clr_transformed_data <- clr(data)
+clr_transformed_data <- as.data.frame(clr_transformed_data)
+anyNA(clr_transformed_data)
+
+# View the transformed data
+head(clr_transformed_data)
+set.seed(101)
+#################################################
+#################################################
+# Load necessary libraries
+library(pheatmap)
+library(dplyr)
+
+# Assuming clr_transformed_data and meta are already loaded as data frames
+
+# Ensure row names of clr_transformed_data match meta for annotation
+rownames(meta) <- meta$Customer.ID
+meta <- meta %>% select(-Customer.ID)  # Remove redundant column
+meta <- meta %>%
+  mutate(Type = str_replace(Type, "Coconut mik", "Coconut milk"))
+# Apply log(2) transformation
+clr_transformed_data_log2 <- clr_transformed_data / log(2)
+
+# Scale values by subtracting feature (column) mean
+clr_transformed_data_scaled <- sweep(clr_transformed_data_log2, 2, colMeans(clr_transformed_data_log2), "-")
+set.seed(123)
+# Generate heatmap
 type_colors <- c(
   # Brine types
   "Sauerkraut" = "#1b9e77",
@@ -810,69 +1293,768 @@ type_colors <- c(
   "Coconut milk kefir" = "#9467bd",
   "Unfermented Coconut milk" = "#9467bd"
 )
+
+substrate_colors <- c("Brine"= "#1b9e77","Sugar" = "#ff7f0e", "Dairy" = "#1f77b4","Dairy alternate" = "#9467bd" )
+#####
 status_colors <- c(
   "Fermented" = "#1f78b4",    # Dark blue
   "Unfermented" = "#a6cee3"   # Light blue
 )
+annotation_colors <- list(
+  Type = type_colors,
+  Status = status_colors, 
+  Substrate = substrate_colors
+)
+pheatmap(
+  mat = clr_transformed_data_scaled,
+  annotation_row = meta,
+  annotation_colors = annotation_colors,  # <- Custom color list
+  clustering_distance_rows = "euclidean",
+  clustering_distance_cols = "euclidean",
+  clustering_method = "ward.D2",
+  cluster_rows = TRUE,
+  cluster_cols=FALSE,
+  show_rownames = FALSE,
+  show_colnames = TRUE,
+  fontsize_row = 6,
+  fontsize_col = 6,
+  border_color = "black",
+  color = colorRampPalette(c("blue", "white", "red"))(50)
+)#saved as a svg using the side plot bar 1500 width and 1680 height
+#################################################################################
+#################################################################################
+library(gridExtra)
+library(circlize)
+library(ape)
+library(dendextend)
+library(corrplot)
+library(cluster)
+library(ggtree)
+#######################################
+#######################################
+data_o <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/neurometabolites.csv", header = FALSE)
+colnames(data_o) <- as.character(data_o[1, ])
+data_o <- data_o[-1, ]  # Remove the first row
+meta <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute_by_R.csv")
+meta <- meta[,c(1:5)]
+meta_2 <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/neuro_meta.csv")
+data <- data_o
+##################################
+####################################
+####################################
+####################################
+#only keeping level 1 and level 2
+meta <- meta %>%
+  mutate(Type = str_replace(Type, "Coconut mik", "Coconut milk"))
+# Keep only rows where Level is 1, 2a, or 2b
+meta_2 <- meta_2 %>%
+  filter(Level %in% c("1", "2a", "2b"))
 
-p <- ggplot(meta_richness_long, aes(x = Category, y = Richness, fill = Category)) +
-  geom_boxplot(alpha = 0.5, outlier.shape = NA) +
-  geom_jitter(aes(x = Category, y = Richness), 
-              width = 0.2, size = 3, alpha = 0.7, color = "black", show.legend = FALSE) +
-  facet_wrap(~ Factor, scales = "free_x") +
-  theme_minimal(base_size = 14) +
-  labs(
-    title = "Effect of Substrate, Status, and Type on Neuromodulatory Metabolite Richness",
-    x = "",
-    y = "Number of Neuromodulatory Metabolites"
-  ) +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    panel.border = element_rect(color = "black", fill = NA, size = 1),
-    strip.background = element_rect(fill = "gray80", color = "black", size = 1),
-    strip.text = element_text(face = "bold", size = 12)
-  ) +
-  scale_fill_manual(
-    values = c(
-      substrate_colors,
-      type_colors,
-      status_colors
-    ),
-    guide = guide_legend(override.aes = list(size = 6))
-  )
-# Custom facet labels
-facet_labels <- c(
-  "Substrate" = "Effect of Substrate", 
-  "Status" = "Effect of Fermentation Type",
-  "Type" = "Food Type"
+data_o <- data_o %>%
+  select(id, any_of(meta_2$Metabolite))
+###################################
+# Separate the LOD values (last row) from the data
+rownames(data) <- NULL
+rownames(data) <- data$id
+lod_values <- data[nrow(data), ]
+
+# Separate the LOD values (last row) from the data
+lod_values <- data[nrow(data), ]
+data <- data[-nrow(data), ]  # Remove the last row to keep only the data
+
+# Identify common columns in `data` and `lod_values`, excluding the first column in `data`
+common_cols <- intersect(names(data)[-c(1,2)], names(lod_values))
+
+# Apply the LOD replacement for each column in `data` that has a corresponding LOD in `lod_values`
+for (col in common_cols) {
+  data[[col]] <- ifelse(as.numeric(data[[col]]) < as.numeric(lod_values[[col]]), 
+                        as.numeric(lod_values[[col]]), 
+                        as.numeric(data[[col]]))
+}
+data <- data[,-c(1,2)]
+
+############################
+# Apply CLR transformation
+clr_transformed_data <- clr(data)
+clr_transformed_data <- as.data.frame(clr_transformed_data)
+anyNA(clr_transformed_data)
+
+# View the transformed data
+head(clr_transformed_data)
+set.seed(101)
+#######################################
+# Calculate Aitchison distance
+aitchison_distance <- as.matrix(dist(clr_transformed_data, method = "euclidean"))
+
+# Convert the distance matrix to a `dist` object if not already
+aitchison_dist <- as.dist(aitchison_distance)
+# Ensure meta table rownames match the sample IDs in the distance matrix
+rownames(meta) <- meta$Customer.ID
+meta <- meta[rownames(aitchison_distance), ]  # Align meta with distance matrix
+# Perform hierarchical clustering
+hclust_result <- hclust(aitchison_dist, method = "ward.D2")
+# Convert hclust to a dendrogram
+dendro <- as.dendrogram(hclust_result)
+# Compute silhouette scores for a range of cluster numbers
+sil_scores <- lapply(2:10, function(k) {
+  cluster_labels <- cutree(hclust_result, k = k)  # Cluster labels for `k` clusters
+  silhouette(cluster_labels, dist = aitchison_dist)  # Compute silhouette
+})
+
+# Extract the average silhouette width for each number of clusters
+avg_sil <- sapply(sil_scores, function(s) mean(s[, 3]))  # Silhouette width is in the third column
+
+# Increase plot margins
+par(mar = c(5, 5, 4, 2))  # Adjust bottom, left, top, and right margins
+
+# Recreate the silhouette plot
+plot(2:10, avg_sil, type = "b", pch = 19, col = "blue",
+     main = "Silhouette Analysis for Optimal Clusters",
+     xlab = "Number of Clusters", ylab = "Average Silhouette Width")
+###############################################################################
+#to make a kindergarden dendrogram
+
+# Convert hclust to phylo object
+phylo_tree <- as.phylo(hclust_result)
+
+# Extract clustering information
+num_clusters <- 4  
+clusters <- cutree(hclust_result, k = num_clusters)
+
+# Ensure metadata matches the tree tip labels
+meta$Cluster <- clusters
+meta <- meta[rownames(aitchison_distance), ]  # Align metadata
+
+# Replace sample IDs with substrates in tree labels
+phylo_tree$tip.label <- meta$Substrate[match(phylo_tree$tip.label, meta$Customer.ID)]
+
+# Assign colors for clusters (halo effect)
+cluster_colors <- setNames(rainbow(num_clusters), unique(meta$Cluster))
+
+# Create the circular dendrogram **with legend for cluster colors**
+p <- ggtree(phylo_tree, layout = "circular", branch.length = "none") + 
+  geom_tiplab(aes(label = label), 
+              size = 4, fontface = "bold", align = TRUE, hjust = 0.5, offset = 1.5) +  # Move labels outward
+  geom_hilight(mapping = aes(subset = label %in% meta$Substrate, 
+                             fill = factor(meta$Cluster[match(label, meta$Substrate)])), 
+               alpha = 0.4, show.legend = TRUE) +  # Ensure legend is shown
+  scale_fill_manual(name = "Cluster", values = cluster_colors, labels = unique(meta$Cluster))+
+  labs(title = "Clustering of foods based on neuromodultory content", fill = "Cluster") +
+  theme(legend.position = "right")  # Legend
+
+
+# Display the plot
+print(p) 
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/ggtree.svg", plot = p, width = 12, height = 6, units = "in")
+
+meta$Cluster <- clusters  
+
+
+cluster_means <- aggregate(. ~ Cluster, data = cbind(Cluster = meta$Cluster, clr_transformed_data), FUN = mean)
+
+head(cluster_means)
+
+
+#finding the features that drive the clustering
+# Assuming `data` is your CLR-transformed data frame and `clusters` are cluster assignments
+clusters <- cutree(hclust_result, k = 4)  # Cut the dendrogram into 4 clusters (example)
+data$Cluster <- as.factor(clusters)      # Add cluster labels to the data
+
+# Calculate average feature values by cluster
+feature_means <- aggregate(. ~ Cluster, data = data, FUN = mean)
+
+# View features driving clusters
+print(feature_means)
+significant_features <- sapply(names(data)[-ncol(data)], function(feature) {
+  kruskal.test(data[[feature]] ~ data$Cluster)$p.value
+})
+
+# View features with significant differences
+significant_features <- significant_features[significant_features < 0.05]
+print(significant_features)
+# Subset data for features and clusters
+heatmap_data <- data[, -ncol(data)]  # Remove cluster column
+heatmap_clusters <- as.numeric(data$Cluster)
+heatmap_data <- clr(heatmap_data)
+heatmap_data <- as.data.frame(heatmap_data)
+type_colors <- c(
+  # Brine types
+  "Sauerkraut" = "#1b9e77",
+  "Sauerkraut Broth" = "#1b9e77",
+  "Kvass" = "#1b9e77",
+  "Kimchi" = "#1b9e77",
+  
+  # Sugar types
+  "Kombucha" = "#ff7f0e",
+  "Water kefir" = "#ff7f0e",
+  "Unfermented fig" = "#ff7f0e",
+  "Unfermented tea" = "#ff7f0e",
+  
+  # Dairy types
+  "Milk Kefir" = "#1f77b4",
+  "Unfermented Milk" = "#1f77b4",
+  
+  # Coconut/Dairy alternate
+  "Coconut milk kefir" = "#9467bd",
+  "Unfermented Coconut milk" = "#9467bd"
 )
 
-# Plot
-p <- ggplot(meta_richness_long, aes(x = Category, y = Richness, fill = Category)) +
-  geom_boxplot(alpha = 0.5, outlier.shape = NA) +
-  geom_jitter(aes(x = Category, y = Richness),
-              width = 0.2, size = 3, alpha = 0.7, color = "black", show.legend = FALSE) +
-  facet_wrap(~ Factor, scales = "free_x", labeller = labeller(Factor = facet_labels)) +  # 👈 this line adds custom labels
-  theme_minimal(base_size = 14) +
-  labs(
-    title = "Effect of Substrate, Status, and Type on Global Metabolite Richness",
-    x = "",
-    y = "Number of Neuromodulatory Metabolites"
-  ) +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    panel.border = element_rect(color = "black", fill = NA, size = 1),
-    strip.background = element_rect(fill = "gray80", color = "black", size = 1),
-    strip.text = element_text(face = "bold", size = 12)
-  ) +
-  scale_fill_manual(
-    values = c(
-      substrate_colors,
-      type_colors,
-      status_colors
-    ),
-    guide = guide_legend(override.aes = list(size = 6))
+substrate_colors <- c("Brine"= "#1b9e77","Sugar" = "#ff7f0e", "Dairy" = "#1f77b4","Dairy alternate" = "#9467bd" )
+#####
+status_colors <- c(
+  "Fermented" = "#1f78b4",    # Dark blue
+  "Unfermented" = "#a6cee3"   # Light blue
+)
+# Use only selected columns for annotation (excluding Customer.ID)
+annotation_df <- meta[, c("Type", "Status", "Substrate", "Cluster")]
+
+# Add cluster colors (if needed)
+annotation_colors$Cluster <- setNames(RColorBrewer::brewer.pal(4, "Set2"), unique(annotation_df$Cluster))
+
+pheatmap(
+  mat = as.matrix(heatmap_data),
+  annotation_row = annotation_df,  # No Customer.ID
+  annotation_colors = annotation_colors,
+  cluster_rows = TRUE,
+  cluster_cols = FALSE,
+  show_rownames = FALSE,
+  show_colnames = TRUE,
+  fontsize_row = 6,
+  fontsize_col = 8,
+  border_color = "black",
+  legend = TRUE,
+  color = colorRampPalette(c("blue", "white", "red"))(50)
+)
+###################################################################################
+#install.packages("UpSetR")
+library(UpSetR)
+install.packages("compositions")  # Uncomment if you haven't installed it yet
+library(compositions)
+library(phyloseq)
+###################################################################################
+#what are the factors driving this clustering
+###################################################################################
+###########################################################
+data_o <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/neurometabolites.csv", header = FALSE)
+colnames(data_o) <- as.character(data_o[1, ])
+data_o <- data_o[-1, ]  # Remove the first row
+meta <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute_by_R.csv")
+meta <- meta[,c(1:5)]
+meta_2 <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/neuro_meta.csv")
+data <- data_o
+###################################
+# Separate the LOD values (last row) from the data
+rownames(data) <- NULL
+rownames(data) <- data$id
+lod_values <- data[nrow(data), ]
+
+lod_values <- data[nrow(data), ]
+data <- data[-nrow(data), ]  #to keep data without lod row
+
+
+common_cols <- intersect(names(data)[-c(1,2)], names(lod_values))
+
+for (col in common_cols) {
+  data[[col]] <- ifelse(as.numeric(data[[col]]) < as.numeric(lod_values[[col]]), 
+                        as.numeric(lod_values[[col]]), 
+                        as.numeric(data[[col]]))
+}
+data <- data[,-c(1,2)]
+
+############################
+############################
+
+clr_transformed_data <- clr(data)
+clr_transformed_data <- as.data.frame(clr_transformed_data)
+anyNA(clr_transformed_data)
+
+
+#############################
+#############################
+# Calculate Aitchison distance
+aitchison_distance <- as.matrix(dist(clr_transformed_data, method = "euclidean"))
+#do this to not get err downststream
+aitchison_dist <- as.dist(aitchison_distance)
+#  match the sample IDs in the distance matrix
+rownames(meta) <- meta$Customer.ID
+meta <- meta[rownames(aitchison_distance), ]  # Align meta with distance matrix
+
+hclust_result <- hclust(aitchison_dist, method = "ward.D2")
+
+num_clusters <- 4  # Specify 4 clusters
+clusters_2 <- cutree(hclust_result, k = num_clusters)  # Cut into 4 clusters
+meta$Cluster <- clusters_2[meta$Customer.ID]
+#############################################################################
+#############################################################################
+
+#we want this as a phyloseq object
+#trying new ways to merge tables
+clr_data <- t(clr_transformed_data)
+
+otu_table <- otu_table(clr_data, taxa_are_rows = TRUE)
+
+
+sample_data <- sample_data(meta)
+
+phyloseq_obj <- phyloseq(otu_table, meta)
+
+
+phyloseq_obj
+psMelt <- psmelt(phyloseq_obj) 
+
+
+#############################################
+#############################################
+
+psMelt <- merge(psMelt, meta[, c("Customer.ID", "Cluster")], 
+                by.x = "Sample", by.y = "Customer.ID", 
+                all.x = TRUE)
+psMelt <- merge(psMelt, meta[, c("Customer.ID", "Substrate")], 
+                by.x = "Sample", by.y = "Customer.ID", 
+                all.x = TRUE)
+psMelt <- merge(psMelt, meta[, c("Customer.ID", "Fermentation_type")], 
+                by.x = "Sample", by.y = "Customer.ID", 
+                all.x = TRUE)
+
+data <- psMelt 
+data$Cluster <- as.factor(data$Cluster)
+
+###########################################################################
+# Linear model for Abundance ~ Cluster + Substrate
+model <- lm(Abundance ~ as.factor(Cluster) , data = data)
+
+# Summary of the model
+summary(model)#this code will choose cluster 1 as the reference cluster
+#Abundance is the dependant variable and Cluster is the independent variable
+#the result from this code tells us that cluster does not infleunce the abundance of the metabolites
+#the cluster means do no differ from that of custer 1 as t =0
+###########################################################################
+
+########################################
+glm_model <- glm(Abundance ~ Cluster, data = data, family = gaussian()) # i have used gaussian as it is clr transformed
+summary(glm_model)
+############################################################
+
+# Linear model without intercept
+lm_no_intercept <- lm(Abundance ~ 0 + Cluster, data = data) # No Intercept (0 + Cluster):
+#Use when you want to compare the absolute mean Abundance values for each cluster directly.
+#Removes the intercept → Each cluster gets its own coefficient.
+
+
+# Summary of the model
+summary(lm_no_intercept)
+
+# cluster does not affect abundance
+#however the baove codes consider all the otu aka the metabolites in a cluster
+#this does not tell us much
+#a better approach would be to see which specific metabolites are different between the cluster and run GLM for each of the metabolites
+##########################################################################
+# Function to analyze each metabolite
+metabolite_analysis <- data %>%
+  group_by(OTU) %>%
+  do({
+    model <- lm(Abundance ~ as.factor(Cluster), data = .) 
+    summary_model <- summary(model)                       
+    coefficients <- summary_model$coefficients            
+    p_values <- coefficients[, "Pr(>|t|)"]                
+    
+    # Return results
+    data.frame(
+      OTU = unique(.$OTU),
+      Cluster = rownames(coefficients),
+      Estimate = coefficients[, "Estimate"],
+      Std_Error = coefficients[, "Std. Error"],
+      p_value = p_values
+    )
+  })
+#Tests whether cluster affects each metabolite individually
+# this is different from the above as we check if the cluser affects the abundance of all metabolites together
+
+# Adjust p-values for multiple testing (optional)
+metabolite_analysis <- metabolite_analysis %>%
+  mutate(adjusted_p_value = p.adjust(p_value, method = "BH"))
+
+# Identify key metabolites for each cluster (significant results)
+key_metabolites <- metabolite_analysis %>%
+  filter(adjusted_p_value < 0.05) %>%
+  arrange(OTU, adjusted_p_value)
+#need to clean as i get as factor in the cluster column
+
+# Clean up the Cluster column
+key_metabolites <- key_metabolites %>%
+  mutate(Cluster = str_replace(Cluster, "as.factor\\(Cluster\\)", "Cluster"))
+#however this considers the first metabolite as the reference metabolite
+#which can be determined by this code
+data$OTU <- as.factor(data$OTU)
+levels(data$OTU)
+#"(+)-castanospermine"  <- will be the reference metabolite
+###############################################################################
+###############################################################################
+
+#identfying driving metabolites for each cluster
+#this is different from above because here the intercept is zero not cluster 1 as above
+metabolite_analysis <- data %>%
+  group_by(OTU) %>%
+  do({
+    model <- lm(Abundance ~ 0 + as.factor(Cluster), data = .)  # No intercept also do not use data = data here as lm wll use the entire dataset
+    summary_model <- summary(model)
+    coefficients <- summary_model$coefficients
+    p_values <- coefficients[, "Pr(>|t|)"]
+    
+    # Return results
+    data.frame(
+      OTU = unique(.$OTU),
+      Cluster = rownames(coefficients),
+      Estimate = coefficients[, "Estimate"],
+      Std_Error = coefficients[, "Std. Error"],
+      p_value = p_values
+    )
+  })
+
+# Adjust 
+metabolite_analysis <- metabolite_analysis %>%
+  mutate(adjusted_p_value = p.adjust(p_value, method = "BH"))
+# Identify key metabolites for each cluster (significant results)
+#is this correct
+key_metabolites_zero <- metabolite_analysis %>%
+  filter(adjusted_p_value < 0.05) %>%
+  arrange(OTU, adjusted_p_value)
+
+
+#becaue i am getting as.factor in each entry of cluster
+
+# Clean up the Cluster column
+key_metabolites_zero <- key_metabolites %>%
+  mutate(Cluster = str_replace(Cluster, "as.factor\\(Cluster\\)", "Cluster"))
+
+# View results
+print(key_metabolites_zero)
+#intercet here could mean the ref cluster
+#could this be cluster 1
+key_metabolites_zero <- key_metabolites_zero %>%
+  mutate(Cluster = ifelse(Cluster == "(Intercept)", "Cluster1", Cluster))
+
+#clean this to replace substrate in the place of cluster
+################################################################################
+
+
+# Convert data into presence/absence matrix (1 = Present, 0 = Absent)
+presence_absence_data <- key_metabolites_zero %>%
+  mutate(Present = 1) %>%  
+  select(OTU, Cluster, Present) %>%
+  spread(key = Cluster, value = Present, fill = 0)  # Convert to wide format
+rownames(presence_absence_data) <- NULL
+# Convert to matrix format for pheatmap
+presence_absence_matrix <- presence_absence_data %>%
+  column_to_rownames(var = "OTU") %>%  # Set OTU as row names
+  as.matrix()
+
+# Define color palette (White = Absent, Black = Present)
+binary_color_palette <- colorRampPalette(c("white", "black"))(2)
+
+pheatmap(presence_absence_matrix,
+         cluster_rows = TRUE, #Metabolites with similar presence/absence patterns across clusters are grouped together
+         cluster_cols = TRUE, 
+         color = binary_color_palette,  
+         main = "Neuromodulatory metabolites driving clustering",
+         legend_breaks = c(0, 1),
+         legend_labels = c("Absent", "Present"),
+         fontsize_row = 8,  # Adjust row name size
+         fontsize_col = 10,  # Adjust column name size
+         border_color = "gray50")  # Add grid lines (gray color)
+
+####################################################################################################################
+#the plot below is not as informative as the heatmap aka upset plot and also venn diagram 
+
+
+################################################################################
+# Create a list of OTUs for each cluster
+metabolites_by_cluster <- key_metabolites_zero %>%
+  group_by(Cluster) %>%
+  summarise(metabolites = list(unique(OTU))) %>%
+  deframe()  # Convert to named list
+#number of metablites per cluster
+metabolite_counts <- key_metabolites_zero %>%
+  group_by(Cluster) %>%
+  summarise(n_metabolites = n_distinct(OTU)) %>%
+  arrange(desc(n_metabolites))
+################################################
+################################################
+
+
+exclusive_shared_metabolites <- key_metabolites_zero %>%
+  filter(Cluster %in% c("Cluster1", "Cluster2")) %>%  # Keep only Clusters 1 & 2
+  group_by(OTU) %>%
+  summarise(n_clusters = n_distinct(Cluster), 
+            all_clusters = paste(unique(Cluster), collapse = ",")) %>%  # Track where each OTU appears
+  filter(n_clusters == 2) %>%  # Keep only those found in both Cluster 1 & 2
+  filter(!OTU %in% key_metabolites_zero$OTU[key_metabolites_zero$Cluster %in% c("Cluster3", "Cluster4")]) %>%
+  select(OTU)
+
+print(exclusive_shared_metabolites)
+
+
+
+
+
+################################################
+################################################
+
+# Prepare data for UpSet plot
+unique_metabolites <- key_metabolites_zero %>%
+  group_by(OTU) %>%
+  summarise(
+    n_clusters = n_distinct(Cluster),  # Count how many clusters have this metabolite
+    clusters = paste(unique(Cluster), collapse = ",")  # Concatenate cluster names
+  ) %>%
+  mutate(
+    status = case_when(
+      n_clusters == 1 ~ "Unique",  # If only in 1 cluster
+      n_clusters > 1 ~ "Shared"    # If in multiple clusters
+    )
   )
-ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/richness_global_split.svg", plot = p, width = 12, height = 6, units = "in")
+
+# Convert to matrix format for UpSet plot
+upset_data <- table(unique_metabolites$clusters)
+
+# Generate UpSet Plot
+upset(fromList(metabolites_by_cluster), 
+      nsets = length(metabolites_by_cluster), 
+      order.by = "freq")
+
+#again this doent tell me much
 
 
+################################################################################
+unique_metabolites <- key_metabolites_zero %>%
+  group_by(OTU) %>%
+  summarize(
+    n_clusters = n_distinct(Cluster),
+    clusters = paste(unique(Cluster), collapse = ",")
+  ) %>%
+  mutate(
+    status = case_when(
+      n_clusters == 1 ~ "Unique",  
+      n_clusters > 1 ~ "Shared"   
+    )
+  )
+
+# Create a list of metabolites for each cluster
+metabolites_by_cluster <- key_metabolites_zero %>%
+  group_by(Cluster) %>%
+  summarize(metabolites = list(unique(OTU))) %>%
+  deframe()  # Convert to a named list
+#install.packages('VennDiagram')
+library(VennDiagram)
+venn.plot <- venn.diagram(
+  x = metabolites_by_cluster,
+  category.names = names(metabolites_by_cluster),
+  filename = NULL, 
+  fill = c("red", "blue", "green", "yellow"),
+  alpha = 0.5,
+  cex = 1.5,
+  fontface = "bold"
+)
+
+grid::grid.draw(venn.plot)
+write.csv(key_metabolites_zero, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/key_metabolites_zero.csv", row.names = FALSE)
+write.csv(data, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/input_data_for_modelling.csv", row.names = FALSE)
+write.csv(meta, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/meta_data_for_modelling.csv", row.names = FALSE)
+#######################################################################
+#######################################################################
+
+# Plot: x-axis as Estimate, y-axis as OTU, size or color by p_value
+ggplot(key_metabolites_zero, aes(x = Estimate, y = OTU, color = Cluster)) +
+  geom_point(aes(size = adjusted_p_value)) +
+  scale_color_brewer(palette = "Set2", name = "Cluster") +  # Color scheme for clusters
+  scale_size_continuous(name = "p-value", range = c(2, 6)) +  # Size by p-value
+  labs(
+    title = "Metabolites by Estimate, OTU, and Cluster",
+    x = "Estimate (Effect Size)",
+    y = "OTU"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(size = 8),
+    axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+    legend.position = "right"
+  )
+########################################
+#co-occuring metabolites
+data <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute.csv")
+meta <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute_by_R.csv")
+meta <- meta[,c(1:5)]
+meta <- meta %>%
+  mutate(Type = str_replace(Type, "Coconut mik", "Coconut milk"))
+# Separate the LOD values (last row) from the data
+lod_values <- data[nrow(data), ]
+data <- data[-nrow(data), ]  # Remove the last row to keep only the data
+
+# Identify common columns in `data` and `lod_values`, excluding the first column in `data`
+common_cols <- intersect(names(data)[-c(1,2)], names(lod_values))
+
+# Apply the LOD replacement for each column in `data` that has a corresponding LOD in `lod_values`
+for (col in common_cols) {
+  data[[col]] <- ifelse(as.numeric(data[[col]]) < as.numeric(lod_values[[col]]), 
+                        as.numeric(lod_values[[col]]), 
+                        as.numeric(data[[col]]))
+}
+data <- data %>%
+  column_to_rownames(var = "Customer.ID")
+meta <- meta %>%
+  column_to_rownames(var = "Customer.ID")
+data <- data[,-1]
+meta <- meta %>%
+  mutate(Type = str_replace(Type, "Coconut mik", "Coconut milk"))
+####################################################
+# Apply CLR transformation
+clr_transformed_data <- clr(data)
+clr_transformed_data <- as.data.frame(clr_transformed_data)
+anyNA(clr_transformed_data)
+
+# View the transformed data
+head(clr_transformed_data)
+set.seed(101)
+###########################################################################
+clr_data <- clr_transformed_data
+####################
+# Convert CLR-transformed data to binary presence-absence (1 = present, 0 = absent)
+binary_data <- clr_data
+binary_data[binary_data > 0] <- 1  # Presence
+binary_data[binary_data <= 0] <- 0  # Absence
+
+# Function to filter metabolites present in all samples of a given Substrate
+filter_by_co_occurrence <- function(df, metadata, column = "Substrate") {
+  unique_groups <- unique(metadata[[column]])
+  retained_metabolites <- list()
+  
+  for (s in unique_groups) {
+    samples_in_substrate <- rownames(metadata[metadata[[column]] == s, ])
+    subset_data <- df[samples_in_substrate, , drop = FALSE]
+    
+    # Identify metabolites present (non-zero) in all samples for this Substrate
+    metabolites_to_keep <- colnames(subset_data)[colSums(subset_data == 1) == nrow(subset_data)]
+    
+    retained_metabolites[[s]] <- metabolites_to_keep
+  }
+  
+  return(retained_metabolites)
+}
+
+# Get list of metabolites that are present in all samples for each Substrate
+co_occurring_metabolites <- filter_by_co_occurrence(binary_data, meta, column = "Substrate")
+
+# Generate Jaccard similarity matrices per Substrate & count unique metabolites
+substrate_metabolite_counts <- data.frame(Substrate = character(), Metabolite_Count = integer(), stringsAsFactors = FALSE)
+
+for (s in names(co_occurring_metabolites)) {
+  metabolites <- co_occurring_metabolites[[s]]
+  if (length(metabolites) < 2) next  # Skip if not enough metabolites for comparison
+  
+  subset_data <- binary_data[rownames(meta[meta$Substrate == s, ]), metabolites, drop = FALSE]
+  
+  # Compute Jaccard similarity
+  jaccard_matrix <- vegdist(t(subset_data), method = "jaccard")
+  
+  # Convert distance to similarity
+  jaccard_similarity <- 1 - as.matrix(jaccard_matrix)
+  
+  # Convert to long format
+  jaccard_long <- as.data.frame(as.table(jaccard_similarity))
+  colnames(jaccard_long) <- c("Metabolite1", "Metabolite2", "Jaccard_Similarity")
+  
+  # Filter strong co-occurrences (Jaccard similarity > 0.7)
+  network_data <- jaccard_long %>% filter(Jaccard_Similarity > 0.7)
+  
+  # Count unique metabolites in the co-occurrence network
+  unique_metabolites <- unique(c(network_data$Metabolite1, network_data$Metabolite2))
+  
+  # Store the results
+  substrate_metabolite_counts <- rbind(substrate_metabolite_counts, 
+                                       data.frame(Substrate = s, Metabolite_Count = length(unique_metabolites)))
+}
+
+# Display results sorted by most co-occurring metabolites
+substrate_metabolite_counts <- substrate_metabolite_counts %>% arrange(desc(Metabolite_Count))
+
+# Print the table
+print(substrate_metabolite_counts)
+##########################################################################################
+##########################################################################################
+library(UpSetR)
+
+# Create a binary matrix of co-occurring metabolites per substrate
+co_occurrence_matrix <- as.data.frame(matrix(0, nrow = length(unique(unlist(co_occurring_metabolites))),
+                                             ncol = length(co_occurring_metabolites)))
+colnames(co_occurrence_matrix) <- names(co_occurring_metabolites)
+rownames(co_occurrence_matrix) <- unique(unlist(co_occurring_metabolites))
+
+# Fill in presence data
+for (s in names(co_occurring_metabolites)) {
+  co_occurrence_matrix[co_occurring_metabolites[[s]], s] <- 1
+}
+
+# Plot Upset
+upset(co_occurrence_matrix, sets = colnames(co_occurrence_matrix), 
+      order.by = "freq", mainbar.y.label = "Metabolite Overlap", 
+      sets.x.label = "Number of Metabolites")
+#########################################################################################
+########################################################################################
+# Create a binary matrix of co-occurring metabolites per substrate
+co_occurrence_matrix <- as.data.frame(matrix(0, 
+                                             nrow = length(unique(unlist(co_occurring_metabolites))),
+                                             ncol = length(co_occurring_metabolites)))
+colnames(co_occurrence_matrix) <- names(co_occurring_metabolites)
+rownames(co_occurrence_matrix) <- unique(unlist(co_occurring_metabolites))
+
+# Fill in presence data
+for (s in names(co_occurring_metabolites)) {
+  co_occurrence_matrix[co_occurring_metabolites[[s]], s] <- 1
+}
+
+# Convert to long format for UpSet analysis
+co_occurrence_long <- co_occurrence_matrix %>%
+  mutate(Metabolite = rownames(.)) %>%
+  pivot_longer(-Metabolite, names_to = "Substrate", values_to = "Presence")
+
+# Identify unique and shared metabolites across substrates
+shared_metabolites <- co_occurrence_long %>%
+  group_by(Metabolite) %>%
+  summarise(Shared_Substrates = paste(Substrate[Presence == 1], collapse = ", "),
+            Count = sum(Presence)) %>%
+  arrange(desc(Count))
+
+# Display the result as a table
+print(shared_metabolites)
+shared_metabolites <- as.data.frame(shared_metabolites)
+######################################################################################################
+######################################################################################################
+
+# Create a binary matrix of co-occurring metabolites per substrate
+co_occurrence_matrix <- as.data.frame(matrix(0, 
+                                             nrow = length(unique(unlist(co_occurring_metabolites))),
+                                             ncol = length(co_occurring_metabolites)))
+colnames(co_occurrence_matrix) <- names(co_occurring_metabolites)
+rownames(co_occurrence_matrix) <- unique(unlist(co_occurring_metabolites))
+
+# Fill in presence data
+for (s in names(co_occurring_metabolites)) {
+  co_occurrence_matrix[co_occurring_metabolites[[s]], s] <- 1
+}
+
+# Assign colors to each substrate
+num_substrates <- length(colnames(co_occurrence_matrix))
+substrate_colors <- brewer.pal(num_substrates, "Set2")  # Use Set2 color palette
+# Compute total number of metabolites per substrate
+total_metabolites_per_substrate <- colSums(co_occurrence_matrix)
+# Generate UpSet plot with colors and exact metabolite counts
+upset(co_occurrence_matrix, 
+      sets = colnames(co_occurrence_matrix), 
+      order.by = "freq", 
+      mainbar.y.label = "Number of Shared Metabolites", 
+      sets.x.label = "Total Metabolites per Substrate",
+      keep.order = TRUE,
+      show.numbers = "yes",  # Ensures exact numbers are displayed
+      sets.bar.color = substrate_colors, text.scale = 2)  # Color bars by substrate
+
+write.csv(shared_metabolites, "C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/final/New folder/shared_metabolites.csv")
