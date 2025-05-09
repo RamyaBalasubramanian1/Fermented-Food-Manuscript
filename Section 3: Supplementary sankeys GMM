@@ -1,0 +1,125 @@
+#install.packages("compositions")  
+library(compositions)
+library(stringr)
+library(janitor)
+library(ggplot2)
+library(janitor)
+library(dplyr)
+library(compositions)
+library(ghibli)
+library(factoextra)
+library(patchwork)
+library(pheatmap)
+library(ComplexHeatmap)
+install.packages("coloRamPalette")
+library(colorRampPalette)
+# Install the circlize package if not already installed
+if (!requireNamespace("circlize", quietly = TRUE)) {
+  install.packages("circlize")
+}
+library(rstatix)
+library(ggpubr)
+library(FSA)
+library(circlize)
+library(ggforce)
+library(vegan)
+if(!require(ggplot2)) install.packages("ggplot2")
+if(!require(factoextra)) install.packages("factoextra")
+library(gridExtra)
+library(ggplot2)
+library(factoextra)
+#install.packages("devtools")
+#devtools::install_github("pmartinezarbizu/pairwiseAdonis", force = TRUE)
+library(pairwiseAdonis)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+#install.packages("ggalluvial")
+library(ggalluvial)
+#install.packages("ggsankey")
+library(ggsankey)
+#install.packages("networkD3")
+library(networkD3)
+library(htmlwidgets)
+library(purrr)
+library(compositions)
+library(Tjazi)
+library(ComplexHeatmap)
+library(circlize)
+library(dplyr)
+library(igraph)
+library(ggraph)
+library(ggplot2)
+library(patchwork)
+########################
+
+
+########################################################
+########################################################
+
+mk_strat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/milk_kefir/gmm_strat/modules.tsv")
+mk_strat <- row_to_names(mk_strat, 1)
+mk_strat[, 3:ncol(mk_strat)] <- lapply(mk_strat[, 3:ncol(mk_strat)], as.numeric)
+str(mk_strat)
+library(tidyr)
+
+mk_long <- pivot_longer(mk_strat, 
+                        cols = -c(Taxon, Module), 
+                        names_to = "Sample", 
+                        values_to = "Contribution")
+mk_long <- mk_long[mk_long$Contribution > 0, ]
+
+anno <-read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/annotation_gmm.csv")
+dim(anno)
+meta <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/meta_insilico.csv")
+meta <- meta[,-c(7,8)]
+
+mk_long_annotated <- merge(mk_long, anno, by = "Module", all.x = TRUE)
+mk_long_annotated$Module <- NULL
+names(mk_long_annotated)[names(mk_long_annotated) == "Annotation"] <- "Module"
+################
+links <- aggregate(Contribution ~ Taxon + Superpathway, data = mk_long_annotated, sum)
+names(links) <- c("source", "target", "value")
+nodes <- data.frame(name = unique(c(links$source, links$target)))
+links$source <- match(links$source, nodes$name) - 1
+links$target <- match(links$target, nodes$name) - 1
+p <- sankeyNetwork(Links = links, Nodes = nodes,
+                   Source = "source", Target = "target",
+                   Value = "value", NodeID = "name",
+                   fontSize = 12, nodeWidth = 30)
+htmlwidgets::saveWidget(p, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk_gmm.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk_gmm.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk_gmm.pdf", selector = "pdf")
+###########################
+#including molecule
+# Load required package
+# Merge annotation info into mk_long
+mk_long_annotated <- merge(mk_long, anno[, c("Module", "Annotation", "Molecule")], 
+                           by = "Module", all.x = TRUE)
+
+# Aggregate for Taxon → Annotation
+links1 <- aggregate(Contribution ~ Taxon + Annotation, data = mk_long_annotated, sum)
+names(links1) <- c("source", "target", "value")
+
+# Aggregate for Annotation → Molecule
+links2 <- aggregate(Contribution ~ Annotation + Molecule, data = mk_long_annotated, sum)
+names(links2) <- c("source", "target", "value")
+
+# Combine both levels
+links <- rbind(links1, links2)
+
+# Create unique list of all nodes
+nodes <- data.frame(name = unique(c(links$source, links$target)))
+
+# Map node names to indices (0-based for networkD3)
+links$source <- match(links$source, nodes$name) - 1
+links$target <- match(links$target, nodes$name) - 1
+
+# Create Sankey plot
+p <- sankeyNetwork(Links = links, Nodes = nodes,
+                   Source = "source", Target = "target",
+                   Value = "value", NodeID = "name",
+                   fontSize = 12, nodeWidth = 30)
+htmlwidgets::saveWidget(p, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk.pdf", selector = "pdf")
+############################################
