@@ -249,3 +249,25 @@ q1 <- ggplot(richness_48h, aes(x = State, y = Richness, group = Strain, color = 
     legend.box.margin = margin(l = 10)
   )
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/supplementary/module_richness_overall_grain.svg", plot = q1, width = 12, height = 8, units = "in")
+wilcox_test_result <- wk_long %>%
+  filter(Time == "48h") %>%
+  group_by(Strain, State) %>%
+  summarise(Richness = sum(Presence), .groups = "drop") %>%
+  pivot_wider(names_from = State, values_from = Richness) %>%
+  filter(!is.na(L) & !is.na(G)) %>%
+  summarise(
+    p_value = wilcox.test(L, G, paired = TRUE)$p.value
+  )
+
+print(wilcox_test_result)
+wilcox_test_liquid_time <- wk_long %>%
+  filter(State == "L", Time %in% c("08h", "48h")) %>%
+  group_by(Strain, Time) %>%
+  summarise(Richness = sum(Presence), .groups = "drop") %>%
+  pivot_wider(names_from = Time, values_from = Richness) %>%
+  filter(!is.na(`08h`) & !is.na(`48h`)) %>%
+  summarise(
+    p_value = wilcox.test(`08h`, `48h`, paired = TRUE)$p.value
+  )
+
+print(wilcox_test_liquid_time)
