@@ -193,3 +193,59 @@ p3 <- ggplot(richness_df, aes(x = Time, y = Richness, fill = State)) +
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/supplementary/module_richness_p1.svg", plot = p1, width = 12, height = 8, units = "in")
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/supplementary/module_richness_p2.svg", plot = p2, width = 12, height = 8, units = "in")
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/supplementary/module_richness_p3.svg", plot = p3, width = 12, height = 8, units = "in")
+library(dplyr)
+library(ggplot2)
+
+# Filter to liquid-only and calculate richness
+richness_liquid <- wk_long %>%
+  filter(State == "L") %>%
+  group_by(Strain, Time) %>%
+  summarise(Richness = sum(Presence), .groups = "drop")
+
+# Plot with smaller legend
+q <- ggplot(richness_liquid, aes(x = Time, y = Richness, group = Strain)) +
+  geom_line(aes(color = Strain), alpha = 0.3) +
+  stat_summary(aes(group = 1), fun = mean, geom = "line", color = "black", size = 1.2) +
+  stat_summary(aes(group = 1), fun = mean, geom = "point", color = "black", size = 2) +
+  theme_minimal() +
+  labs(
+    title = "Overall Module Richness Trend in Liquid State",
+    subtitle = "Black line shows average richness across all strains",
+    x = "Time",
+    y = "Number of Modules Present"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.text = element_text(size = 6),
+    legend.title = element_text(size = 6),  plot.title = element_text(size = 8, face = "bold"),
+    plot.subtitle = element_text(size = 9),  legend.justification = c(1.2, 0.9),  # Push legend farther right
+    legend.box.margin = margin(l = 10)
+  )
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/supplementary/module_richness_overall.svg", plot = q, width = 12, height = 8, units = "in")
+# Prepare data: richness per strain for 48h timepoint
+richness_48h <- wk_long %>%
+  filter(Time == "48h") %>%
+  group_by(Strain, State) %>%
+  summarise(Richness = sum(Presence), .groups = "drop")
+
+# Plot: per-strain lines + mean line across strains, with legend
+q1 <- ggplot(richness_48h, aes(x = State, y = Richness, group = Strain, color = Strain)) +
+  geom_point(size = 3) +
+  geom_line(alpha = 0.6) +
+  stat_summary(aes(group = 1), fun = mean, geom = "line", color = "black", size = 1.2, show.legend = FALSE) +
+  stat_summary(aes(group = 1), fun = mean, geom = "point", color = "black", size = 2.5, show.legend = FALSE) +
+  theme_minimal() +
+  labs(
+    title = "Module Richness per Strain at 48h: Liquid vs Grain",
+    subtitle = "Black line shows mean richness across all strains",
+    x = "State",
+    y = "Number of Modules Present",
+    color = "Strain"
+  ) + theme(
+    axis.text.x = element_text(angle = 0, hjust = 1),
+    legend.text = element_text(size = 6),
+    legend.title = element_text(size = 6),  plot.title = element_text(size = 8, face = "bold"),
+    plot.subtitle = element_text(size = 9),  legend.justification = c(1.2, 0.9),  # Push legend farther right
+    legend.box.margin = margin(l = 10)
+  )
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/supplementary/module_richness_overall_grain.svg", plot = q1, width = 12, height = 8, units = "in")
