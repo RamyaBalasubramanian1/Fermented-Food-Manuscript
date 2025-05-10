@@ -1,0 +1,195 @@
+#install.packages("compositions")  
+library(compositions)
+library(stringr)
+library(janitor)
+library(ggplot2)
+library(janitor)
+library(dplyr)
+library(compositions)
+library(ghibli)
+library(factoextra)
+library(patchwork)
+library(pheatmap)
+library(ComplexHeatmap)
+install.packages("coloRamPalette")
+library(colorRampPalette)
+# Install the circlize package if not already installed
+if (!requireNamespace("circlize", quietly = TRUE)) {
+  install.packages("circlize")
+}
+library(rstatix)
+library(ggpubr)
+library(FSA)
+library(circlize)
+library(ggforce)
+library(vegan)
+if(!require(ggplot2)) install.packages("ggplot2")
+if(!require(factoextra)) install.packages("factoextra")
+library(gridExtra)
+library(ggplot2)
+library(factoextra)
+#install.packages("devtools")
+#devtools::install_github("pmartinezarbizu/pairwiseAdonis", force = TRUE)
+library(pairwiseAdonis)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+#install.packages("ggalluvial")
+library(ggalluvial)
+#install.packages("ggsankey")
+library(ggsankey)
+#install.packages("networkD3")
+library(networkD3)
+library(htmlwidgets)
+library(purrr)
+library(compositions)
+library(Tjazi)
+library(ComplexHeatmap)
+library(circlize)
+library(dplyr)
+library(igraph)
+library(ggraph)
+library(ggplot2)
+library(patchwork)
+#############################################################
+wk_strat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/wk_final_run/waterkefir/strat/modules.tsv")
+wk_strat <- row_to_names(wk_strat, 1)
+wk_strat[, 3:ncol(wk_strat)] <- lapply(wk_strat[, 3:ncol(wk_strat)], as.numeric)
+str(wk_strat)
+library(tidyr)
+
+wk_long <- pivot_longer(wk_strat, 
+                        cols = -c(Taxon, Module), 
+                        names_to = "Sample", 
+                        values_to = "Contribution")
+wk_long <- wk_long[wk_long$Contribution > 0, ]
+
+anno <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/annotation_gbm.csv")
+dim(anno)
+#################
+#################
+meta <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/meta_insilico.csv")
+meta <- meta[,-c(7,8)]
+
+wk_long_annotated <- merge(wk_long, anno[, c("Module", "Annotation")], by = "Module", all.x = TRUE)
+wk_long_annotated$Module <- NULL
+names(wk_long_annotated)[names(wk_long_annotated) == "Annotation"] <- "Module"
+##################
+wk_long_annotated$Sample <- substr(wk_long_annotated$Sample, 1, 13)
+wk_long_annotated <- separate(
+  wk_long_annotated,
+  col = Sample,
+  into = c("Strain", "Passage", "State", "Time"),
+  sep = "-",
+  remove = FALSE
+)
+wk_long_annotated_1 <- wk_long_annotated[grepl("h$", wk_long_annotated$Time), ]
+removed_rows <- wk_long_annotated[!grepl("h$", wk_long_annotated$Time), ]#sam said remove these
+################################
+wk_unstrat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/wk_final_run/waterkefir/modules.tsv", header = TRUE)
+colnames(wk_unstrat) <- substr(colnames(wk_unstrat), 1, 13)
+wk_long <- pivot_longer(
+  wk_unstrat,
+  cols = -Module,
+  names_to = "Sample",
+  values_to = "Abundance"
+)
+wk_long <- separate(
+  wk_long,
+  col = Sample,
+  into = c("Strain", "Passage", "State", "Time"),
+  sep = "\\."
+)
+wk_long$Strain[grepl("^WKMedia", wk_long$Strain)] <- "media"
+wk_long <- wk_long %>%
+  mutate(across(where(is.character), ~replace_na(., "not_applicable"))) %>%
+  mutate(across(where(is.numeric),   ~replace_na(., 0)))
+wk_long <- wk_long[grepl("h$", wk_long$Time), ]
+##################
+head(wk_long)
+library(reshape2)
+library(vegan)
+library(tidyr)
+library(ggplot2)
+library(dplyr)
+
+# Step 1: Create Presence column and SampleID
+wk_long <- wk_long %>%
+  mutate(
+    Presence = ifelse(Abundance > 0, 1, 0),
+    SampleID = paste(Strain, Time, sep = "_")
+  )
+
+# Step 2: Pivot to wide format (presence/absence matrix)
+wk_pca_matrix <- dcast(
+  wk_long,
+  SampleID ~ Module,
+  value.var = "Presence",
+  fun.aggregate = max,
+  fill = 0
+)
+rownames(wk_pca_matrix) <- wk_pca_matrix$SampleID
+wk_pca_matrix$SampleID <- NULL
+
+# Step 3: Compute Jaccard distance and PCoA
+jaccard_dist <- vegdist(wk_pca_matrix, method = "jaccard", binary = TRUE)
+pcoa_result <- cmdscale(jaccard_dist, k = 2, eig = TRUE)
+pcoa_df <- as.data.frame(pcoa_result$points)
+colnames(pcoa_df) <- c("PCoA1", "PCoA2")
+pcoa_df$SampleID <- rownames(pcoa_df)
+
+# Step 4: Extract metadata and plot
+pcoa_df <- pcoa_df %>%
+  separate(SampleID, into = c("Strain", "Time"), sep = "_")
+
+ggplot(pcoa_df, aes(x = PCoA1, y = PCoA2, color = Strain, shape = Time, group = Strain)) +
+  geom_point(size = 3) +
+  geom_path(alpha = 0.3) +
+  theme_minimal() +
+  labs(title = "PCoA (Jaccard) of Module Presence/Absence", x = "PCoA 1", y = "PCoA 2")
+#########
+library(dplyr)
+library(ggplot2)
+library(ggforce)
+
+# Step 1: Calculate richness per Strain, Passage, Time
+richness_df <- wk_long %>%
+  group_by(Strain, State, Time) %>%
+  summarise(Richness = sum(Presence), .groups = "drop")
+
+# Step 2: Plot page 1 of 20 facets
+p1 <- ggplot(richness_df, aes(x = Time, y = Richness, fill = State)) +
+  geom_col(position = "dodge") +
+  ggforce::facet_wrap_paginate(~Strain, scales = "free_y", ncol = 5, nrow = 4, page = 1) +
+  theme_minimal() +
+  labs(
+    title = "Module Richness Over Time by Passage (Page 1)",
+    x = "Time",
+    y = "Number of Modules Present"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+p2 <- ggplot(richness_df, aes(x = Time, y = Richness, fill = State)) +
+  geom_col(position = "dodge") +
+  ggforce::facet_wrap_paginate(~Strain, scales = "free_y", ncol = 5, nrow = 4, page = 2) +
+  theme_minimal() +
+  labs(
+    title = "Module Richness Over Time by Passage (Page 1)",
+    x = "Time",
+    y = "Number of Modules Present"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+p3 <- ggplot(richness_df, aes(x = Time, y = Richness, fill = State)) +
+  geom_col(position = "dodge") +
+  ggforce::facet_wrap_paginate(~Strain, scales = "free_y", ncol = 5, nrow = 4, page = 3) +
+  theme_minimal() +
+  labs(
+    title = "Module Richness Over Time by Passage (Page 1)",
+    x = "Time",
+    y = "Number of Modules Present"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+######################
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/supplementary/module_richness_p1.svg", plot = p1, width = 12, height = 8, units = "in")
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/supplementary/module_richness_p2.svg", plot = p2, width = 12, height = 8, units = "in")
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/supplementary/module_richness_p3.svg", plot = p3, width = 12, height = 8, units = "in")
