@@ -271,3 +271,73 @@ wilcox_test_liquid_time <- wk_long %>%
   )
 
 print(wilcox_test_liquid_time)
+#######################################
+######################################################
+mk_unstrat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/milk_kefir/gbm/modules.tsv", header = TRUE)
+meta_milk <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/mk_to_remove.csv")
+head(meta_milk)
+meta_milk <- meta_milk[trimws(meta_milk$Time) != "", ]
+meta_milk <- meta_milk[trimws(meta_milk$Time) != "remove", ]
+meta_milk <- meta_milk[trimws(meta_milk$Time) != "Remove", ]
+meta_milk$Time <- gsub("^24$", "24h", meta_milk$Time)
+colnames(mk_unstrat) <- sub("_S.*", "", colnames(mk_unstrat))
+meta_milk$Sample <- sub("_S.*", "", meta_milk$Sample)
+#####
+# Get list of unique sample names from meta_milk
+samples_to_keep <- unique(meta_milk$Sample)
+
+# Subset mk_unstrat to keep only matching sample columns and the "Module" column
+mk_unstrat <- mk_unstrat[, colnames(mk_unstrat) %in% c("Module", samples_to_keep)]
+mk_long <- pivot_longer(mk_unstrat, cols = -Module, names_to="Sample", values_to = "Abundance")
+mk_long <- mk_long %>%
+  mutate(
+    Presence = ifelse(Abundance > 0, 1, 0)
+  )
+
+mk_all <- merge(mk_long, meta_milk, by = "Sample")
+##########################
+# Step 1: Convert to binary presence/absence (1 if >1, else 0)
+mk_binary <- mk_unstrat
+mk_binary[,-1] <- ifelse(mk_binary[,-1] > 1, 1, 0)
+
+# Step 2: Transpose to sample-by-module matrix for PCoA
+mk_mat <- as.data.frame(t(mk_binary[,-1]))
+colnames(mk_mat) <- mk_binary$Module
+mk_mat$Sample <- rownames(mk_mat)
+# Step 1: Remove samples (rows) with all 0s
+mk_mat_clean <- mk_mat %>%
+  filter(rowSums(select(., -Sample)) > 0)
+# Step 3: Jaccard PCoA
+jaccard_dist <- vegdist(mk_mat_clean[, -ncol(mk_mat_clean)], method = "jaccard", binary = TRUE)
+pcoa_result <- cmdscale(jaccard_dist, k = 2, eig = TRUE)
+
+# Step 4: Create PCoA dataframe
+pcoa_df <- as.data.frame(pcoa_result$points)
+colnames(pcoa_df) <- c("PCoA1", "PCoA2")
+pcoa_df$Sample <- rownames(pcoa_df)
+
+# Step 5: Merge with metadata
+pcoa_df <- left_join(pcoa_df, meta_milk, by = "Sample")
+
+ggplot(pcoa_df, aes(x = PCoA1, y = PCoA2, color = Time)) +
+  geom_point(size = 3) +
+  theme_minimal() +
+  labs(title = "PCoA (Jaccard) of Module Presence/Absence by Time",
+       x = "PCoA 1", y = "PCoA 2")
+# Step 7: Compute and plot richness (sum of modules per sample)
+richness_df <- mk_mat %>%
+  rowwise() %>%
+  mutate(Richness = sum(c_across(-Sample))) %>%
+  ungroup() %>%
+  select(Sample, Richness) %>%
+  left_join(meta_milk, by = "Sample")
+richness_df$Time <- factor(richness_df$Time, levels = c("0h", "8h", "24h"))
+ggplot(richness_df, aes(x = Time, y = Richness, fill = Time)) +
+  geom_col(position = "dodge") +
+  theme_minimal() +
+  labs(title = "Module Richness by Sample",
+       x = "Time", y = "Number of Modules Present") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+######
+shapiro_test(richness_df$Richness)
+kruskal.test(Richness ~ Time, data = richness_df)#need to find if the samples are paired or not
