@@ -64,7 +64,11 @@ aff <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-si
 fs <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/FS/gmm/modules.tsv", header = TRUE)
 paula <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/Paula/gmm/modules.tsv", header = TRUE)
 mk <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/milk_kefir/gmm/modules.txt", header = TRUE)
-
+mk_remove <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/mk_to_Remove.csv")
+removed_samples <- mk_remove %>%
+  filter(is.na(Time) | (Time) == "" | tolower(Time) == "remove") %>%
+  pull(Sample)
+colnames(mk) <- gsub("\\.", "-", colnames(mk))
 colnames(mk) <- gsub("\\.", "-", colnames(mk))
 
 wk <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/wk_final_run/gmm/modules.tsv", header = TRUE)
@@ -125,6 +129,8 @@ invalid_cols <- setdiff(clean_colnames, clean_meta_ids)
 # View them
 invalid_cols
 ################################################################################
+all <- all[, !(colnames(all) %in% removed_samples)]#removing controls and replicates
+all <- all[, !(colnames(all) == "AF90")]#low sequencing depth
 ################################################################################
 call <- all
 call <- t(call)
@@ -522,8 +528,12 @@ aff <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-si
 fs <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/FS/gbm/modules.tsv", header = TRUE)
 paula <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/Paula/gbm/modules.tsv", header = TRUE)
 mk <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/milk_kefir/gbm/modules.txt", header = TRUE)
-
+mk_remove <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/mk_to_Remove.csv")
+removed_samples <- mk_remove %>%
+  filter(is.na(Time) | (Time) == "" | tolower(Time) == "remove") %>%
+  pull(Sample)
 colnames(mk) <- gsub("\\.", "-", colnames(mk))
+
 
 wk <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/wk_final_run/waterkefir/modules.tsv", header = TRUE)
 wk <- wk[, !grepl("^WK.*T", colnames(wk))]
@@ -583,6 +593,9 @@ invalid_cols <- setdiff(clean_colnames, clean_meta_ids)
 # View them
 invalid_cols
 ################################################################################
+################################################################################
+all <- all[, !(colnames(all) %in% removed_samples)]#removing controls and replicates
+all <- all[, !(colnames(all) == "AF90")]#low sequencing depth
 ################################################################################
 call <- all
 call <- t(call)
@@ -1010,3 +1023,4 @@ p4 <- ggplot(dunn_matrix, aes(x = Group1, y = Group2, fill = p.adj)) +
     panel.spacing = unit(1, "lines")
   )
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_2/gbm_dunn_pg_4.svg", plot = p4, width = 8, height = 6, units = "in")
+
