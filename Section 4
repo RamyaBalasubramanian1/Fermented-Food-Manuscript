@@ -10,6 +10,11 @@ meta <- meta[,-c(7,8)]
 anno <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/tryp_anno.csv")
 wk <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/wk_final_run/unstrat.txt", sep = "\t", header = TRUE)
 mk <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/milk_kefir/unstrat_mod.txt", sep = "\t", header = TRUE)
+mk_remove <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/mk_to_Remove.csv")
+removed_samples <- mk_remove %>%
+  filter(is.na(Time) | (Time) == "" | tolower(Time) == "remove") %>%
+  pull(Sample)
+colnames(mk) <- gsub("\\.", "-", colnames(mk))
 bai <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/baijiu/unstrat.txt", sep = "\t", header = TRUE)
 kom <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/kombucha/unstrat.txt", sep = "\t", header = TRUE)
 kin <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/kinema/unstrat.txt", sep = "\t", header = TRUE)
@@ -67,6 +72,9 @@ clean_meta_ids <- trimws(meta$ID)
 invalid_cols <- setdiff(clean_colnames, clean_meta_ids)
 
 invalid_cols
+################################
+all <- all[, !(colnames(all) %in% removed_samples)]#removing controls and replicates
+all <- all[, !(colnames(all) == "AF90")]#low sequencing depth
 #################################
 all[is.na(all)] <- 0
 substrate_colors <- c(
@@ -137,6 +145,7 @@ ko_matrix <- ko_matrix[n_zeroes <= round(ncol(ko_matrix) * 0.90),]
 
 ko_matrix <- clr_c(ko_matrix)
 rownames(ko_matrix) <- gsub("\\.", "-", rownames(ko_matrix))
+ko_matrix <- ko_matrix[,-62]#removing row with all NA ans the KO allocation for that column was all zero
 data.a.pca <- prcomp(ko_matrix)
 ###############################
 pc1 <- round(data.a.pca$sdev[1]^2/sum(data.a.pca$sdev^2),4) * 100
@@ -473,7 +482,7 @@ label_positions <- plot_data %>%
 plot_data <- left_join(plot_data, label_positions, by = "Substrate")
 
 # Define label to annotate (you must define kw_label and substrate_colors beforehand)
-# Example: kw_label <- "Kruskal-Wallis, p < 0.001"
+ kw_label <- "Kruskal-Wallis, p < 0.001"
 
 # Create the plot
 p_final <- ggplot(plot_data, aes(x = Substrate, y = Richness, fill = Substrate)) +
@@ -506,7 +515,7 @@ p_final <- ggplot(plot_data, aes(x = Substrate, y = Richness, fill = Substrate))
 
 ggsave(filename = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/trypnet_richness_pairwise_alpahbet_sphaghetti.svg", plot = p_final, width = 12, height = 6, units = "in", dpi = 300, device = "svg")
 
-###############################################################################
+
 ###############################################################################
 p <- ggplot(all, aes(x = State, y = Richness, fill = State)) +
   geom_boxplot(outlier.shape = NA, alpha = 0.6, color = "black") +
@@ -539,48 +548,17 @@ p <- ggplot(all, aes(x = Type.of.fermentation, y = Richness, fill = Type.of.ferm
   theme_minimal(base_size = 14) 
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/richness_trypnet_TOF_plot.svg", plot = p, width = 8, height = 6, units = "in")
 ######################################
-# Calculate Jaccard distance matrix
-jaccard_dist <- vegdist(pa_binary, method = "jaccard", binary = TRUE)
-
-# Perform PCoA
-pcoa_result <- cmdscale(jaccard_dist, k = 2, eig = TRUE)
-
-# Create data frame for plotting
-pcoa_df <- data.frame(
-  SampleID = rownames(pcoa_result$points),
-  PC1 = pcoa_result$points[, 1],
-  PC2 = pcoa_result$points[, 2],
-  Substrate = meta_filtered$Substrate
-)
-
-# Plot PCoA
-ggplot(pcoa_df, aes(x = PC1, y = PC2, fill = Substrate)) +
-  geom_point(shape = 21, size = 3, stroke = 0.7, color = "black") +
-  scale_fill_manual(values = substrate_colors) +
-  labs(
-    title = "PCoA (Jaccard distance) of Presence/Absence KO profiles",
-    x = "PCoA Axis 1",
-    y = "PCoA Axis 2"
-  ) +
-  theme_minimal() +
-  theme(
-    axis.title = element_text(size = 12, face = "bold"),
-    axis.text = element_text(size = 10),
-    legend.title = element_text(size = 12),
-    legend.text = element_text(size = 10),
-    legend.position = "right"
-  )
 
 ########################################
 pa_binary <- pa_binary[rowSums(pa_binary) > 0, ]
 
 jaccard_dist <- vegdist(pa_binary, method = "jaccard", binary = TRUE)
+meta_filtered <- meta[rownames(pa_binary), ]
+# Ensure sample names match between meta and pa_binary
+meta_filtered <- meta[meta$ID %in% rownames(pa_binary), ]
 
-meta_filtered <- meta_filtered[meta_filtered$ID %in% rownames(pa_binary), ]
-
+# Also ensure the same order
 meta_filtered <- meta_filtered[match(rownames(pa_binary), meta_filtered$ID), ]
-
-meta_filtered <- meta_filtered[complete.cases(meta_filtered), ]
 
 pcoa_result <- cmdscale(jaccard_dist, k = 2, eig = TRUE)
 
@@ -759,6 +737,12 @@ mk_strat <- read.table(
   quote = "",
   comment.char = ""
 )
+mk_remove <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/mk_to_Remove.csv")
+removed_samples <- mk_remove %>%
+  filter(is.na(Time) | (Time) == "" | tolower(Time) == "remove") %>%
+  pull(Sample)
+colnames(mk_strat) <- gsub("\\.", "-", colnames(mk_strat))
+
 anno <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/tryp_anno.csv")
 tryp_ko <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/tryp_meta.csv")
 tryp <- tryp_ko %>%
@@ -778,6 +762,8 @@ colnames(anno)[colnames(anno)=="KEGG"] <- "compound"
 anno_2 <- merge(anno, tryp, by ="compound")
 anno_2 <- anno_2[,-3]
 ##################################################
+colnames(mk_strat_filtered)[-c(1,2)] <- sub("_interleaved.*", "", colnames(mk_strat_filtered)[-c(1,2)])
+mk_strat_filtered <- mk_strat_filtered[, !(colnames(mk_strat_filtered) %in% removed_samples)]
 ##################################################
 linked_data <- mk_strat_filtered %>%
   inner_join(tryp, by = "KO")
@@ -958,7 +944,7 @@ colourScale <- paste0(
 )
 
 # Step 5: Plot the Sankey
-  wk <-sankeyNetwork(
+wk <-sankeyNetwork(
   Links = long_data %>% select(source, target, value = total_abundance),
   Nodes = nodes,
   Source = "source",
@@ -970,9 +956,9 @@ colourScale <- paste0(
   sinksRight = FALSE,
   colourScale = colourScale
 )
-  htmlwidgets::saveWidget(wk, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_wk.html")
-  webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_wk.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_wk.pdf", selector = "pdf")
-  
+htmlwidgets::saveWidget(wk, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_wk.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_wk.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_wk.pdf", selector = "pdf")
+
 ########
 ########################################################################
 ########################################################################
