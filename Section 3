@@ -166,6 +166,12 @@ dev.off()
 ########################################################
 
 mk_strat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/milk_kefir/gbm_strat/modules.tsv")
+mk_remove <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/mk_to_Remove.csv")
+removed_samples <- mk_remove %>%
+  filter(is.na(Time) | (Time) == "" | tolower(Time) == "remove") %>%
+  pull(Sample)
+colnames(mk_strat) <- gsub("\\.", "-", colnames(mk_strat))
+
 mk_strat <- row_to_names(mk_strat, 1)
 mk_strat[, 3:ncol(mk_strat)] <- lapply(mk_strat[, 3:ncol(mk_strat)], as.numeric)
 str(mk_strat)
@@ -176,6 +182,15 @@ mk_long <- pivot_longer(mk_strat,
                         names_to = "Sample", 
                         values_to = "Contribution")
 mk_long <- mk_long[mk_long$Contribution > 0, ]
+mk_long$Sample <- sub("_interleaved.*", "", mk_long$Sample)
+
+mk_long <- mk_long[!mk_long$Sample %in% removed_samples,]
+
+
+
+
+
+
 
 anno <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/annotation_gbm.csv")
 dim(anno)
@@ -192,9 +207,9 @@ nodes <- data.frame(name = unique(c(links$source, links$target)))
 links$source <- match(links$source, nodes$name) - 1
 links$target <- match(links$target, nodes$name) - 1
 p <- sankeyNetwork(Links = links, Nodes = nodes,
-              Source = "source", Target = "target",
-              Value = "value", NodeID = "name",
-              fontSize = 12, nodeWidth = 30)
+                   Source = "source", Target = "target",
+                   Value = "value", NodeID = "name",
+                   fontSize = 12, nodeWidth = 30)
 htmlwidgets::saveWidget(p, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk.html")
 webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk.pdf", selector = "pdf")
 ###########################
@@ -224,9 +239,9 @@ links$target <- match(links$target, nodes$name) - 1
 
 # Create Sankey plot
 p <- sankeyNetwork(Links = links, Nodes = nodes,
-              Source = "source", Target = "target",
-              Value = "value", NodeID = "name",
-              fontSize = 12, nodeWidth = 30)
+                   Source = "source", Target = "target",
+                   Value = "value", NodeID = "name",
+                   fontSize = 12, nodeWidth = 30)
 htmlwidgets::saveWidget(p, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk.html")
 webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk.pdf", selector = "pdf")
 ############################################
