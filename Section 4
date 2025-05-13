@@ -426,6 +426,87 @@ all %>%
 all %>%
   kruskal_effsize(Richness ~ Type.of.fermentation)
 ###############################################################################
+library(multcompView)
+dunn_result <- dunnTest(Richness ~ Substrate, data = all, method = "bh")
+sig_pairs <- dunn_result$res %>%                                      # only significant
+  separate(Comparison, into = c("group1", "group2"), sep = " - ") %>%
+  mutate(
+    label = case_when(
+      P.adj < 0.001 ~ "***",
+      P.adj < 0.01 ~ "**",
+      P.adj < 0.05 ~ "*",  
+      P.adj > 0.05 ~ "NS"
+    ),
+    y.position = 20 + row_number()  # adjust Y positions if needed
+  )
+
+# Function to generate compact letter display labels from sig_pairs
+get_cld_letters <- function(sig_pairs_df) {
+  groups <- unique(c(sig_pairs_df$group1, sig_pairs_df$group2))
+  p_mat <- matrix(1, nrow=length(groups), ncol=length(groups),
+                  dimnames = list(groups, groups))
+  for (i in 1:nrow(sig_pairs_df)) {
+    g1 <- sig_pairs_df$group1[i]
+    g2 <- sig_pairs_df$group2[i]
+    p_val <- sig_pairs_df$P.adj[i]
+    p_mat[g1, g2] <- p_val
+    p_mat[g2, g1] <- p_val
+  }
+  sig_matrix <- p_mat < 0.05
+  rownames(sig_matrix) <- colnames(sig_matrix) <- groups
+  cld <- multcompView::multcompLetters(sig_matrix)$Letters
+  return(data.frame(Substrate = names(cld), Letters = cld))
+}
+
+# Generate CLD letters
+letters_df <- get_cld_letters(sig_pairs)
+
+# Merge with richness data
+plot_data <- all %>%
+  left_join(letters_df, by = "Substrate")
+
+# Determine y-axis position for each label
+label_positions <- plot_data %>%
+  group_by(Substrate) %>%
+  summarise(y = max(Richness, na.rm = TRUE) + 1)
+
+plot_data <- left_join(plot_data, label_positions, by = "Substrate")
+
+# Define label to annotate (you must define kw_label and substrate_colors beforehand)
+# Example: kw_label <- "Kruskal-Wallis, p < 0.001"
+
+# Create the plot
+p_final <- ggplot(plot_data, aes(x = Substrate, y = Richness, fill = Substrate)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.6, color = "black") +
+  geom_jitter(
+    shape = 21, width = 0.2, size = 2.5, alpha = 0.5,
+    color = "black", stroke = 0.4, aes(fill = Substrate)
+  ) +
+  geom_text(aes(y = y, label = Letters), vjust = 0, size = 5) +
+  scale_fill_manual(values = substrate_colors) +
+  labs(
+    title = "",
+    x = "",
+    y = "Richness"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    axis.text.x = element_text(angle = 0, hjust = 0.3),
+    legend.position = "none"
+  ) +
+  annotate("label", 
+           x = 4, 
+           y = max(all$Richness, na.rm = TRUE) - 0.1, 
+           label = kw_label,
+           size = 4, fontface = "bold", fill = "white", color = "black") +
+  scale_y_continuous(
+    limits = c(0, NA),
+    expand = expansion(mult = c(0.06, 0.05))
+  )
+
+ggsave(filename = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/trypnet_richness_pairwise_alpahbet_sphaghetti.svg", plot = p_final, width = 12, height = 6, units = "in", dpi = 300, device = "svg")
+
+###############################################################################
 ###############################################################################
 p <- ggplot(all, aes(x = State, y = Richness, fill = State)) +
   geom_boxplot(outlier.shape = NA, alpha = 0.6, color = "black") +
