@@ -1,0 +1,237 @@
+#install.packages("compositions")  
+library(compositions)
+library(stringr)
+library(janitor)
+library(ggplot2)
+library(janitor)
+library(dplyr)
+library(compositions)
+library(ghibli)
+library(factoextra)
+library(patchwork)
+library(pheatmap)
+library(ComplexHeatmap)
+install.packages("coloRamPalette")
+library(colorRampPalette)
+# Install the circlize package if not already installed
+if (!requireNamespace("circlize", quietly = TRUE)) {
+  install.packages("circlize")
+}
+library(reshape2)
+library(rstatix)
+library(ggpubr)
+library(FSA)
+library(circlize)
+library(ggforce)
+library(vegan)
+if(!require(ggplot2)) install.packages("ggplot2")
+if(!require(factoextra)) install.packages("factoextra")
+library(gridExtra)
+library(ggplot2)
+library(factoextra)
+#install.packages("devtools")
+#devtools::install_github("pmartinezarbizu/pairwiseAdonis", force = TRUE)
+library(pairwiseAdonis)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+#install.packages("ggalluvial")
+library(ggalluvial)
+#install.packages("ggsankey")
+library(ggsankey)
+#install.packages("networkD3")
+library(networkD3)
+library(htmlwidgets)
+library(purrr)
+library(compositions)
+library(Tjazi)
+library(ComplexHeatmap)
+library(circlize)
+library(dplyr)
+library(igraph)
+library(ggraph)
+library(ggplot2)
+library(patchwork)
+#################################################################################
+
+mk_strat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/milk_kefir/gbm_strat/modules.tsv")
+mk_remove <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/mk_to_Remove.csv")
+removed_samples <- mk_remove %>%
+  filter(is.na(Time) | (Time) == "" | tolower(Time) == "remove") %>%
+  pull(Sample)
+colnames(mk_strat) <- gsub("\\.", "-", colnames(mk_strat))
+
+mk_strat <- row_to_names(mk_strat, 1)
+mk_strat[, 3:ncol(mk_strat)] <- lapply(mk_strat[, 3:ncol(mk_strat)], as.numeric)
+str(mk_strat)
+library(tidyr)
+
+mk_long <- pivot_longer(mk_strat, 
+                        cols = -c(Taxon, Module), 
+                        names_to = "Sample", 
+                        values_to = "Contribution")
+mk_long <- mk_long[mk_long$Contribution > 0, ]
+mk_long$Sample <- sub("_interleaved.*", "", mk_long$Sample)
+
+mk_long <- mk_long[!mk_long$Sample %in% removed_samples,]
+
+anno <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/annotation_gbm.csv")
+dim(anno)
+meta <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/meta_insilico.csv")
+meta <- meta[,-c(7,8)]
+
+mk_long_annotated <- merge(mk_long, anno[, c("Module", "Annotation")], by = "Module", all.x = TRUE)
+mk_long_annotated$Module <- NULL
+names(mk_long_annotated)[names(mk_long_annotated) == "Annotation"] <- "Module"
+
+#including molecule
+# Load required package
+# Merge annotation info into mk_long
+mk_long_annotated <- merge(mk_long, anno[, c("Module", "Annotation", "Molecule")], 
+                           by = "Module", all.x = TRUE)
+
+# Step 1: Filter data
+filtered_data <- mk_long_annotated %>%
+  filter(Contribution > 0) %>%
+  filter(!Annotation %in% c("S-Adenosyl methionine (SAM) synthesis", "Heatshock protein"))
+
+# Step 2: Keep only taxa with >3 unique annotations
+taxa_to_keep <- filtered_data %>%
+  group_by(Taxon) %>%
+  summarise(n_annotations = n_distinct(Annotation), .groups = "drop") %>%
+  filter(n_annotations > 3) %>%
+  pull(Taxon)
+
+filtered_data <- filtered_data %>%
+  filter(Taxon %in% taxa_to_keep)
+
+# Step 3: Create edges
+# Taxon → Annotation
+edges1 <- filtered_data %>%
+  distinct(Taxon, Annotation) %>%
+  mutate(value = 1,
+         source = as.character(Taxon),
+         target = as.character(Annotation)) %>%
+  select(source, target, value)
+
+# Annotation → Molecule
+edges2 <- filtered_data %>%
+  distinct(Annotation, Molecule) %>%
+  mutate(value = 1,
+         source = as.character(Annotation),
+         target = as.character(Molecule)) %>%
+  select(source, target, value)
+
+# Combine edges
+all_edges <- bind_rows(edges1, edges2)
+
+# Step 4: Create node list and map to IDs
+nodes <- data.frame(name = unique(c(all_edges$source, all_edges$target)), stringsAsFactors = FALSE)
+
+all_edges <- all_edges %>%
+  mutate(source_id = match(source, nodes$name) - 1,
+         target_id = match(target, nodes$name) - 1)
+
+# Final check for NA
+stopifnot(!any(is.na(all_edges$source_id)), !any(is.na(all_edges$target_id)))
+
+# Step 5: Plot Sankey
+P <- sankeyNetwork(Links = all_edges,
+                   Nodes = nodes,
+                   Source = "source_id",
+                   Target = "target_id",
+                   Value = "value",
+                   NodeID = "name",
+                   fontSize = 12,
+                   nodeWidth = 30)
+
+# View
+P
+
+####################################
+wk_strat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/wk_final_run/waterkefir/strat/modules.tsv")
+wk_strat <- row_to_names(wk_strat, 1)
+wk_strat[, 3:ncol(wk_strat)] <- lapply(wk_strat[, 3:ncol(wk_strat)], as.numeric)
+str(wk_strat)
+library(tidyr)
+
+wk_long <- pivot_longer(wk_strat, 
+                        cols = -c(Taxon, Module), 
+                        names_to = "Sample", 
+                        values_to = "Contribution")
+wk_long <- wk_long[wk_long$Contribution > 0, ]
+
+anno <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/annotation_gbm.csv")
+dim(anno)
+#################
+#################
+meta <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/meta_insilico.csv")
+meta <- meta[,-c(7,8)]
+wk_long_annotated <- merge(wk_long, anno[, c("Module", "Annotation")], by = "Module", all.x = TRUE)
+wk_long_annotated$Module <- NULL
+names(wk_long_annotated)[names(wk_long_annotated) == "Annotation"] <- "Module"
+
+#including molecule
+# Load required package
+# Merge annotation info into mk_long
+wk_long_annotated <- merge(wk_long, anno[, c("Module", "Annotation", "Molecule")], 
+                           by = "Module", all.x = TRUE)
+###########
+# Step 1: Filter data
+filtered_data <- wk_long_annotated %>%
+  filter(Contribution > 0) %>%
+  filter(!Annotation %in% c("S-Adenosyl methionine (SAM) synthesis", "Heatshock protein"))
+
+# Step 2: Keep only taxa with >3 unique annotations
+taxa_to_keep <- filtered_data %>%
+  group_by(Taxon) %>%
+  summarise(n_annotations = n_distinct(Annotation), .groups = "drop") %>%
+  filter(n_annotations > 3) %>%
+  pull(Taxon)
+
+filtered_data <- filtered_data %>%
+  filter(Taxon %in% taxa_to_keep)
+
+# Step 3: Create edges
+# Taxon → Annotation
+edges1 <- filtered_data %>%
+  distinct(Taxon, Annotation) %>%
+  mutate(value = 1,
+         source = as.character(Taxon),
+         target = as.character(Annotation)) %>%
+  select(source, target, value)
+
+# Annotation → Molecule
+edges2 <- filtered_data %>%
+  distinct(Annotation, Molecule) %>%
+  mutate(value = 1,
+         source = as.character(Annotation),
+         target = as.character(Molecule)) %>%
+  select(source, target, value)
+
+# Combine edges
+all_edges <- bind_rows(edges1, edges2)
+
+# Step 4: Create node list and map to IDs
+nodes <- data.frame(name = unique(c(all_edges$source, all_edges$target)), stringsAsFactors = FALSE)
+
+all_edges <- all_edges %>%
+  mutate(source_id = match(source, nodes$name) - 1,
+         target_id = match(target, nodes$name) - 1)
+
+# Final check for NA
+stopifnot(!any(is.na(all_edges$source_id)), !any(is.na(all_edges$target_id)))
+
+# Step 5: Plot Sankey
+P <- sankeyNetwork(Links = all_edges,
+                   Nodes = nodes,
+                   Source = "source_id",
+                   Target = "target_id",
+                   Value = "value",
+                   NodeID = "name",
+                   fontSize = 12,
+                   nodeWidth = 30)
+
+# View
+P
