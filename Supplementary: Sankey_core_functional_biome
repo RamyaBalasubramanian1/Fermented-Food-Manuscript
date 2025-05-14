@@ -166,7 +166,7 @@ taxa_prevalent <- filtered_data %>%
   summarise(n_samples = n(), .groups = "drop") %>%
   filter(n_samples / total_samples >= 0.5) %>%
   pull(Taxon)
-
+#based on https://journals.asm.org/doi/10.1128/msystems.01066-22
 filtered_data <- filtered_data %>%
   filter(Taxon %in% taxa_prevalent)
 
