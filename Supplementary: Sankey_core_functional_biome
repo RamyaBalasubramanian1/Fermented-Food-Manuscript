@@ -148,6 +148,9 @@ P <- sankeyNetwork(Links = all_edges,
 
 # View
 P
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_MK.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_MK.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_MK.pdf", selector = "pdf")
+
 ###########################################
 #applying prevalence cutoffs
 # Step 1: Filter valid contributions and exclude unwanted annotations
@@ -221,7 +224,8 @@ P <- sankeyNetwork(Links = all_edges,
 
 # View
 P
-
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_MK_PREV.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_MK_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_MK_PREV.pdf", selector = "pdf")
 
 ####################################
 wk_strat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/wk_final_run/waterkefir/strat/modules.tsv")
@@ -309,6 +313,8 @@ P <- sankeyNetwork(Links = all_edges,
 
 # View
 P
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_WK.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_WK.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_WK.pdf", selector = "pdf")
 #######################################
 #######apply a 30% prevalence threshold#
 ##########################################
@@ -386,6 +392,8 @@ P <- sankeyNetwork(Links = all_edges,
 
 # View
 P
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_WK_PREV.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_WK_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_WK_PREV.pdf", selector = "pdf")
 ##########################################
 kom_strat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/kombucha/gbm_strat/modules.tsv")
 kom_strat <- row_to_names(kom_strat, 1)
@@ -412,7 +420,7 @@ kom_long_annotated$Module <- NULL
 names(kom_long_annotated)[names(kom_long_annotated) == "Annotation"] <- "Module"
 ##############################
 kom_long_annotated <- merge(wk_long, anno[, c("Module", "Annotation", "Molecule")], 
-                           by = "Module", all.x = TRUE)
+                            by = "Module", all.x = TRUE)
 ###########
 # Step 1: Filter data
 filtered_data <- kom_long_annotated %>%
@@ -471,6 +479,9 @@ P <- sankeyNetwork(Links = all_edges,
 
 # View
 P
+#########
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_kom.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_kom.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_kom.pdf", selector = "pdf")
 ####################################
 #applying a prevalence threshold 50%
 #############
@@ -549,6 +560,8 @@ P <- sankeyNetwork(Links = all_edges,
 
 # View
 P
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_kom_prev.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_kom_prev.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_kom_prev.pdf", selector = "pdf")
 ############################################################
 #################################################################
 ##paula mk#############################################################
@@ -579,7 +592,7 @@ paula_long_annotated$Module <- NULL
 names(paula_long_annotated)[names(paula_long_annotated) == "Annotation"] <- "Module"
 #######################
 paula_long_annotated <- merge(paula_long, anno[, c("Module", "Annotation", "Molecule")], 
-                            by = "Module", all.x = TRUE)
+                              by = "Module", all.x = TRUE)
 ###########
 # Step 1: Filter data
 filtered_data <- paula_long_annotated %>%
@@ -638,6 +651,8 @@ P <- sankeyNetwork(Links = all_edges,
 
 # View
 P
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_PAU.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_PAU.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_PAU.pdf", selector = "pdf")
 ####################################
 #applying a prevalence threshold 50%
 #############
@@ -716,6 +731,9 @@ P <- sankeyNetwork(Links = all_edges,
 
 # View
 P
+##########
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_PAU_PREV.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_PAU_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_PAU_PREV.pdf", selector = "pdf")
 #####################################################
 #####################################################
 #doing the same for kimchi,sauerkruat and kvass(beet)
@@ -824,7 +842,8 @@ P <- sankeyNetwork(Links = all_edges,
 # View
 P
 #########################################################
-
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_BRINE_PREV.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_BRINE_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_BRINE_PREV.pdf", selector = "pdf")
 
 fs_strat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/FS/gbm_strat/modules.tsv", header = TRUE)
 #fs_strat <- row_to_names(fs_strat, 1)
@@ -930,6 +949,8 @@ P <- sankeyNetwork(Links = all_edges,
 # View
 P
 ################################################################################
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_SUGAR_PREV.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_SUGAR_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_SUGAR_PREV.pdf", selector = "pdf")
 
 
 fs_strat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/FS/gbm_strat/modules.tsv", header = TRUE)
@@ -1035,6 +1056,9 @@ P <- sankeyNetwork(Links = all_edges,
 
 # View
 P
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_DAIRY_PREV.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_DAIRY_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_DAIRY_PREV.pdf", selector = "pdf")
+
 #############################################
 #aff food
 aff_strat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/AFF/gbm_strat/modules.tsv", header = TRUE)
@@ -1454,7 +1478,7 @@ aff_fermented <- aff_long_annotated %>%
   inner_join(meta, by = "ID") %>% 
   filter(!is.na(Fermented.food.category))
 ##############################
-  aff_fermented <- aff_fermented %>% filter(Substrate=="Dairy")
+aff_fermented <- aff_fermented %>% filter(Substrate=="Dairy")
 #######
 # Step 1: Filter for presence and remove unwanted modules
 filtered_data <- aff_fermented %>%
