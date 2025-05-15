@@ -91,18 +91,14 @@ p <- sankeyNetwork(Links = links, Nodes = nodes,
 htmlwidgets::saveWidget(p, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk_gmm.html")
 webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk_gmm.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk_gmm.pdf", selector = "pdf")
 ###########################
-#including molecule
-# Load required package
-# Merge annotation info into mk_long
-mk_long_annotated <- merge(mk_long, anno[, c("Module", "Annotation", "Molecule")], 
-                           by = "Module", all.x = TRUE)
+
 
 # Aggregate for Taxon → Annotation
-links1 <- aggregate(Contribution ~ Taxon + Annotation, data = mk_long_annotated, sum)
+links1 <- aggregate(Contribution ~ Taxon + Superpathway, data = mk_long_annotated, sum)
 names(links1) <- c("source", "target", "value")
 
 # Aggregate for Annotation → Molecule
-links2 <- aggregate(Contribution ~ Annotation + Molecule, data = mk_long_annotated, sum)
+links2 <- aggregate(Contribution ~ Superpathway + Level_2, data = mk_long_annotated, sum)
 names(links2) <- c("source", "target", "value")
 
 # Combine both levels
@@ -120,6 +116,77 @@ p <- sankeyNetwork(Links = links, Nodes = nodes,
                    Source = "source", Target = "target",
                    Value = "value", NodeID = "name",
                    fontSize = 12, nodeWidth = 30)
-htmlwidgets::saveWidget(p, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk.html")
-webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk.pdf", selector = "pdf")
+htmlwidgets::saveWidget(p, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk_gmm.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk_gmm.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_mk_gmm.pdf", selector = "pdf")
 ############################################
+#applying prevalence cutoffs
+# Step 1: Filter valid contributions and exclude unwanted annotations
+filtered_data <- mk_long_annotated %>%
+  filter(Contribution > 0)
+
+# Step 2: Keep taxa present in *all* samples (based on Contribution > 0)
+total_samples <- filtered_data %>%
+  distinct(Sample) %>%
+  nrow()
+
+taxa_prevalent <- filtered_data %>%
+  distinct(Taxon, Sample) %>%
+  group_by(Taxon) %>%
+  summarise(n_samples = n(), .groups = "drop") %>%
+  filter(n_samples / total_samples >= 0.5) %>%
+  pull(Taxon)
+
+filtered_data <- filtered_data %>%
+  filter(Taxon %in% taxa_prevalent)
+
+# Step 3: Keep only taxa with >3 unique annotations
+taxa_to_keep <- filtered_data %>%
+  group_by(Taxon) %>%
+  summarise(n_annotations = n_distinct(Superpathway), .groups = "drop") %>%
+  filter(n_annotations > 3) %>%
+  pull(Taxon)
+
+filtered_data <- filtered_data %>%
+  filter(Taxon %in% taxa_to_keep)
+
+# Step 4: Create edges
+# Taxon → Annotation
+edges1 <- filtered_data %>%
+  distinct(Taxon, Superpathway) %>%
+  mutate(value = 1,
+         source = as.character(Taxon),
+         target = as.character(Superpathway)) %>%
+  select(source, target, value)
+
+# Annotation → Molecule
+edges2 <- filtered_data %>%
+  distinct(Superpathway, Level_2) %>%
+  mutate(value = 1,
+         source = as.character(Superpathway),
+         target = as.character(Level_2)) %>%
+  select(source, target, value)
+
+# Step 5: Combine edges and create node list
+all_edges <- bind_rows(edges1, edges2)
+
+nodes <- data.frame(name = unique(c(all_edges$source, all_edges$target)), stringsAsFactors = FALSE)
+
+all_edges <- all_edges %>%
+  mutate(source_id = match(source, nodes$name) - 1,
+         target_id = match(target, nodes$name) - 1)
+
+# Final check for NA
+stopifnot(!any(is.na(all_edges$source_id)), !any(is.na(all_edges$target_id)))
+
+# Step 6: Plot Sankey
+P <- sankeyNetwork(Links = all_edges,
+                   Nodes = nodes,
+                   Source = "source_id",
+                   Target = "target_id",
+                   Value = "value",
+                   NodeID = "name",
+                   fontSize = 12,
+                   nodeWidth = 30)
+
+# View
+P
