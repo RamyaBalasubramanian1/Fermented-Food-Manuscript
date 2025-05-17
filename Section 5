@@ -338,9 +338,7 @@ meta_richness$Substrate[meta_richness$Substrate == "Dairy alternate"] <- "Coconu
 # Combine all relevant color palettes
 substrate_colors <- c(
   "Dairy" = "#1f77b4", "Sugar" = "#ff7f0e", "Brine" = "#1b9e77",
-  "Coconut Dairy" = "#9467bd", "Soy" = "#d62728", "Cereal" = "#8c564b",
-  "Root and tuber" = "#e41a1c", "Seed" = "#7f7f7f", "Palm Tree" = "#B565A7"
-)
+  "Coconut Dairy" = "#9467bd")
 
 type_colors <- c(
   "Sauerkraut" = "#1b9e77", "Sauerkraut Broth" = "#1b9e77", "Kvass" = "#1b9e77", "Kimchi" = "#1b9e77",
@@ -389,11 +387,92 @@ print(P)
 
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/global_richness.svg", plot = P, width = 12, height = 6, units = "in")
 ########################################################################
+########################################################################
+#jaccard##################################################################
+meta <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute_by_R.csv")
+metadata <- meta[,c(1:5)]
+data <-  read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute.csv")
+data <- data[,-2]
+data <- data[-38,]
 
+# Extract the LOD row (assumed to be the last row)
+lod <- data[nrow(data), -1]  # Remove the first column (Customer.ID)
 
+# Remove the LOD row from the original data to focus on samples only
+data_samples <- data[-nrow(data), ]
 
+# Apply the condition: if value > LOD, set to 1; otherwise, set to 0
+binary_data <- data_samples
+binary_data[-1] <- lapply(2:ncol(data_samples), function(i) ifelse(data_samples[[i]] > lod[[i-1]], 1, 0))
+# Remove the Customer.ID column for calculations
+binary_matrix <- binary_data[, -1]
+# Calculate Jaccard distance
+jaccard_dist <- vegdist(binary_matrix, method = "jaccard")
+# Perform Principal Coordinates Analysis (PCoA)
+pcoa_result <- cmdscale(jaccard_dist, eig = TRUE, k = 2)  # k=2 for 2D plot
 
+pcoa_df <- data.frame(
+  SampleID = binary_data$Customer.ID,
+  PC1 = pcoa_result$points[, 1],
+  PC2 = pcoa_result$points[, 2]
+)
 
+colnames(pcoa_df)[colnames(pcoa_df) == "SampleID"] <- "Customer.ID"
+# Calculate variance explained for each axis
+variance_explained <- round(100 * pcoa_result$eig / sum(pcoa_result$eig), 2)
+
+# Merge the PCoA results with metadata based on Customer.ID
+pcoa_df <- merge(pcoa_df, metadata, by = "Customer.ID")
+
+# Plot with color by 'Type', shape by 'Status', and increased dot size
+x<- ggplot(pcoa_df, aes(x = PC1, y = PC2, color = Type, shape = Status)) +
+  geom_point(size = 5) +  # Increased dot size
+  labs(
+    title = "Beta Diversity Plot global metabolites (PCoA on Jaccard Distance)",
+    x = paste0("PC1 (", variance_explained[1], "%)"),
+    y = paste0("PC2 (", variance_explained[2], "%)")
+  ) +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+##########################
+pcoa_df$Substrate[pcoa_df$Substrate == "Coconut mik kefir"] <- "Coconut milk kefir"
+
+substrate_colors <- c(
+  "Dairy" = "#1f77b4", "Sugar" = "#ff7f0e", "Brine" = "#1b9e77",
+  "Dairy alternate" = "#9467bd")
+# Create PCoA plot with customized aesthetics
+pcoa_plot <- ggplot(pcoa_df, aes(x = PC1, y = PC2, fill = Substrate, shape = Status, size = Status)) +
+  geom_point(color = "black", stroke = 1.5) +  # black border for points
+  scale_fill_manual(
+    values = substrate_colors,
+    guide = guide_legend(override.aes = list(shape = 21, size = 6, color = "black"))
+  ) +
+  scale_shape_manual(
+    values = c("Fermented" = 21, "Unfermented" = 24),
+    guide = guide_legend(override.aes = list(size = 6, fill = NA))
+  ) +
+  scale_size_manual(values = c("Fermented" = 8, "Unfermented" = 5), guide = "none") +
+  theme_minimal() +
+  labs(
+    title = "Beta Diversity Plot Global Metabolites (PCoA on Jaccard Distance)",
+    x = paste0("PC1 (", variance_explained[1], "%)"),
+    y = paste0("PC2 (", variance_explained[2], "%)")
+  ) +
+  theme(
+    legend.position = "right",
+    legend.title = element_text(size = 14, face = "bold"),
+    legend.text = element_text(size = 12),
+    axis.text.x = element_text(size = 14, face = "bold"),
+    axis.title.x = element_text(size = 16, face = "bold"),
+    axis.text.y = element_text(size = 14, face = "bold"),
+    axis.title.y = element_text(size = 16, face = "bold")
+  )
+
+# Display the plot
+print(pcoa_plot)
+
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/global_pca_jaccard.svg", plot = pcoa_plot, width = 12, height = 6, units = "in")
+########################################################################
 
 
 #######################################################################
@@ -530,7 +609,120 @@ ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master
 N <- (p1 | p2) /
   (p3 | p4)
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/pca_neuro_split.svg", plot = N, width = 12, height = 6, units = "in")
-#
+###########################################
+##jaccard
+#######################################
+data_o <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/neurometabolites.csv", header = FALSE)
+colnames(data_o) <- as.character(data_o[1, ])
+data_o <- data_o[-1, ]  # Remove the first row
+meta <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute_by_R.csv")
+meta <- meta[,c(1:5)]
+meta <- meta %>%
+  mutate(Type = str_replace(Type, "Coconut mik", "Coconut milk"))
+meta_neuro <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/neuro_meta.csv")
+data <- data_o
+##################################
+# Extract the metabolite names from meta_neuro that belong to Level 1, 2a, or 2b
+filtered_metabolites <- meta_neuro %>%
+  filter(Level %in% c("1", "2a", "2b")) %>%
+  pull(Metabolite)
+
+# Retain only the metabolite columns that match meta_neuro$Metabolite, plus the first two columns
+filtered_data <- data %>%
+  select(id, `Study group`, all_of(filtered_metabolites))
+
+# Display the first few rows of the filtered dataset
+head(filtered_data)
+######################################
+#sanity check to see only level 122b metabolites are reained in the data and meta_neuro
+# Extract the column names from filtered_data, excluding the first two columns
+filtered_data_metabolites <- colnames(filtered_data)[-c(1,2)]
+
+# Extract the metabolites from meta_neuro that belong to Level 1, 2a, or 2b
+filtered_meta_neuro_metabolites <- meta_neuro %>%
+  filter(Level %in% c("1", "2a", "2b")) %>%
+  pull(Metabolite)
+
+# Check if meta_neuro$Metabolite matches the column names in filtered_data
+matching_metabolites <- filtered_meta_neuro_metabolites %in% filtered_data_metabolites
+
+# Print mismatches
+mismatched_metabolites <- filtered_meta_neuro_metabolites[!matching_metabolites]
+
+# Display results
+if (length(mismatched_metabolites) > 0) {
+  cat("Metabolites in meta_neuro that do NOT match column names in filtered_data:\n")
+  print(mismatched_metabolites)
+} else {
+  cat("All metabolite names in meta_neuro match the column names in filtered_data.\n")
+}
+#################################################################################
+data <- filtered_data[,-2]
+# Extract the LOD row (assumed to be the last row)
+lod <- data[nrow(data), -1]  # Remove the first column (Customer.ID)
+
+# Remove the LOD row from the original data to focus on samples only
+data_samples <- data[-nrow(data), ]
+
+# Apply the condition: if value > LOD, set to 1; otherwise, set to 0
+binary_data <- data_samples
+binary_data[-1] <- lapply(2:ncol(data_samples), function(i) ifelse(data_samples[[i]] > lod[[i-1]], 1, 0))
+#######################################
+#######################################
+# Remove the Customer.ID column for calculations
+binary_matrix <- binary_data[, -1]
+# Calculate Jaccard distance
+jaccard_dist <- vegdist(binary_matrix, method = "jaccard")
+# Perform Principal Coordinates Analysis (PCoA)
+pcoa_result <- cmdscale(jaccard_dist, eig = TRUE, k = 2)  # k=2 for 2D plot
+
+pcoa_df <- data.frame(
+  SampleID = binary_data$id,
+  PC1 = pcoa_result$points[, 1],
+  PC2 = pcoa_result$points[, 2]
+)
+colnames(pcoa_df)[colnames(pcoa_df) == "SampleID"] <- "Customer.ID"
+# Calculate variance explained for each axis
+variance_explained <- round(100 * pcoa_result$eig / sum(pcoa_result$eig), 2)
+
+# Merge the PCoA results with metadata based on Customer.ID
+pcoa_df <- merge(pcoa_df, meta, by = "Customer.ID")
+pcoa_df$Substrate[pcoa_df$Substrate == "Coconut mik kefir"] <- "Coconut milk kefir"
+
+substrate_colors <- c(
+  "Dairy" = "#1f77b4", "Sugar" = "#ff7f0e", "Brine" = "#1b9e77",
+  "Dairy alternate" = "#9467bd")
+# Create PCoA plot with customized aesthetics
+pcoa_plot <- ggplot(pcoa_df, aes(x = PC1, y = PC2, fill = Substrate, shape = Status, size = Status)) +
+  geom_point(color = "black", stroke = 1.5) +  # black border for points
+  scale_fill_manual(
+    values = substrate_colors,
+    guide = guide_legend(override.aes = list(shape = 21, size = 6, color = "black"))
+  ) +
+  scale_shape_manual(
+    values = c("Fermented" = 21, "Unfermented" = 24),
+    guide = guide_legend(override.aes = list(size = 6, fill = NA))
+  ) +
+  scale_size_manual(values = c("Fermented" = 8, "Unfermented" = 5), guide = "none") +
+  theme_minimal() +
+  labs(
+    title = "Beta Diversity Plot neuromodulatory Metabolites (PCoA on Jaccard Distance)",
+    x = paste0("PC1 (", variance_explained[1], "%)"),
+    y = paste0("PC2 (", variance_explained[2], "%)")
+  ) +
+  theme(
+    legend.position = "right",
+    legend.title = element_text(size = 14, face = "bold"),
+    legend.text = element_text(size = 12),
+    axis.text.x = element_text(size = 14, face = "bold"),
+    axis.title.x = element_text(size = 16, face = "bold"),
+    axis.text.y = element_text(size = 14, face = "bold"),
+    axis.title.y = element_text(size = 16, face = "bold")
+  )
+
+# Display the plot
+print(pcoa_plot)
+
 
 ####################################################################################################################################
 #######################################
@@ -540,7 +732,7 @@ ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master
 # data_o <- data_o[-1, ]  # Remove the first row
 # meta <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute_by_R.csv")
 # meta <- meta[,c(1:5)]
- meta_2 <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/neuro_meta.csv")
+meta_2 <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/neuro_meta.csv")
 # data <- data_o
 # meta <- meta %>%
 #   mutate(Type = str_replace(Type, "Coconut mik", "Coconut milk"))
