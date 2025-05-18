@@ -1,3 +1,4 @@
+
 #install.packages("purrr")
 library(purrr)
 library(tidyverse)
@@ -482,7 +483,7 @@ label_positions <- plot_data %>%
 plot_data <- left_join(plot_data, label_positions, by = "Substrate")
 
 # Define label to annotate (you must define kw_label and substrate_colors beforehand)
- kw_label <- "Kruskal-Wallis, p < 0.001"
+kw_label <- "Kruskal-Wallis, p < 0.001"
 
 # Create the plot
 p_final <- ggplot(plot_data, aes(x = Substrate, y = Richness, fill = Substrate)) +
@@ -785,6 +786,9 @@ long_data <- linked_data %>%
   group_by(Species, Metabolite) %>%
   summarise(total_abundance = sum(Abundance, na.rm = TRUE), .groups = "drop") %>%
   filter(total_abundance > 0)
+long_data <- long_data %>%
+  filter(Species != "unclassified") %>%
+  mutate(Species = sub(".*s__", "", Species))
 ##################################################################################
 ##################################################################################
 # Create nodes
@@ -898,6 +902,9 @@ long_data <- linked_data %>%
   group_by(Species, Metabolite) %>%
   summarise(total_abundance = sum(Abundance, na.rm = TRUE), .groups = "drop") %>%
   filter(total_abundance > 0)
+long_data <- long_data %>%
+  filter(Species != "unclassified") %>%
+  mutate(Species = sub(".*s__", "", Species))
 ###########
 # Create nodes
 nodes <- data.frame(name = unique(c(long_data$Species, long_data$Metabolite)))
@@ -1011,6 +1018,9 @@ long_data <- linked_data %>%
   group_by(Species, Metabolite) %>%
   summarise(total_abundance = sum(Abundance, na.rm = TRUE), .groups = "drop") %>%
   filter(total_abundance > 0)
+long_data <- long_data %>%
+  filter(Species != "unclassified") %>%
+  mutate(Species = sub(".*s__", "", Species))
 ###########
 
 # Create nodes
@@ -1125,6 +1135,9 @@ long_data <- linked_data %>%
   group_by(Species, Metabolite) %>%
   summarise(total_abundance = sum(Abundance, na.rm = TRUE), .groups = "drop") %>%
   filter(total_abundance > 0)
+long_data <- long_data %>%
+  filter(Species != "unclassified") %>%
+  mutate(Species = sub(".*s__", "", Species))
 ###########
 library(dplyr)
 library(networkD3)
@@ -1240,6 +1253,9 @@ long_data <- linked_data %>%
   group_by(Species, Metabolite) %>%
   summarise(total_abundance = sum(Abundance, na.rm = TRUE), .groups = "drop") %>%
   filter(total_abundance > 0)
+long_data <- long_data %>%
+  filter(Species != "unclassified") %>%
+  mutate(Species = sub(".*s__", "", Species))
 ###########
 library(dplyr)
 library(networkD3)
@@ -1347,10 +1363,13 @@ linked_data <- linked_data %>%
 abundance_cols <- linked_data %>%
   select(where(is.numeric)) %>%
   colnames()
-# Extract the "FSxx" prefix from sample IDs
-sample_prefixes <- gsub("^(FS[0-9A-Z]+)_.*", "\\1", clean_sample_ids)
 sample_cols <- linked_data %>% select(where(is.numeric)) %>% colnames()
 clean_sample_ids <- gsub("_interleaved_Abundance\\.RPKs", "", sample_cols)
+
+# Extract the "FSxx" prefix from sample IDs
+sample_prefixes <- gsub("^(FS[0-9A-Z]+)_.*", "\\1", clean_sample_ids)
+
+
 
 # Create a lookup table to map full IDs back to meta$ID values
 id_map <- data.frame(
@@ -1376,6 +1395,11 @@ long_data <- linked_data %>%
 long_data_annotated <- long_data %>%
   left_join(meta_subset %>% select(Sample, Substrate, Fermented.food.category, Type.of.fermentation), 
             by = "Sample")
+
+long_data <- long_data %>%
+  filter(Species != "unclassified") %>%
+  mutate(Species = sub(".*s__", "", Species))
+
 #sugar_data <- long_data_annotated %>%
 # filter(Substrate == "Sugar", Abundance > 0)
 
@@ -1757,6 +1781,12 @@ long_data <- linked_data %>%
   filter(total_abundance > 0)
 
 
+long_data <- long_data %>%
+  filter(Species != "unclassified") %>%
+  mutate(Species = sub(".*s__", "", Species))
+
+
+
 # Create nodes
 nodes <- data.frame(name = unique(c(long_data$Species, long_data$Metabolite)))
 
@@ -1834,12 +1864,12 @@ data_long <- linked_data %>%
   ) %>%
   filter(!is.na(MilkType))
 
-# Step 2: Join with metabolite annotations
-linked_data_annotated <- data_long %>%
-  inner_join(anno, by = "compound")
 
+data_long <- data_long %>%
+  filter(Species != "unclassified") %>%
+  mutate(Species = sub(".*s__", "", Species))
 # Step 3: Aggregate for Sankey
-sankey_data <- linked_data_annotated %>%
+sankey_data <- data_long %>%
   group_by(MilkType, Species, Metabolite) %>%
   summarise(total_abundance = sum(Abundance, na.rm = TRUE), .groups = "drop") %>%
   filter(total_abundance > 0)
