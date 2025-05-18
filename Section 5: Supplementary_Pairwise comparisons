@@ -1,0 +1,436 @@
+#install.packages("compositions")  # Uncomment if you haven't installed it yet
+library(compositions)
+library(janitor)
+library(ggplot2)
+library(janitor)
+library(dplyr)
+library(tidyr)
+library(compositions)
+library(ghibli)
+library(factoextra)
+library(patchwork)
+library(pheatmap)
+library(ComplexHeatmap)
+library(janitor)
+library(tidyverse)
+#install.packages("coloRamPalette")
+library(colorRampPalette)
+# Install the circlize package if not already installed
+if (!requireNamespace("circlize", quietly = TRUE)) {
+  install.packages("circlize")
+}
+
+# Load the circlize library
+library(circlize)
+library(ggforce)
+library(vegan)
+if(!require(ggplot2)) install.packages("ggplot2")
+if(!require(factoextra)) install.packages("factoextra")
+library(gridExtra)
+# Load the libraries
+library(ggplot2)
+library(factoextra)
+#install.packages("kableExtra")
+library(kableExtra)
+#install.packages("devtools")
+#devtools::install_github("pmartinezarbizu/pairwiseAdonis", force = TRUE)
+library(pairwiseAdonis)
+library(ggpubr)
+library(rstatix)
+data <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute.csv", check.names = FALSE)
+meta <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/level122a_lod_impute_by_R.csv", check.names = FALSE)
+meta <- meta[,c(1:5)]
+
+
+lod_values <- data[nrow(data), ]
+data <- data[-nrow(data), ] #last row has lod
+common_cols <- intersect(names(data)[-c(1,2)], names(lod_values))
+
+# replacing value below lod with lod
+for (col in common_cols) {
+  data[[col]] <- ifelse(as.numeric(data[[col]]) < as.numeric(lod_values[[col]]), 
+                        as.numeric(lod_values[[col]]), 
+                        as.numeric(data[[col]]))
+}
+data <- data %>%
+  column_to_rownames(var = "Customer ID")
+meta <- meta %>%
+  column_to_rownames(var = "Customer ID")
+data <- data[,-1]
+
+
+clr_transformed_data <- clr(data)
+clr_transformed_data <- as.data.frame(clr_transformed_data)
+clr_transformed_data$id <- rownames(clr_transformed_data)
+meta$id <- rownames(meta)
+all_data <- merge(meta,clr_transformed_data, by = "id")
+####################################################
+#####################################################
+# checking the impact of substrate on the abundance of each metab
+#i used nova because the data is clr trans
+all_data <- all_data %>% select(-id, -Type, -Status, -Fermentation_type) 
+anova_results <- apply(all_data[, -1], 2, function(metabolite) {
+  aov_res <- aov(metabolite ~ all_data$Substrate)
+  summary(aov_res)[[1]][["Pr(>F)"]][1]
+})
+
+# should i use fdr?
+p_values <- as.data.frame(anova_results)
+p_values$Metabolite <- rownames(p_values)
+p_values$p_adj <- p.adjust(p_values$anova_results, method = "bonferroni")
+
+# removing ns data
+sig_metabolites <- p_values %>% filter(p_adj < 0.05) %>% select(Metabolite, p_adj)
+# conv to long
+all_long <- all_data %>%
+  select(one_of(sig_metabolites$Metabolite), Substrate) %>%
+  pivot_longer(cols = -Substrate, names_to = "Metabolite", values_to = "Abundance")
+#too many metabolites to display in a page
+#################################################################################################################
+#################################################################################################################
+# faceting per metab
+# #ggplot(all_long, aes(x = Substrate, y = Abundance, fill = Substrate)) +
+#   geom_boxplot() +
+#   facet_wrap(~Metabolite, scales = "free") +
+#   theme_bw() +
+#   labs(title = "Significantly Abundant Metabolites by Substrate", x = "Substrate", y = "CLR Abundance") +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+#maybe split between pages
+#prev plor only will show the global p
+#effect of metabolite er substate
+
+# # Function to generate paginated plots
+# plot_paginated_facets <- function(page_num) {
+#   ggplot(all_long, aes(x = Substrate, y = Abundance, fill = Substrate)) +
+#     geom_boxplot(alpha = 0.6) + 
+#     ggforce::facet_wrap_paginate(~Metabolite, scales = "free", ncol = 5, nrow = 1, page = page_num) +  # 10 plots per page
+#     theme_minimal(base_size = 14) +
+#     labs(title = paste("Pairwise Comparisons of Metabolite *Median* Abundance (Page", page_num, ")"),
+#          x = "Substrate",
+#          y = "CLR Abundance") +
+#     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  
+#     stat_compare_means(comparisons = pairwise_comparisons, 
+#                        method = "wilcox.test", 
+#                        label = "p.signif", hide.ns = TRUE) }
+# 
+# plot_paginated_facets(1)  
+# plot_paginated_facets(2)  
+# plot_paginated_facets(3)
+# plot_paginated_facets(4)
+# Ensure Substrate is a factor with correct levels
+all_long$Substrate <- factor(all_long$Substrate, levels = c("Brine", "Sugar", "Dairy", "Dairy alternate"))
+# Define pairwise comparisons
+pairwise_comparisons <- list(
+  c("Brine", "Sugar"),
+  c("Brine", "Dairy"),
+  c("Brine", "Dairy alternate"),
+  c("Sugar", "Dairy"),
+  c("Sugar", "Dairy alternate"),
+  c("Dairy", "Dairy alternate")
+)
+shapiro.test(all_long$Abundance)
+#not normal
+
+#######################################################################
+#finding groups that are pairwise different for the significant metabolite in question
+
+
+pairwise_results <- list()
+
+for (met in unique(all_long$Metabolite)) {
+  
+  sub_data <- all_long %>% filter(Metabolite == met)
+  
+  
+  shapiro_p <- shapiro.test(sub_data$Abundance)$p.value
+  
+  test_type <- ifelse(shapiro_p > 0.05, "t-test", "wilcox")
+  
+  if (test_type == "t-test") {
+    test_res <- pairwise.t.test(sub_data$Abundance, sub_data$Substrate, p.adjust.method = "bonferroni")
+  } else {
+    test_res <- pairwise.wilcox.test(sub_data$Abundance, sub_data$Substrate, p.adjust.method = "bonferroni")
+  }
+  test_df <- as.data.frame(as.table(test_res$p.value))
+  colnames(test_df) <- c("Substrate1", "Substrate2", "p_value")
+  test_df$Metabolite <- met
+  test_df$TestType <- test_type
+  
+  pairwise_results[[met]] <- test_df
+}
+#the bove code applies t test whereever normal other wise applied pairwise wilcox
+#need to depo this resultas a csv?
+pairwise_results_df <- bind_rows(pairwise_results)
+
+
+##############################################################################
+##############################################################################
+#########################################################################
+# Create a new column for substrate comparison
+pairwise_results_df <- pairwise_results_df %>%
+  mutate(Comparison = paste(Substrate1, "vs", Substrate2, sep=" "))
+
+# Categorize significance levels as numeric values for Y-axis
+pairwise_results_df <- pairwise_results_df %>%
+  mutate(Significance_Stars = case_when(
+    p_value < 0.001 ~ 3,  # "***"
+    p_value < 0.01  ~ 2,  # "**"
+    p_value < 0.05  ~ 1,  # "*"
+    TRUE ~ 0         # "NS"
+  ))
+
+# Define factor labels for the Y-axis
+significance_labels <- c("NS", "*", "**", "***")
+
+# Dynamically generate colors for all comparisons
+unique_comparisons <- unique(pairwise_results_df$Comparison)
+comparison_colors <- setNames(rainbow(length(unique_comparisons)), unique_comparisons)
+
+# Create the plot
+ggplot(pairwise_results_df, aes(x = Metabolite, y = Significance_Stars, color = Comparison)) +
+  geom_jitter(width = 0.3, height = 0.2, size = 3, alpha = 0.7) +  # Jitter to avoid overlap
+  scale_y_continuous(breaks = 0:3, labels = significance_labels) +  # Set significance levels
+  scale_color_manual(values = comparison_colors) +  # Dynamically map colors
+  theme_minimal() +
+  labs(title = "Significance of Metabolite Differences Across Substrate Comparisons",
+       x = "Metabolite",
+       y = "Significance Level",
+       color = "Substrate Comparison") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+#need to clean row names
+pairwise_results_df_filtered <- pairwise_results_df %>%
+  filter(Significance_Stars > 0)
+x <- ggplot(pairwise_results_df_filtered, aes(x = Metabolite, y = Significance_Stars, color = Comparison)) +
+  geom_jitter(width = 0.3, height = 0.2, size = 3, alpha = 0.7) +  # Jitter to avoid overlap
+  scale_y_continuous(breaks = 0:3, labels = significance_labels) +  # Set significance levels
+  scale_color_manual(values = comparison_colors) +  # Dynamically map colors
+  theme_minimal() +
+  labs(title = "Significance of Metabolite Differences Across Substrate Comparisons",
+       x = "Metabolite",
+       y = "Significance Level",
+       color = "Substrate Comparison") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 6))
+#############################################################################
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/global_pairwise_comparison.svg", plot = x, width = 12, height = 6, units = "in")
+#############################################################################
+comparison_summary <- pairwise_results_df_filtered %>%
+  group_by(Comparison) %>%
+  summarise(Total_Significant_Metabolites = n()) %>%
+  arrange(desc(Total_Significant_Metabolites))
+
+comparison_summary
+write.csv(pairwise_results_df_filtered, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/pairwise_global_metabolomics.csv")
+##############################################################################
+
+# Ensure Significance_Stars is numeric
+pairwise_results_df_filtered <- pairwise_results_df_filtered %>%
+  mutate(Significance_Stars = as.numeric(as.character(Significance_Stars)))
+
+# Convert data into wide format for heatmap
+heatmap_data <- pairwise_results_df_filtered %>%
+  select(Metabolite, Comparison, Significance_Stars) %>%
+  pivot_wider(names_from = Comparison, values_from = Significance_Stars, values_fill = 0)
+
+# Set Metabolites as row names
+heatmap_matrix <- as.data.frame(heatmap_data)  # Keep it a dataframe initially
+rownames(heatmap_matrix) <- heatmap_matrix$Metabolite  # Assign row names
+heatmap_matrix <- heatmap_matrix[,-1]  # Remove Metabolite column
+
+# Convert to a matrix after setting row names
+heatmap_matrix <- as.matrix(heatmap_matrix)
+
+# Define column annotation (Color for each comparison)
+unique_comparisons <- colnames(heatmap_matrix)
+comparison_colors <- setNames(rainbow(length(unique_comparisons)), unique_comparisons)
+
+column_annotation <- HeatmapAnnotation(
+  Comparison = unique_comparisons,
+  col = list(Comparison = comparison_colors),
+  annotation_legend_param = list(title = "Comparison", at = unique_comparisons, labels = unique_comparisons)
+)
+
+# Define color scale for heatmap (NS=white, *=yellow, **=orange, ***=red)
+col_fun <- colorRamp2(c(0, 1, 2, 3), c("white", "yellow", "orange", "red"))
+
+# Create the heatmap
+hmap <- Heatmap(heatmap_matrix, 
+                name = "Significance", 
+                col = col_fun, 
+                top_annotation = column_annotation, 
+                cluster_rows = FALSE, 
+                cluster_columns = FALSE, 
+                show_row_names = TRUE,  
+                show_column_names = FALSE,
+                row_names_gp = gpar(fontsize = 8),  # Reduce row font size
+                column_names_gp = gpar(fontsize = 8),  # Reduce column font size
+                rect_gp = gpar(col = "black", lwd = 0.5),  # Add grid lines (black, thin)
+                heatmap_legend_param = list(
+                  title = "Significance", 
+                  labels = c("NS", "*", "**", "***"),
+                  direction = "horizontal"))
+
+###################################
+metabolites <- unique(pairwise_results_df$Metabolite)
+metabolites <- as.data.frame(metabolites)
+
+#############################
+metabolites <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/final/pairwise_df.csv")
+
+# Ensure metabolites are matched with the heatmap matrix row names
+metabolites_matched <- metabolites[match(rownames(heatmap_matrix), metabolites$metabolites), ]
+
+# Convert Category to a factor (optional but helps avoid issues)
+metabolites_matched$Category <- as.factor(metabolites_matched$Category)
+
+# Define unique colors for categories (ensure named vector)
+unique_categories <- levels(metabolites_matched$Category)
+library(viridis)
+category_colors <- setNames(viridis(length(unique_categories), option = "C"), unique_categories)
+
+# Generate enough colors dynamically
+category_colors <- setNames(colorRampPalette(brewer.pal(11, "Set3"))(length(unique_categories)), unique_categories)
+
+# Create a row annotation for Metabolite Category
+row_annotation <- rowAnnotation(
+  Category = metabolites_matched$Category,
+  col = list(Category = category_colors),  # Apply the updated color palette
+  annotation_legend_param = list(title = "Metabolite Category")
+)
+
+# Define column annotation (Color for each comparison)
+unique_comparisons <- colnames(heatmap_matrix)
+comparison_colors <- setNames(colorRampPalette(brewer.pal(11, "Set1"))(length(unique_comparisons)), unique_comparisons)
+
+column_annotation <- HeatmapAnnotation(
+  Comparison = unique_comparisons,
+  col = list(Comparison = comparison_colors),
+  annotation_legend_param = list(title = "Comparison")
+)
+
+# Define color scale for heatmap
+col_fun <- colorRamp2(c(0, 1, 2, 3), c("white", "yellow", "orange", "red"))
+
+# Create the heatmap with row annotation
+hmap <- Heatmap(heatmap_matrix, 
+                name = "Significance", 
+                col = col_fun, 
+                top_annotation = column_annotation, 
+                left_annotation = row_annotation,  # Adding the row annotation here
+                cluster_rows = FALSE, 
+                cluster_columns = FALSE, 
+                show_row_names = TRUE,  # Retaining original row names
+                show_column_names = FALSE,  
+                row_names_gp = gpar(fontsize = 8),  
+                column_names_gp = gpar(fontsize = 8),  
+                rect_gp = gpar(col = "black", lwd = 0.5),
+                heatmap_legend_param = list(
+                  title = "Significance", 
+                  labels = c("NS", "*", "**", "***"),
+                  direction = "vertical")
+)
+# Draw the heatmap with legend repositioned
+draw(hmap, heatmap_legend_side = "left", annotation_legend_side = "right")
+##########################################
+#trying to facet
+######################################################
+
+
+# Ensure metabolites are matched with the heatmap matrix row names
+metabolites_matched <- metabolites[match(rownames(heatmap_matrix), metabolites$metabolites), ]
+
+# Convert Category to a factor with a fixed order
+metabolites_matched$Category <- factor(metabolites_matched$Category, levels = unique(metabolites$Category))
+
+# Sort rows by Category
+sorted_indices <- order(metabolites_matched$Category)
+heatmap_matrix <- heatmap_matrix[sorted_indices, ]
+metabolites_matched <- metabolites_matched[sorted_indices, ]
+
+# Define unique colors for categories
+category_colors <- setNames(colorRampPalette(brewer.pal(8, "Set3"))(length(unique(metabolites_matched$Category))), unique(metabolites_matched$Category))
+
+# Define color scale for heatmap
+col_fun <- colorRamp2(c(0, 1, 2, 3), c("white", "yellow", "orange", "red"))
+
+# Split data by category
+heatmap_list <- lapply(split(heatmap_matrix, metabolites_matched$Category), function(mat) {
+  Heatmap(as.matrix(mat), 
+          name = "Significance", 
+          col = col_fun, 
+          cluster_rows = TRUE, 
+          cluster_columns = FALSE, 
+          show_row_names = TRUE,  
+          show_column_names = TRUE,  
+          row_names_gp = gpar(fontsize = 8),  
+          column_names_gp = gpar(fontsize = 8),  
+          rect_gp = gpar(col = "black", lwd = 0.5),
+          heatmap_legend_param = list(
+            title = "Significance", 
+            labels = c("NS", "*", "**", "***"),
+            direction = "horizontal",
+            grid_height = unit(5, "mm"),
+            grid_width = unit(5, "mm"))
+  )
+})
+
+# Create layout for multiple heatmaps (Faceting)
+grid.newpage()  # Clear previous plots
+do.call(grid.arrange, c(heatmap_list, ncol = 2))  # Arrange in 2 columns
+
+# Ensure metabolites are matched with the heatmap matrix row names
+metabolites_matched <- metabolites[match(rownames(heatmap_matrix), metabolites$metabolites), ]
+
+# Convert Category to a factor with a fixed order
+metabolites_matched$Category <- factor(metabolites_matched$Category, levels = unique(metabolites$Category))
+
+# Sort the heatmap matrix rows based on Category
+sorted_indices <- order(metabolites_matched$Category)  # Get sorting order
+heatmap_matrix <- heatmap_matrix[sorted_indices, ]  # Reorder matrix
+metabolites_matched <- metabolites_matched[sorted_indices, ]  # Reorder metadata accordingly
+
+# Define unique colors for categories (ensure named vector)
+unique_categories <- levels(metabolites_matched$Category)
+category_colors <- setNames(rainbow(length(unique_categories)), unique_categories)
+
+# Create a row annotation for Metabolite Category
+row_annotation <- rowAnnotation(
+  Category = metabolites_matched$Category,
+  col = list(Category = category_colors),  # Fixed: now a named vector
+  annotation_legend_param = list(title = "Metabolite Category")
+)
+
+# Define column annotation (Color for each comparison)
+unique_comparisons <- colnames(heatmap_matrix)
+comparison_colors <- setNames(rainbow(length(unique_comparisons)), unique_comparisons)
+
+column_annotation <- HeatmapAnnotation(
+  Comparison = unique_comparisons,
+  col = list(Comparison = comparison_colors),
+  annotation_legend_param = list(title = "Comparison")
+)
+
+# Define color scale for heatmap
+col_fun <- colorRamp2(c(0, 1, 2, 3), c("white", "yellow", "orange", "red"))
+
+# Create the heatmap with row annotation and category-based clustering
+hmap <- Heatmap(heatmap_matrix, 
+                name = "Significance", 
+                col = col_fun, 
+                top_annotation = column_annotation, 
+                left_annotation = row_annotation,  # Adding the row annotation here
+                cluster_rows = FALSE,  # No clustering, rows are manually ordered by Category
+                cluster_columns = FALSE,  # Optional: Disable clustering for columns (set to TRUE if needed)
+                show_row_names = TRUE,  # Retaining original row names
+                show_column_names = TRUE,  
+                row_names_gp = gpar(fontsize = 8),  
+                column_names_gp = gpar(fontsize = 8),  
+                rect_gp = gpar(col = "black", lwd = 0.5),
+                heatmap_legend_param = list(
+                  title = "Significance", 
+                  labels = c("NS", "*", "**", "***"),
+                  direction = "horizontal")
+)
+
+# Draw the heatmap with legends positioned properly
+draw(hmap, heatmap_legend_side = "left", annotation_legend_side = "right")
