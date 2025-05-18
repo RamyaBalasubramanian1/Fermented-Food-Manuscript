@@ -108,7 +108,9 @@ pheatmap::pheatmap(
 dev.off()
 #######################################################
 #######################################################
-
+meta <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/meta_insilico.csv")
+meta <- meta[,-c(7,8)]
+anno <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/annotation_gbm.csv")
 kin_strat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/kinema/gbm_strat/modules.tsv")
 kin_strat <- row_to_names(kin_strat, 1)
 kin_strat[, 3:ncol(kin_strat)] <- lapply(kin_strat[, 3:ncol(kin_strat)], as.numeric)
@@ -123,11 +125,11 @@ kin_long <- kin_long[kin_long$Contribution > 0, ]
 kin_long_annotated <- merge(kin_long, anno[, c("Module", "Annotation")], by = "Module", all.x = TRUE)
 kin_long_annotated$Module <- NULL
 names(kin_long_annotated)[names(kin_long_annotated) == "Annotation"] <- "Module"
-kin_long_annotated$Sample <- substr(kin_long_annotated$Sample, 1, 11)
+kin_long_annotated$Sample <- substr(kin_long_annotated$Sample, 1, 10)
 colnames(kin_long_annotated)[colnames(kin_long_annotated)=="Sample"] <- "ID"
 ################
 kin_long_annotated <- kin_long_annotated %>%
-  inner_join(meta, by = "ID") %>% 
+  inner_join(meta, by = "ID") %>%
   filter(!is.na(Fermented.food.category))
 kin_long_annotated <- kin_long_annotated %>%
   filter(Taxon != "unclassified") %>%
@@ -193,6 +195,9 @@ meta <- meta[,-c(7,8)]
 mk_long_annotated <- merge(mk_long, anno[, c("Module", "Annotation")], by = "Module", all.x = TRUE)
 mk_long_annotated$Module <- NULL
 names(mk_long_annotated)[names(mk_long_annotated) == "Annotation"] <- "Module"
+mk_long_annotated <- mk_long_annotated %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 ################
 links <- aggregate(Contribution ~ Taxon + Module, data = mk_long_annotated, sum)
 names(links) <- c("source", "target", "value")
@@ -211,7 +216,9 @@ webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-si
 # Merge annotation info into mk_long
 mk_long_annotated <- merge(mk_long, anno[, c("Module", "Annotation", "Molecule")], 
                            by = "Module", all.x = TRUE)
-
+mk_long_annotated <- mk_long_annotated %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 links1 <- aggregate(Contribution ~ Taxon + Annotation, data = mk_long_annotated, sum)
 names(links1) <- c("source", "target", "value")
 
@@ -225,7 +232,21 @@ nodes$group <- nodes$name
 
 links$source <- match(links$source, nodes$name) - 1
 links$target <- match(links$target, nodes$name) - 1
+# === 1. Define colors for Molecules and Annotations ===
+molecules <- c("Kynurenine", "Tryptophan", "Glutamate", "Acetylcholine", "Histamine", 
+               "p-Cresol", "GABA", "Dopamine", "NO", "HSP", "Estrogen", 
+               "Quinolinic acid", "SCFA", "SAM", "Inositol")
 
+annotations <- c("Tryptophan metabolism", "Biogenic amine metabolism", "Tyrosine metabolism",
+                 "GABA metabolism", "NO metabolism", "Heat shock protein", "Steroid metabolism",
+                 "LCFA synthesis", "S-Adenosylmethionine (SAM) synthesis", "Sugar metabolism")
+
+mol_palette <- colorRampPalette(brewer.pal(12, "Set3"))
+ann_palette <- colorRampPalette(brewer.pal(12, "Paired"))
+
+mol_colors <- setNames(mol_palette(length(molecules)), molecules)
+ann_colors <- setNames(ann_palette(length(annotations)), annotations)
+all_colors <- c(mol_colors, ann_colors)
 # === 4. Map consistent colors ===
 node_colors <- sapply(nodes$group, function(x) ifelse(x %in% names(all_colors), all_colors[x], "#CCCCCC"))
 color_scale <- paste0(
@@ -370,6 +391,11 @@ wk_long <- wk_long[wk_long$Contribution > 0, ]
 anno <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/annotation_gbm.csv")
 wk_long_annotated <- merge(wk_long, anno[, c("Module", "Annotation", "Molecule")], 
                            by = "Module", all.x = TRUE)
+#######################################################
+wk_long_annotated <- wk_long_annotated %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
+
 
 # === 3. Create Sankey links ===
 links1 <- aggregate(Contribution ~ Taxon + Annotation, data = wk_long_annotated, sum)
@@ -432,6 +458,9 @@ kom_long_annotated <- merge(kom_long, anno[, c("Module", "Annotation")], by = "M
 head(kom_long_annotated)
 kom_long_annotated$Module <- NULL
 names(kom_long_annotated)[names(kom_long_annotated) == "Annotation"] <- "Module"
+kom_long_annotated <- kom_long_annotated %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 ################
 links <- aggregate(Contribution ~ Taxon + Module, data = kom_long_annotated, sum)
 names(links) <- c("source", "target", "value")
@@ -485,15 +514,6 @@ p <- sankeyNetwork(Links = links, Nodes = nodes,
                    fontSize = 12, nodeWidth = 30,
                    colourScale = color_scale)
 
-
-
-
-
-
-
-
-
-
 # Aggregate for Taxon → Annotation
 links1 <- aggregate(Contribution ~ Taxon + Annotation, data = kom_long_annotated, sum)
 names(links1) <- c("source", "target", "value")
@@ -542,6 +562,10 @@ meta <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-sil
 meta <- meta[,-c(7,8)]
 
 paula_long_annotated <- merge(paula_long, anno[, c("Module", "Annotation", "Molecule")], by = "Module", all.x = TRUE)
+
+paula_long_annotated <- paula_long_annotated %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 ###############################
 # head(paula_long_annotated)
 # paula_long_annotated$Sample <- sub("^(.*S[0-9]+).*", "\\1", paula_long_annotated$Sample)
@@ -638,7 +662,9 @@ fs_fermented <- fs_long_annotated %>%
   inner_join(meta, by = "ID") %>% 
   filter(!is.na(Fermented.food.category))
 fs_fermented <- fs_fermented %>% filter(Fermented.food.category=="Sauerkraut")
-
+fs_fermented <- fs_fermented %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 ################
 links <- aggregate(Contribution ~ Taxon + Module, data = fs_fermented, sum)
 names(links) <- c("source", "target", "value")
@@ -726,7 +752,9 @@ fs_fermented <- fs_long_annotated %>%
   inner_join(meta, by = "ID") %>% 
   filter(!is.na(Fermented.food.category))
 fs_fermented <- fs_fermented %>% filter(Fermented.food.category==c("Kimchi", "Scallion kimchi", "Carrot kimchi", "Brussels sprout kimchi"))
-
+fs_fermented <- fs_fermented %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 
 links1 <- fs_fermented %>%
   group_by(Fermented.food.category, Taxon) %>%
@@ -1097,7 +1125,9 @@ aff_fermented <- aff_long_annotated %>%
   filter(!is.na(Fermented.food.category))
 ##############################
 aff_fermented <- aff_fermented %>% filter(Substrate=="Palm Tree")
-
+aff_fermented <- aff_fermented %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 links1 <- aff_fermented %>%
   group_by(Fermented.food.category, Taxon) %>%
   summarise(value = sum(Contribution), .groups = "drop") %>%
@@ -1204,7 +1234,9 @@ aff_fermented <- aff_long_annotated %>%
   filter(!is.na(Fermented.food.category))
 ##############################
 aff_fermented <- aff_fermented %>% filter(Substrate=="Root and tuber")
-
+aff_fermented <- aff_fermented %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 links1 <- aff_fermented %>%
   group_by(Fermented.food.category, Taxon) %>%
   summarise(value = sum(Contribution), .groups = "drop") %>%
@@ -1282,7 +1314,9 @@ aff_fermented <- aff_fermented %>% filter(Substrate=="Cereal")
 heatmap_df <- aff_fermented %>%
   group_by(Taxon, Molecule) %>%
   summarise(Contribution = sum(Contribution), .groups = "drop")
-
+aff_fermented <- aff_fermented %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 # Reshape into matrix
 heat_matrix <- dcast(heatmap_df, Taxon ~ Molecule, value.var = "Contribution", fill = 0)
 rownames(heat_matrix) <- heat_matrix$Taxon
@@ -1308,6 +1342,9 @@ aff_fermented <- aff_long_annotated %>%
   inner_join(meta, by = "ID") %>% 
   filter(!is.na(Fermented.food.category))
 aff_fermented <- aff_fermented %>% filter(Substrate=="Seed")
+aff_fermented <- aff_fermented %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 heatmap_df <- aff_fermented %>%
   group_by(Taxon, Molecule) %>%
   summarise(Contribution = sum(Contribution), .groups = "drop")
@@ -1338,6 +1375,9 @@ dev.off()
 aff_fermented <- aff_long_annotated %>%
   inner_join(meta, by = "ID") %>% 
   filter(!is.na(Fermented.food.category))
+aff_fermented <- aff_fermented %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 ##############################
 aff_fermented <- aff_fermented %>% filter(Substrate=="Dairy")
 
@@ -1385,6 +1425,13 @@ p
 
 ############################################
 #i want to show the diversity of taxon contributing to module in ff is higher than FS
+meta <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/meta_insilico.csv")
+meta <- meta[,-c(7,8)]
+
+aff_long_annotated <- merge(aff_long, anno[, c("Module", "Annotation", "Molecule")], by = "Module", all.x = TRUE)
+aff_long_annotated$Sample <- substr(aff_long_annotated$Sample, 1, 4)
+colnames(aff_long_annotated)[colnames(aff_long_annotated) == "Sample"] <- "ID"
+############
 aff_fermented <- aff_long_annotated %>%
   inner_join(meta, by = "ID") %>% 
   filter(!is.na(Fermented.food.category))
@@ -1434,7 +1481,9 @@ aff_long <- pivot_longer(aff_strat,
                          names_to = "Sample", 
                          values_to = "Contribution")
 aff_long <- aff_long[aff_long$Contribution > 0, ]
-
+aff_long <- aff_long %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 anno <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/annotation_gbm.csv")
 dim(anno)
 #################
@@ -1482,6 +1531,9 @@ fs_fermented <- fs_long_annotated %>%
   inner_join(meta, by = "ID") %>% 
   filter(!is.na(Fermented.food.category))
 fs_fermented <- fs_fermented %>% filter(Substrate=="Dairy")
+fs_fermented <- fs_fermented %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 ##############################################
 #trying to show that the number of connections are more in european dairy compared to african dairy
 ################################################
