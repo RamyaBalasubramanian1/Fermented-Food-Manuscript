@@ -850,7 +850,9 @@ fs_fermented <- fs_long_annotated %>%
   inner_join(meta, by = "ID") %>% 
   filter(!is.na(Fermented.food.category))
 fs_fermented <- fs_fermented %>% filter(Fermented.food.category=="Beetroot kvass")
-
+fs_fermented <- fs_fermented %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 ################
 links <- aggregate(Contribution ~ Taxon + Module, data = fs_fermented, sum)
 names(links) <- c("source", "target", "value")
@@ -890,10 +892,10 @@ htmlwidgets::saveWidget(p, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SIL
 webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_kvass.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/sankey_plot_kvass.pdf", selector = "pdf")
 #############################################
 #############################################
-links1 <- aggregate(Contribution ~ Taxon + Annotation, data = fs_fermented, sum)
+links1 <- aggregate(Contribution ~ Taxon + Module, data = fs_fermented, sum)
 names(links1) <- c("source", "target", "value")
 
-links2 <- aggregate(Contribution ~ Annotation + Molecule, data = fs_fermented, sum)
+links2 <- aggregate(Contribution ~ Module + Molecule, data = fs_fermented, sum)
 names(links2) <- c("source", "target", "value")
 
 links <- rbind(links1, links2)
