@@ -11,8 +11,7 @@ library(factoextra)
 library(patchwork)
 library(pheatmap)
 library(ComplexHeatmap)
-install.packages("coloRamPalette")
-library(colorRampPalette)
+
 # Install the circlize package if not already installed
 if (!requireNamespace("circlize", quietly = TRUE)) {
   install.packages("circlize")
@@ -90,11 +89,13 @@ names(mk_long_annotated)[names(mk_long_annotated) == "Annotation"] <- "Module"
 # Merge annotation info into mk_long
 mk_long_annotated <- merge(mk_long, anno[, c("Module", "Annotation", "Molecule")], 
                            by = "Module", all.x = TRUE)
-
+mk_long_annotated <- mk_long_annotated %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 # Step 1: Filter data
 filtered_data <- mk_long_annotated %>%
   filter(Contribution > 0) %>%
-  filter(!Annotation %in% c("S-Adenosyl methionine (SAM) synthesis", "Heatshock protein"))
+  filter(!Annotation %in% c("S-Adenosylmethionine (SAM) synthesis", "Heat shock protein"))
 
 # Step 2: Keep only taxa with >3 unique annotations
 taxa_to_keep <- filtered_data %>%
@@ -148,15 +149,15 @@ P <- sankeyNetwork(Links = all_edges,
 
 # View
 P
-htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_MK.html")
-webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_MK.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_MK.pdf", selector = "pdf")
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_MK.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_MK.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_MK.pdf", selector = "pdf")
 
 ###########################################
 #applying prevalence cutoffs
 # Step 1: Filter valid contributions and exclude unwanted annotations
 filtered_data <- mk_long_annotated %>%
   filter(Contribution > 0) %>%
-  filter(!Annotation %in% c("S-Adenosyl methionine (SAM) synthesis", "Heatshock protein"))
+  filter(!Annotation %in% c("S-Adenosylmethionine (SAM) synthesis", "Heat shock protein"))
 
 # Step 2: Keep taxa present in *all* samples (based on Contribution > 0)
 total_samples <- filtered_data %>%
@@ -224,8 +225,8 @@ P <- sankeyNetwork(Links = all_edges,
 
 # View
 P
-htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_MK_PREV.html")
-webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_MK_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_MK_PREV.pdf", selector = "pdf")
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_MK_PREV.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_MK_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_MK_PREV.pdf", selector = "pdf")
 
 ####################################
 wk_strat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/wk_final_run/waterkefir/strat/modules.tsv")
@@ -255,6 +256,9 @@ names(wk_long_annotated)[names(wk_long_annotated) == "Annotation"] <- "Module"
 # Merge annotation info into mk_long
 wk_long_annotated <- merge(wk_long, anno[, c("Module", "Annotation", "Molecule")], 
                            by = "Module", all.x = TRUE)
+wk_long_annotated <- wk_long_annotated %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 ###########
 # Step 1: Filter data
 filtered_data <- wk_long_annotated %>%
@@ -392,8 +396,8 @@ P <- sankeyNetwork(Links = all_edges,
 
 # View
 P
-htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_WK_PREV.html")
-webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_WK_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_WK_PREV.pdf", selector = "pdf")
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_WK_PREV.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_WK_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_WK_PREV.pdf", selector = "pdf")
 ##########################################
 kom_strat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/kombucha/gbm_strat/modules.tsv")
 kom_strat <- row_to_names(kom_strat, 1)
@@ -419,13 +423,16 @@ head(kom_long_annotated)
 kom_long_annotated$Module <- NULL
 names(kom_long_annotated)[names(kom_long_annotated) == "Annotation"] <- "Module"
 ##############################
-kom_long_annotated <- merge(wk_long, anno[, c("Module", "Annotation", "Molecule")], 
+kom_long_annotated <- merge(kom_long, anno[, c("Module", "Annotation", "Molecule")], 
                             by = "Module", all.x = TRUE)
+kom_long_annotated <- kom_long_annotated %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 ###########
 # Step 1: Filter data
 filtered_data <- kom_long_annotated %>%
   filter(Contribution > 0) %>%
-  filter(!Annotation %in% c("S-Adenosyl methionine (SAM) synthesis", "Heatshock protein"))
+  filter(!Annotation %in% c("S-Adenosylmethionine (SAM) synthesis", "Heatshock protein"))
 
 # Step 2: Keep only taxa with >3 unique annotations
 taxa_to_keep <- filtered_data %>%
@@ -480,8 +487,8 @@ P <- sankeyNetwork(Links = all_edges,
 # View
 P
 #########
-htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_kom.html")
-webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_kom.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_kom.pdf", selector = "pdf")
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_kom.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_kom.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_kom.pdf", selector = "pdf")
 ####################################
 #applying a prevalence threshold 50%
 #############
@@ -491,7 +498,7 @@ library(networkD3)
 # Step 1: Filter valid contributions and exclude unwanted annotations
 filtered_data <- kom_long_annotated %>%
   filter(Contribution > 0) %>%
-  filter(!Annotation %in% c("S-Adenosyl methionine (SAM) synthesis", "Heatshock protein"))
+  filter(!Annotation %in% c("S-Adenosylmethionine (SAM) synthesis", "Heat shock protein"))
 
 # Step 2: Keep taxa present in *all* samples (based on Contribution > 0)
 total_samples <- filtered_data %>%
@@ -560,8 +567,8 @@ P <- sankeyNetwork(Links = all_edges,
 
 # View
 P
-htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_kom_prev.html")
-webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_kom_prev.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_kom_prev.pdf", selector = "pdf")
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_kom_prev.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_kom_prev.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_kom_prev.pdf", selector = "pdf")
 ############################################################
 #################################################################
 ##paula mk#############################################################
@@ -593,11 +600,14 @@ names(paula_long_annotated)[names(paula_long_annotated) == "Annotation"] <- "Mod
 #######################
 paula_long_annotated <- merge(paula_long, anno[, c("Module", "Annotation", "Molecule")], 
                               by = "Module", all.x = TRUE)
+paula_long_annotated <- paula_long_annotated %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 ###########
 # Step 1: Filter data
 filtered_data <- paula_long_annotated %>%
   filter(Contribution > 0) %>%
-  filter(!Annotation %in% c("S-Adenosyl methionine (SAM) synthesis", "Heatshock protein"))
+  filter(!Annotation %in% c("S-Adenosylmethionine (SAM) synthesis", "Heat shock protein"))
 
 # Step 2: Keep only taxa with >3 unique annotations
 taxa_to_keep <- filtered_data %>%
@@ -651,8 +661,8 @@ P <- sankeyNetwork(Links = all_edges,
 
 # View
 P
-htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_PAU.html")
-webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_PAU.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_PAU.pdf", selector = "pdf")
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_PAU.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_PAU.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_PAU.pdf", selector = "pdf")
 ####################################
 #applying a prevalence threshold 50%
 #############
@@ -662,7 +672,7 @@ library(networkD3)
 # Step 1: Filter valid contributions and exclude unwanted annotations
 filtered_data <- paula_long_annotated %>%
   filter(Contribution > 0) %>%
-  filter(!Annotation %in% c("S-Adenosyl methionine (SAM) synthesis", "Heatshock protein"))
+  filter(!Annotation %in% c("S-Adenosylmethionine (SAM) synthesis", "Heat shock protein"))
 
 # Step 2: Keep taxa present in *all* samples (based on Contribution > 0)
 total_samples <- filtered_data %>%
@@ -732,8 +742,8 @@ P <- sankeyNetwork(Links = all_edges,
 # View
 P
 ##########
-htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_PAU_PREV.html")
-webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_PAU_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_PAU_PREV.pdf", selector = "pdf")
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_PAU_PREV.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_PAU_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_PAU_PREV.pdf", selector = "pdf")
 #####################################################
 #####################################################
 #doing the same for kimchi,sauerkruat and kvass(beet)
@@ -768,11 +778,13 @@ fs_fermented <- fs_long_annotated %>%
   inner_join(meta, by = "ID") %>% 
   filter(!is.na(Fermented.food.category))
 fs_fermented <- fs_fermented %>% filter(Substrate=="Brine")
-
+fs_fermented <- fs_fermented %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 # Step 1: Filter for presence and remove unwanted modules
 filtered_data <- fs_fermented %>%
   filter(Contribution > 0) %>%
-  filter(!Module %in% c("S-adenosyl methionine synthesis", "Heatshock protein"))
+  filter(!Module %in% c("S-Adenosylmethionine (SAM) synthesis", "Heat shock protein"))
 
 # Step 2: Keep only taxa present in ≥ 60% of samples
 total_samples <- filtered_data %>%
@@ -842,9 +854,9 @@ P <- sankeyNetwork(Links = all_edges,
 # View
 P
 #########################################################
-htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_BRINE_PREV.html")
-webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_BRINE_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_BRINE_PREV.pdf", selector = "pdf")
-
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_BRINE_PREV.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_BRINE_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_BRINE_PREV.pdf", selector = "pdf")
+##########################################################
 fs_strat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/FS/gbm_strat/modules.tsv", header = TRUE)
 #fs_strat <- row_to_names(fs_strat, 1)
 fs_strat[, 3:ncol(fs_strat)] <- lapply(fs_strat[, 3:ncol(fs_strat)], as.numeric)
@@ -875,11 +887,13 @@ fs_fermented <- fs_long_annotated %>%
   inner_join(meta, by = "ID") %>% 
   filter(!is.na(Fermented.food.category))
 fs_fermented <- fs_fermented %>% filter(Substrate=="Sugar")
-
+fs_fermented <- fs_fermented %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 # Step 1: Filter for presence and remove unwanted modules
 filtered_data <- fs_fermented %>%
   filter(Contribution > 0) %>%
-  filter(!Module %in% c("S-adenosyl methionine synthesis", "Heatshock protein"))
+  filter(!Module %in% c("S-Adenosylmethionine (SAM) synthesis", "Heat shock protein"))
 
 # Step 2: Keep only taxa present in ≥ 60% of samples
 total_samples <- filtered_data %>%
@@ -949,8 +963,8 @@ P <- sankeyNetwork(Links = all_edges,
 # View
 P
 ################################################################################
-htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_SUGAR_PREV.html")
-webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_SUGAR_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_SUGAR_PREV.pdf", selector = "pdf")
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_SUGAR_PREV.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_SUGAR_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_SUGAR_PREV.pdf", selector = "pdf")
 
 
 fs_strat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/FS/gbm_strat/modules.tsv", header = TRUE)
@@ -983,11 +997,13 @@ fs_fermented <- fs_long_annotated %>%
   inner_join(meta, by = "ID") %>% 
   filter(!is.na(Fermented.food.category))
 fs_fermented <- fs_fermented %>% filter(Substrate=="Dairy")
-
+fs_fermented <- fs_fermented %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 # Step 1: Filter for presence and remove unwanted modules
 filtered_data <- fs_fermented %>%
   filter(Contribution > 0) %>%
-  filter(!Module %in% c("S-adenosyl methionine synthesis", "Heatshock protein"))
+  filter(!Module %in% c("S-Adenosylmethionine (SAM) synthesis", "Heatshock protein"))
 
 # Step 2: Keep only taxa present in ≥ 60% of samples
 total_samples <- filtered_data %>%
@@ -1056,8 +1072,8 @@ P <- sankeyNetwork(Links = all_edges,
 
 # View
 P
-htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_DAIRY_PREV.html")
-webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_DAIRY_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/GBM_PA_SANKEY_DAIRY_PREV.pdf", selector = "pdf")
+htmlwidgets::saveWidget(P, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_DAIRY_PREV.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_DAIRY_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_DAIRY_PREV.pdf", selector = "pdf")
 
 #############################################
 #aff food
@@ -1095,7 +1111,7 @@ aff_fermented <- aff_fermented %>% filter(Substrate=="Palm Tree")
 # Step 1: Filter for presence and remove unwanted modules
 filtered_data <- aff_fermented %>%
   filter(Contribution > 0) %>%
-  filter(!Module %in% c("S-adenosyl methionine synthesis", "Heatshock protein"))
+  filter(!Module %in% c("S-Adenosylmethionine synthesis", "Heat shock protein"))
 
 # Step 2: Keep only taxa present in ≥ 60% of samples
 total_samples <- filtered_data %>%
@@ -1121,7 +1137,9 @@ taxa_to_keep <- filtered_data %>%
 
 filtered_data <- filtered_data %>%
   filter(Taxon %in% taxa_to_keep)
-
+filtered_data <- filtered_data %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 # Step 4: Create edges
 # Taxon → Module
 edges1 <- filtered_data %>%
@@ -1196,11 +1214,14 @@ aff_fermented <- aff_long_annotated %>%
   filter(!is.na(Fermented.food.category))
 ##############################
 aff_fermented <- aff_fermented %>% filter(Substrate=="Cereal")
+aff_fermented <- aff_fermented %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 #######
 # Step 1: Filter for presence and remove unwanted modules
 filtered_data <- aff_fermented %>%
   filter(Contribution > 0) %>%
-  filter(!Module %in% c("S-adenosyl methionine synthesis", "Heatshock protein"))
+  filter(!Module %in% c("S-Adenosylmethionine (SAM) synthesis", "Heat shock protein"))
 
 # Step 2: Keep only taxa present in ≥ 60% of samples
 total_samples <- filtered_data %>%
@@ -1305,8 +1326,10 @@ aff_fermented <- aff_fermented %>% filter(Substrate=="Root and tuber")
 # Step 1: Filter for presence and remove unwanted modules
 filtered_data <- aff_fermented %>%
   filter(Contribution > 0) %>%
-  filter(!Module %in% c("S-adenosyl methionine synthesis", "Heatshock protein"))
-
+  filter(!Module %in% c("S-Adenosylmethionine (SAM) synthesis", "Heat shock protein"))
+filtered_data <- filtered_data %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 # Step 2: Keep only taxa present in ≥ 60% of samples
 total_samples <- filtered_data %>%
   distinct(ID) %>%
@@ -1394,8 +1417,10 @@ aff_fermented <- aff_fermented %>% filter(Substrate=="Seed")
 # Step 1: Filter for presence and remove unwanted modules
 filtered_data <- aff_fermented %>%
   filter(Contribution > 0) %>%
-  filter(!Module %in% c("S-adenosyl methionine synthesis", "Heatshock protein"))
-
+  filter(!Module %in% c("S-Adenosylmethionine (SAM) synthesis", "Heat shock protein"))
+filtered_data <- filtered_data %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 # Step 2: Keep only taxa present in ≥ 60% of samples
 total_samples <- filtered_data %>%
   distinct(ID) %>%
@@ -1483,8 +1508,10 @@ aff_fermented <- aff_fermented %>% filter(Substrate=="Dairy")
 # Step 1: Filter for presence and remove unwanted modules
 filtered_data <- aff_fermented %>%
   filter(Contribution > 0) %>%
-  filter(!Module %in% c("S-adenosyl methionine synthesis", "Heatshock protein"))
-
+  filter(!Module %in% c("S-Adenosylmethionine (SAM) synthesis", "Heat shock protein"))
+filtered_data <- filtered_data %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 # Step 2: Keep only taxa present in ≥ 60% of samples
 total_samples <- filtered_data %>%
   distinct(ID) %>%
