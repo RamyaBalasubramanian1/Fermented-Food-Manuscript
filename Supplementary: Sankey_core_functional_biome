@@ -520,7 +520,7 @@ filtered_data <- filtered_data %>%
 taxa_to_keep <- filtered_data %>%
   group_by(Taxon) %>%
   summarise(n_annotations = n_distinct(Annotation), .groups = "drop") %>%
-  filter(n_annotations > 3) %>%
+  filter(n_annotations > 1) %>%
   pull(Taxon)
 
 filtered_data <- filtered_data %>%
@@ -613,7 +613,7 @@ filtered_data <- paula_long_annotated %>%
 taxa_to_keep <- filtered_data %>%
   group_by(Taxon) %>%
   summarise(n_annotations = n_distinct(Annotation), .groups = "drop") %>%
-  filter(n_annotations > 3) %>%
+  filter(n_annotations > 1) %>%
   pull(Taxon)
 
 filtered_data <- filtered_data %>%
@@ -694,7 +694,7 @@ filtered_data <- filtered_data %>%
 taxa_to_keep <- filtered_data %>%
   group_by(Taxon) %>%
   summarise(n_annotations = n_distinct(Annotation), .groups = "drop") %>%
-  filter(n_annotations > 3) %>%
+  filter(n_annotations > 2) %>%
   pull(Taxon)
 
 filtered_data <- filtered_data %>%
@@ -795,7 +795,7 @@ taxa_prevalent <- filtered_data %>%
   distinct(Taxon, ID) %>%
   group_by(Taxon) %>%
   summarise(n_samples = n(), .groups = "drop") %>%
-  filter(n_samples / total_samples >= 0.6) %>%
+  filter(n_samples / total_samples >= 0.5) %>%
   pull(Taxon)
 
 filtered_data <- filtered_data %>%
@@ -805,7 +805,7 @@ filtered_data <- filtered_data %>%
 taxa_to_keep <- filtered_data %>%
   group_by(Taxon) %>%
   summarise(n_modules = n_distinct(Module), .groups = "drop") %>%
-  filter(n_modules > 3) %>%
+  filter(n_modules > 2) %>%
   pull(Taxon)
 
 filtered_data <- filtered_data %>%
@@ -904,7 +904,7 @@ taxa_prevalent <- filtered_data %>%
   distinct(Taxon, ID) %>%
   group_by(Taxon) %>%
   summarise(n_samples = n(), .groups = "drop") %>%
-  filter(n_samples / total_samples >= 0.3) %>%
+  filter(n_samples / total_samples >= 0.5) %>%
   pull(Taxon)
 
 filtered_data <- filtered_data %>%
@@ -914,7 +914,7 @@ filtered_data <- filtered_data %>%
 taxa_to_keep <- filtered_data %>%
   group_by(Taxon) %>%
   summarise(n_modules = n_distinct(Module), .groups = "drop") %>%
-  filter(n_modules > 3) %>%
+  filter(n_modules > 2) %>%
   pull(Taxon)
 
 filtered_data <- filtered_data %>%
@@ -1014,7 +1014,7 @@ taxa_prevalent <- filtered_data %>%
   distinct(Taxon, ID) %>%
   group_by(Taxon) %>%
   summarise(n_samples = n(), .groups = "drop") %>%
-  filter(n_samples / total_samples >= 0.3) %>%
+  filter(n_samples / total_samples >= 0.5) %>%
   pull(Taxon)
 
 filtered_data <- filtered_data %>%
@@ -1024,7 +1024,7 @@ filtered_data <- filtered_data %>%
 taxa_to_keep <- filtered_data %>%
   group_by(Taxon) %>%
   summarise(n_modules = n_distinct(Module), .groups = "drop") %>%
-  filter(n_modules > 3) %>%
+  filter(n_modules > 2) %>%
   pull(Taxon)
 
 filtered_data <- filtered_data %>%
@@ -1105,14 +1105,16 @@ colnames(aff_long_annotated)[colnames(aff_long_annotated) =="Sample"] = "ID"
 aff_fermented <- aff_long_annotated %>%
   inner_join(meta, by = "ID") %>% 
   filter(!is.na(Fermented.food.category))
+aff_fermented <- aff_fermented %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
 ##############################
 aff_fermented <- aff_fermented %>% filter(Substrate=="Palm Tree")
 #######
 # Step 1: Filter for presence and remove unwanted modules
 filtered_data <- aff_fermented %>%
   filter(Contribution > 0) %>%
-  filter(!Module %in% c("S-Adenosylmethionine synthesis", "Heat shock protein"))
-
+  filter(!Module %in% c("S-Adenosylmethionine (SAM) synthesis", "Heat shock protein"))
 # Step 2: Keep only taxa present in ≥ 60% of samples
 total_samples <- filtered_data %>%
   distinct(ID) %>%
@@ -1122,7 +1124,7 @@ taxa_prevalent <- filtered_data %>%
   distinct(Taxon, ID) %>%
   group_by(Taxon) %>%
   summarise(n_samples = n(), .groups = "drop") %>%
-  filter(n_samples / total_samples >= 0.3) %>%
+  filter(n_samples / total_samples >= 0.5) %>%
   pull(Taxon)
 
 filtered_data <- filtered_data %>%
@@ -1137,10 +1139,7 @@ taxa_to_keep <- filtered_data %>%
 
 filtered_data <- filtered_data %>%
   filter(Taxon %in% taxa_to_keep)
-filtered_data <- filtered_data %>%
-  filter(Taxon != "unclassified") %>%
-  mutate(Taxon = sub(".*s__", "", Taxon))
-# Step 4: Create edges
+
 # Taxon → Module
 edges1 <- filtered_data %>%
   distinct(Taxon, Module) %>%
@@ -1171,7 +1170,7 @@ all_edges <- all_edges %>%
 stopifnot(!any(is.na(all_edges$source_id)), !any(is.na(all_edges$target_id)))
 
 # Step 6: Plot the Sankey
-P <- sankeyNetwork(Links = all_edges,
+P1 <- sankeyNetwork(Links = all_edges,
                    Nodes = nodes,
                    Source = "source_id",
                    Target = "target_id",
@@ -1181,7 +1180,7 @@ P <- sankeyNetwork(Links = all_edges,
                    nodeWidth = 30)
 
 # View
-P
+P1
 ################################################################
 #aff food
 aff_strat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/AFF/gbm_strat/modules.tsv", header = TRUE)
@@ -1242,7 +1241,7 @@ filtered_data <- filtered_data %>%
 taxa_to_keep <- filtered_data %>%
   group_by(Taxon) %>%
   summarise(n_modules = n_distinct(Module), .groups = "drop") %>%
-  filter(n_modules > 3) %>%
+  filter(n_modules > 2) %>%
   pull(Taxon)
 
 filtered_data <- filtered_data %>%
@@ -1279,7 +1278,7 @@ all_edges <- all_edges %>%
 stopifnot(!any(is.na(all_edges$source_id)), !any(is.na(all_edges$target_id)))
 
 # Step 6: Plot the Sankey
-P <- sankeyNetwork(Links = all_edges,
+Q <- sankeyNetwork(Links = all_edges,
                    Nodes = nodes,
                    Source = "source_id",
                    Target = "target_id",
@@ -1289,7 +1288,7 @@ P <- sankeyNetwork(Links = all_edges,
                    nodeWidth = 30)
 
 # View
-P
+Q
 #####################################
 #aff food
 aff_strat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/AFF/gbm_strat/modules.tsv", header = TRUE)
@@ -1339,7 +1338,7 @@ taxa_prevalent <- filtered_data %>%
   distinct(Taxon, ID) %>%
   group_by(Taxon) %>%
   summarise(n_samples = n(), .groups = "drop") %>%
-  filter(n_samples / total_samples >= 0.3) %>%
+  filter(n_samples / total_samples >= 0.5) %>%
   pull(Taxon)
 
 filtered_data <- filtered_data %>%
@@ -1349,7 +1348,7 @@ filtered_data <- filtered_data %>%
 taxa_to_keep <- filtered_data %>%
   group_by(Taxon) %>%
   summarise(n_modules = n_distinct(Module), .groups = "drop") %>%
-  filter(n_modules > 3) %>%
+  filter(n_modules > 2) %>%
   pull(Taxon)
 
 filtered_data <- filtered_data %>%
@@ -1386,7 +1385,7 @@ all_edges <- all_edges %>%
 stopifnot(!any(is.na(all_edges$source_id)), !any(is.na(all_edges$target_id)))
 
 # Step 6: Plot the Sankey
-P <- sankeyNetwork(Links = all_edges,
+R <- sankeyNetwork(Links = all_edges,
                    Nodes = nodes,
                    Source = "source_id",
                    Target = "target_id",
@@ -1396,7 +1395,7 @@ P <- sankeyNetwork(Links = all_edges,
                    nodeWidth = 30)
 
 # View
-P
+R
 #####################################################
 meta <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/meta_insilico.csv")
 meta <- meta[,-c(7,8)]
@@ -1430,7 +1429,7 @@ taxa_prevalent <- filtered_data %>%
   distinct(Taxon, ID) %>%
   group_by(Taxon) %>%
   summarise(n_samples = n(), .groups = "drop") %>%
-  filter(n_samples / total_samples >= 0.3) %>%
+  filter(n_samples / total_samples >= 0.5) %>%
   pull(Taxon)
 
 filtered_data <- filtered_data %>%
@@ -1440,7 +1439,7 @@ filtered_data <- filtered_data %>%
 taxa_to_keep <- filtered_data %>%
   group_by(Taxon) %>%
   summarise(n_modules = n_distinct(Module), .groups = "drop") %>%
-  filter(n_modules > 3) %>%
+  filter(n_modules > 2) %>%
   pull(Taxon)
 
 filtered_data <- filtered_data %>%
@@ -1477,7 +1476,7 @@ all_edges <- all_edges %>%
 stopifnot(!any(is.na(all_edges$source_id)), !any(is.na(all_edges$target_id)))
 
 # Step 6: Plot the Sankey
-P <- sankeyNetwork(Links = all_edges,
+S <- sankeyNetwork(Links = all_edges,
                    Nodes = nodes,
                    Source = "source_id",
                    Target = "target_id",
@@ -1487,7 +1486,7 @@ P <- sankeyNetwork(Links = all_edges,
                    nodeWidth = 30)
 
 # View
-P
+S
 ##########################
 meta <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/meta_insilico.csv")
 meta <- meta[,-c(7,8)]
@@ -1521,7 +1520,7 @@ taxa_prevalent <- filtered_data %>%
   distinct(Taxon, ID) %>%
   group_by(Taxon) %>%
   summarise(n_samples = n(), .groups = "drop") %>%
-  filter(n_samples / total_samples >= 0.3) %>%
+  filter(n_samples / total_samples >= 0.5) %>%
   pull(Taxon)
 
 filtered_data <- filtered_data %>%
@@ -1531,7 +1530,7 @@ filtered_data <- filtered_data %>%
 taxa_to_keep <- filtered_data %>%
   group_by(Taxon) %>%
   summarise(n_modules = n_distinct(Module), .groups = "drop") %>%
-  filter(n_modules > 3) %>%
+  filter(n_modules > 2) %>%
   pull(Taxon)
 
 filtered_data <- filtered_data %>%
@@ -1568,7 +1567,7 @@ all_edges <- all_edges %>%
 stopifnot(!any(is.na(all_edges$source_id)), !any(is.na(all_edges$target_id)))
 
 # Step 6: Plot the Sankey
-P <- sankeyNetwork(Links = all_edges,
+T <- sankeyNetwork(Links = all_edges,
                    Nodes = nodes,
                    Source = "source_id",
                    Target = "target_id",
@@ -1578,5 +1577,15 @@ P <- sankeyNetwork(Links = all_edges,
                    nodeWidth = 30)
 
 # View
-P
+T
 ##############################################################
+htmlwidgets::saveWidget(P1, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_PALM_PREV.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_PALM_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_PALM_PREV.pdf", selector = "pdf")
+htmlwidgets::saveWidget(Q, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_Cereal_PREV.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_Cereal_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_Cereal_PREV.pdf", selector = "pdf")
+htmlwidgets::saveWidget(R, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_root_and_tuber_PREV.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_root_and_tuber_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_root_and_tuber_PREV.pdf", selector = "pdf")
+htmlwidgets::saveWidget(R, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_seed_PREV.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_seed_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_seed_PREV.pdf", selector = "pdf")
+htmlwidgets::saveWidget(T, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_aff_dairy_PREV.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_aff_dairy_PREV.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/Supplementary/GBM_PA_SANKEY_aff_dairy_PREV.pdf", selector = "pdf")
