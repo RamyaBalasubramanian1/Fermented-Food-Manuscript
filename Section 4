@@ -1942,3 +1942,417 @@ pau_strat  <- sankeyNetwork(
 pau_strat
 htmlwidgets::saveWidget(pau_strat, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_pau.html")
 webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_pau.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_pau.pdf", selector = "pdf")
+##############################################################
+##############################################################
+###############################
+###############################
+aff_strat <- read.table(
+  "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/AFF/strat.txt",
+  header = TRUE,
+  sep = "\t",    # or change to " " if space-delimited
+  fill = TRUE,   # fills missing columns with NAs
+  quote = "",
+  comment.char = ""
+)
+anno <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/tryp_anno.csv")
+tryp_ko <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/tryp_meta.csv")
+tryp <- tryp_ko %>%
+  pivot_longer(
+    cols = starts_with("KO"),
+    names_to = "KO_number",
+    values_to = "KO"
+  ) %>%
+  select(compound, KO) %>%
+  filter(!is.na(KO), KO !="0") 
+aff_strat$KO <- as.character(aff_strat$KO)
+tryp$KO <- as.character(tryp$KO)
+aff_strat_filtered <- aff_strat[aff_strat$KO %in% tryp$KO, ]
+colnames(anno)[colnames(anno)=="KEGG"] <- "compound"
+anno_2 <- merge(anno, tryp, by ="compound")
+anno_2 <- anno_2[,-3]
+##################################################
+##################################################
+meta <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/meta_insilico.csv")
+meta <- meta[,-c(7,8)]
+#####################################################
+linked_data <- aff_strat_filtered %>%
+  inner_join(tryp, by = "KO")
+##############################################
+# Step 2: Join with anno (on compound)
+linked_data <- linked_data %>%
+  inner_join(anno, by = "compound")
+###################
+
+# Step 1: Get abundance/sample columns
+abundance_cols <- linked_data %>%
+  select(where(is.numeric)) %>%
+  colnames()
+sample_cols <- linked_data %>% select(where(is.numeric)) %>% colnames()
+clean_sample_ids <- gsub("_interleaved_Abundance\\.RPKs", "", sample_cols)
+
+# Extract the "FSxx" prefix from sample IDs
+sample_prefixes <- gsub("^(AF[0-9A-Z]+)_.*", "\\1", clean_sample_ids)
+
+
+
+# Create a lookup table to map full IDs back to meta$ID values
+id_map <- data.frame(
+  Sample = clean_sample_ids,
+  ID = sample_prefixes,
+  stringsAsFactors = FALSE
+)
+
+# Join meta with that map
+meta_subset <- meta %>%
+  inner_join(id_map, by = "ID")
+
+# Step 4: Pivot linked_data to long format
+long_data <- linked_data %>%
+  pivot_longer(
+    cols = all_of(abundance_cols),
+    names_to = "Sample",
+    values_to = "Abundance"
+  ) %>%
+  mutate(Sample = gsub("_interleaved_Abundance\\.RPKs", "", Sample)) %>%
+  filter(Abundance > 0)
+
+long_data_annotated <- long_data %>%
+  left_join(meta_subset %>% select(Sample, Substrate, Fermented.food.category, Type.of.fermentation), 
+            by = "Sample")
+
+long_data_annotated <- long_data_annotated %>%
+  filter(Taxon != "unclassified") %>%
+  mutate(Taxon = sub(".*s__", "", Taxon))
+############################
+############################
+selected_substrate <- "Seed"  # Change as needed
+sankey_data <- long_data_annotated %>%
+  filter(Substrate == selected_substrate, Abundance > 0)
+##########################################
+food_species <- sankey_data %>%
+  group_by(Fermented.food.category, Taxon) %>%
+  summarise(value = sum(Abundance), .groups = "drop")
+
+# Species → Metabolite
+species_metabolite <- sankey_data %>%
+  group_by(Taxon, Metabolite) %>%
+  summarise(value = sum(Abundance), .groups = "drop")
+# Step 3: Create a unified node list
+nodes <- data.frame(name = unique(c(
+  food_species$Fermented.food.category,
+  food_species$Taxon,
+  species_metabolite$Metabolite
+)))
+nodes$type <- dplyr::case_when(
+  nodes$name %in% food_species$Fermented.food.category ~ "Category",
+  nodes$name %in% food_species$Taxon ~ "Species",
+  nodes$name %in% species_metabolite$Metabolite ~ "Metabolite",
+  TRUE ~ "Other"
+)
+
+metabolite_colors <- c(
+  "2-Hydroxy-2,4-pentadienoate" = "#66c2a5",
+  "3-Indoleacrylate" = "#fc8d62",
+  "3-Methylindolepyruvate" = "#8da0cb",
+  "4-Hydroxy-2-oxopentanoate" = "#e78ac3",
+  "Acetaldehyde" = "#a6d854",
+  "gamma-Oxalocrotonate" = "#ffd92f",
+  "Indole" = "#e5c494",
+  "Indole-3-acetamide" = "#b3b3b3",
+  "Indole-3-carboxaldehyde" = "#1f78b4",
+  "Indoleacryloyl-CoA" = "#33a02c",
+  "Indolelactate" = "#fb9a99",
+  "Isophenoxazine" = "#cab2d6",
+  "L-Tryptophan" = "#fdbf6f"
+)
+nodes$color <- ifelse(
+  nodes$type == "Metabolite" & nodes$name %in% names(metabolite_colors),
+  metabolite_colors[nodes$name],
+  ifelse(nodes$type == "Species", "#B0B0B0", "#999999")  # Default gray for others
+)
+# Step 4: Assign node indices
+food_species <- food_species %>%
+  mutate(source = match(Fermented.food.category, nodes$name) - 1,
+         target = match(Taxon, nodes$name) - 1)
+
+species_metabolite <- species_metabolite %>%
+  mutate(source = match(Taxon, nodes$name) - 1,
+         target = match(Metabolite, nodes$name) - 1)
+
+# Step 5: Combine all links
+links <- bind_rows(
+  food_species %>% select(source, target, value),
+  species_metabolite %>% select(source, target, value)
+)
+colourScale <- paste0(
+  "d3.scaleOrdinal().domain([",
+  paste0('"', nodes$name, '"', collapse = ","),
+  "]).range([",
+  paste0('"', nodes$color, '"', collapse = ","),
+  "])"
+)
+# Step 6: Plot the Sankey
+seed <-sankeyNetwork(
+  Links = links,
+  Nodes = nodes,
+  Source = "source",
+  Target = "target",
+  Value = "value",
+  NodeID = "name",
+  fontSize = 12,
+  nodeWidth = 30,
+  sinksRight = FALSE,
+  colourScale = colourScale
+)
+htmlwidgets::saveWidget(Seed, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_seed.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_seed.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_seed.pdf", selector = "pdf")
+########################################
+########################################
+########################################
+selected_substrate <- "Cereal"  # Change as needed
+sankey_data <- long_data_annotated %>%
+  filter(Substrate == selected_substrate, Abundance > 0)
+##########################################
+food_species <- sankey_data %>%
+  group_by(Fermented.food.category, Taxon) %>%
+  summarise(value = sum(Abundance), .groups = "drop")
+
+# Species → Metabolite
+species_metabolite <- sankey_data %>%
+  group_by(Taxon, Metabolite) %>%
+  summarise(value = sum(Abundance), .groups = "drop")
+# Step 3: Create a unified node list
+nodes <- data.frame(name = unique(c(
+  food_species$Fermented.food.category,
+  food_species$Taxon,
+  species_metabolite$Metabolite
+)))
+nodes$type <- dplyr::case_when(
+  nodes$name %in% food_species$Fermented.food.category ~ "Category",
+  nodes$name %in% food_species$Taxon ~ "Species",
+  nodes$name %in% species_metabolite$Metabolite ~ "Metabolite",
+  TRUE ~ "Other"
+)
+
+metabolite_colors <- c(
+  "2-Hydroxy-2,4-pentadienoate" = "#66c2a5",
+  "3-Indoleacrylate" = "#fc8d62",
+  "3-Methylindolepyruvate" = "#8da0cb",
+  "4-Hydroxy-2-oxopentanoate" = "#e78ac3",
+  "Acetaldehyde" = "#a6d854",
+  "gamma-Oxalocrotonate" = "#ffd92f",
+  "Indole" = "#e5c494",
+  "Indole-3-acetamide" = "#b3b3b3",
+  "Indole-3-carboxaldehyde" = "#1f78b4",
+  "Indoleacryloyl-CoA" = "#33a02c",
+  "Indolelactate" = "#fb9a99",
+  "Isophenoxazine" = "#cab2d6",
+  "L-Tryptophan" = "#fdbf6f"
+)
+nodes$color <- ifelse(
+  nodes$type == "Metabolite" & nodes$name %in% names(metabolite_colors),
+  metabolite_colors[nodes$name],
+  ifelse(nodes$type == "Species", "#B0B0B0", "#999999")  # Default gray for others
+)
+# Step 4: Assign node indices
+food_species <- food_species %>%
+  mutate(source = match(Fermented.food.category, nodes$name) - 1,
+         target = match(Taxon, nodes$name) - 1)
+
+species_metabolite <- species_metabolite %>%
+  mutate(source = match(Taxon, nodes$name) - 1,
+         target = match(Metabolite, nodes$name) - 1)
+
+# Step 5: Combine all links
+links <- bind_rows(
+  food_species %>% select(source, target, value),
+  species_metabolite %>% select(source, target, value)
+)
+colourScale <- paste0(
+  "d3.scaleOrdinal().domain([",
+  paste0('"', nodes$name, '"', collapse = ","),
+  "]).range([",
+  paste0('"', nodes$color, '"', collapse = ","),
+  "])"
+)
+# Step 6: Plot the Sankey
+Cereal <-sankeyNetwork(
+  Links = links,
+  Nodes = nodes,
+  Source = "source",
+  Target = "target",
+  Value = "value",
+  NodeID = "name",
+  fontSize = 12,
+  nodeWidth = 30,
+  sinksRight = FALSE,
+  colourScale = colourScale
+)
+htmlwidgets::saveWidget(Cereal, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_cereal.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_cereal.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_cereal.pdf", selector = "pdf")
+##########################################
+##########################################
+selected_substrate <- "Root and tuber"  # Change as needed
+sankey_data <- long_data_annotated %>%
+  filter(Substrate == selected_substrate, Abundance > 0)
+##########################################
+food_species <- sankey_data %>%
+  group_by(Fermented.food.category, Taxon) %>%
+  summarise(value = sum(Abundance), .groups = "drop")
+
+# Species → Metabolite
+species_metabolite <- sankey_data %>%
+  group_by(Taxon, Metabolite) %>%
+  summarise(value = sum(Abundance), .groups = "drop")
+# Step 3: Create a unified node list
+nodes <- data.frame(name = unique(c(
+  food_species$Fermented.food.category,
+  food_species$Taxon,
+  species_metabolite$Metabolite
+)))
+nodes$type <- dplyr::case_when(
+  nodes$name %in% food_species$Fermented.food.category ~ "Category",
+  nodes$name %in% food_species$Taxon ~ "Species",
+  nodes$name %in% species_metabolite$Metabolite ~ "Metabolite",
+  TRUE ~ "Other"
+)
+
+metabolite_colors <- c(
+  "2-Hydroxy-2,4-pentadienoate" = "#66c2a5",
+  "3-Indoleacrylate" = "#fc8d62",
+  "3-Methylindolepyruvate" = "#8da0cb",
+  "4-Hydroxy-2-oxopentanoate" = "#e78ac3",
+  "Acetaldehyde" = "#a6d854",
+  "gamma-Oxalocrotonate" = "#ffd92f",
+  "Indole" = "#e5c494",
+  "Indole-3-acetamide" = "#b3b3b3",
+  "Indole-3-carboxaldehyde" = "#1f78b4",
+  "Indoleacryloyl-CoA" = "#33a02c",
+  "Indolelactate" = "#fb9a99",
+  "Isophenoxazine" = "#cab2d6",
+  "L-Tryptophan" = "#fdbf6f"
+)
+nodes$color <- ifelse(
+  nodes$type == "Metabolite" & nodes$name %in% names(metabolite_colors),
+  metabolite_colors[nodes$name],
+  ifelse(nodes$type == "Species", "#B0B0B0", "#999999")  # Default gray for others
+)
+# Step 4: Assign node indices
+food_species <- food_species %>%
+  mutate(source = match(Fermented.food.category, nodes$name) - 1,
+         target = match(Taxon, nodes$name) - 1)
+
+species_metabolite <- species_metabolite %>%
+  mutate(source = match(Taxon, nodes$name) - 1,
+         target = match(Metabolite, nodes$name) - 1)
+
+# Step 5: Combine all links
+links <- bind_rows(
+  food_species %>% select(source, target, value),
+  species_metabolite %>% select(source, target, value)
+)
+colourScale <- paste0(
+  "d3.scaleOrdinal().domain([",
+  paste0('"', nodes$name, '"', collapse = ","),
+  "]).range([",
+  paste0('"', nodes$color, '"', collapse = ","),
+  "])"
+)
+# Step 6: Plot the Sankey
+RT <-sankeyNetwork(
+  Links = links,
+  Nodes = nodes,
+  Source = "source",
+  Target = "target",
+  Value = "value",
+  NodeID = "name",
+  fontSize = 12,
+  nodeWidth = 30,
+  sinksRight = FALSE,
+  colourScale = colourScale
+)
+htmlwidgets::saveWidget(RT, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_RT.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_RT.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_RT.pdf", selector = "pdf")
+###########################################################
+selected_substrate <- "Palm"  # Change as needed
+sankey_data <- long_data_annotated %>%
+  filter(Substrate == selected_substrate, Abundance > 0)
+##########################################
+food_species <- sankey_data %>%
+  group_by(Fermented.food.category, Taxon) %>%
+  summarise(value = sum(Abundance), .groups = "drop")
+
+# Species → Metabolite
+species_metabolite <- sankey_data %>%
+  group_by(Taxon, Metabolite) %>%
+  summarise(value = sum(Abundance), .groups = "drop")
+# Step 3: Create a unified node list
+nodes <- data.frame(name = unique(c(
+  food_species$Fermented.food.category,
+  food_species$Taxon,
+  species_metabolite$Metabolite
+)))
+nodes$type <- dplyr::case_when(
+  nodes$name %in% food_species$Fermented.food.category ~ "Category",
+  nodes$name %in% food_species$Taxon ~ "Species",
+  nodes$name %in% species_metabolite$Metabolite ~ "Metabolite",
+  TRUE ~ "Other"
+)
+
+metabolite_colors <- c(
+  "2-Hydroxy-2,4-pentadienoate" = "#66c2a5",
+  "3-Indoleacrylate" = "#fc8d62",
+  "3-Methylindolepyruvate" = "#8da0cb",
+  "4-Hydroxy-2-oxopentanoate" = "#e78ac3",
+  "Acetaldehyde" = "#a6d854",
+  "gamma-Oxalocrotonate" = "#ffd92f",
+  "Indole" = "#e5c494",
+  "Indole-3-acetamide" = "#b3b3b3",
+  "Indole-3-carboxaldehyde" = "#1f78b4",
+  "Indoleacryloyl-CoA" = "#33a02c",
+  "Indolelactate" = "#fb9a99",
+  "Isophenoxazine" = "#cab2d6",
+  "L-Tryptophan" = "#fdbf6f"
+)
+nodes$color <- ifelse(
+  nodes$type == "Metabolite" & nodes$name %in% names(metabolite_colors),
+  metabolite_colors[nodes$name],
+  ifelse(nodes$type == "Species", "#B0B0B0", "#999999")  # Default gray for others
+)
+# Step 4: Assign node indices
+food_species <- food_species %>%
+  mutate(source = match(Fermented.food.category, nodes$name) - 1,
+         target = match(Taxon, nodes$name) - 1)
+
+species_metabolite <- species_metabolite %>%
+  mutate(source = match(Taxon, nodes$name) - 1,
+         target = match(Metabolite, nodes$name) - 1)
+
+# Step 5: Combine all links
+links <- bind_rows(
+  food_species %>% select(source, target, value),
+  species_metabolite %>% select(source, target, value)
+)
+colourScale <- paste0(
+  "d3.scaleOrdinal().domain([",
+  paste0('"', nodes$name, '"', collapse = ","),
+  "]).range([",
+  paste0('"', nodes$color, '"', collapse = ","),
+  "])"
+)
+# Step 6: Plot the Sankey
+Palm <-sankeyNetwork(
+  Links = links,
+  Nodes = nodes,
+  Source = "source",
+  Target = "target",
+  Value = "value",
+  NodeID = "name",
+  fontSize = 12,
+  nodeWidth = 30,
+  sinksRight = FALSE,
+  colourScale = colourScale
+)
+htmlwidgets::saveWidget(Palm, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_palm.html")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_palm.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_palm.pdf", selector = "pdf")
+#
