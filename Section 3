@@ -1315,14 +1315,14 @@ dev.off()
 aff_fermented <- aff_long_annotated %>%
   inner_join(meta, by = "ID") %>% 
   filter(!is.na(Fermented.food.category))
-##############################
 aff_fermented <- aff_fermented %>% filter(Substrate=="Cereal")
-heatmap_df <- aff_fermented %>%
-  group_by(Taxon, Molecule) %>%
-  summarise(Contribution = sum(Contribution), .groups = "drop")
 aff_fermented <- aff_fermented %>%
   filter(Taxon != "unclassified") %>%
   mutate(Taxon = sub(".*s__", "", Taxon))
+heatmap_df <- aff_fermented %>%
+  group_by(Taxon, Molecule) %>%
+  summarise(Contribution = sum(Contribution), .groups = "drop")
+
 # Reshape into matrix
 heat_matrix <- dcast(heatmap_df, Taxon ~ Molecule, value.var = "Contribution", fill = 0)
 rownames(heat_matrix) <- heat_matrix$Taxon
@@ -1644,4 +1644,3 @@ p <- p_aff + p_ff + plot_layout(ncol = 2)
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/dairy_diversity_Aff.svg", plot = p_aff, width = 15, height = 6, units = "in", dpi = 300, device = "svg")
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_3/dairy_diversity_ff.svg", plot = p_ff, width = 15, height = 6, units = "in", dpi = 300, device = "svg")
 ###############################################
-
