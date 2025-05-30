@@ -292,7 +292,8 @@ p1<- ggplot(richness_clean, aes(x = Substrate, y = Richness, fill = Substrate)) 
 
 ggsave(filename = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/gbm_richness_plot.svg", plot = p1, width = 8, height = 6, units = "in", dpi = 300, device = "svg")
 
-
+richness_sorted <- richness_clean[order(richness_clean$Richness), ]
+write.csv(richness_sorted,"C:/Users/Ramya.Balasubramania/Desktop/paper_1/gbm_richness_sorted.csv" )
 #stat test
 shapiro.test(richness$Richness)
 kruskal.test(Richness ~ Substrate, data = richness)
