@@ -1665,7 +1665,7 @@ dairy <- sankeyNetwork(
 )
 ########################################################
 htmlwidgets::saveWidget(dairy, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_dairy_fs.html")
-webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_dairyfs.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_dairy_fs.pdf", selector = "pdf")
+webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_dairy_fs.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_dairy_fs.pdf", selector = "pdf")
 
 ########################################################
 # Step 1: Filter for selected substrate if desired (optional)
@@ -2104,7 +2104,7 @@ seed <-sankeyNetwork(
   sinksRight = FALSE,
   colourScale = colourScale
 )
-htmlwidgets::saveWidget(Seed, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_seed.html")
+htmlwidgets::saveWidget(seed, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_seed.html")
 webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_seed.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_seed.pdf", selector = "pdf")
 ########################################
 ########################################
@@ -2356,3 +2356,4 @@ Palm <-sankeyNetwork(
 htmlwidgets::saveWidget(Palm, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_palm.html")
 webshot2::webshot("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_palm.html", file = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_4/sankey_plot_palm.pdf", selector = "pdf")
 #
+
