@@ -339,7 +339,7 @@ meta_richness$Substrate[meta_richness$Substrate == "Dairy alternate"] <- "Coconu
 substrate_colors <- c(
   "Dairy" = "#1f77b4", "Sugar" = "#ff7f0e", "Brine" = "#1b9e77",
   "Coconut Dairy" = "#9467bd")
-
+TOF_colors <- c("Spontaneous" = "#1b9e77", Starter = "#ff7f0e")
 type_colors <- c(
   "Sauerkraut" = "#1b9e77", "Sauerkraut Broth" = "#1b9e77", "Kvass" = "#1b9e77", "Kimchi" = "#1b9e77",
   "Kombucha" = "#ff7f0e", "Water kefir" = "#ff7f0e", "Unfermented fig" = "#ff7f0e", "Unfermented tea" = "#ff7f0e",
@@ -349,12 +349,12 @@ type_colors <- c(
 
 status_colors <- c("Fermented" = "#1f78b4", "Unfermented" = "#a6cee3")
 
-all_colors <- c(substrate_colors, type_colors, status_colors)
+all_colors <- c(substrate_colors, type_colors, status_colors, TOF_colors)
 
 # Pivot to long format for faceting
 meta_richness_long <- meta_richness %>%
   tidyr::pivot_longer(
-    cols = c("Substrate", "Status", "Type"),
+    cols = c("Substrate", "Status", "Fermentation_type"),
     names_to = "Factor",
     values_to = "Category"
   )
@@ -368,9 +368,9 @@ P <- ggplot(meta_richness_long, aes(x = Category, y = Richness, fill = Category)
   facet_wrap(~ Factor, scales = "free_x", labeller = label_value) +
   theme_minimal(base_size = 14) +
   labs(
-    title = "Effect of Substrate, Status, and Type on Neuromodulatory Metabolite Richness",
+    title = "Effect of Substrate, Status, and Type on Global Metabolite Richness",
     x = NULL,
-    y = "Number of Neuromodulatory Metabolites"
+    y = "Number of Global Metabolites"
   ) +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
@@ -543,7 +543,7 @@ substrate_colors <- c(
   "Coconut Dairy" = "#9467bd", "Soy" = "#d62728", "Cereal" = "#8c564b",
   "Root and tuber" = "#e41a1c", "Seed" = "#7f7f7f", "Palm Tree" = "#B565A7"
 )
-
+TOF_colors <- c("Spontaneous" = "#1b9e77", Starter = "#ff7f0e")
 type_colors <- c(
   "Sauerkraut" = "#1b9e77", "Sauerkraut Broth" = "#1b9e77", "Kvass" = "#1b9e77", "Kimchi" = "#1b9e77",
   "Kombucha" = "#ff7f0e", "Water kefir" = "#ff7f0e", "Unfermented fig" = "#ff7f0e", "Unfermented tea" = "#ff7f0e",
@@ -688,7 +688,7 @@ variance_explained <- round(100 * pcoa_result$eig / sum(pcoa_result$eig), 2)
 # Merge the PCoA results with metadata based on Customer.ID
 pcoa_df <- merge(pcoa_df, meta, by = "Customer.ID")
 pcoa_df$Substrate[pcoa_df$Substrate == "Coconut mik kefir"] <- "Coconut milk kefir"
-
+TOF_colors <- c("Spontaneous" = "#1b9e77", Starter = "#ff7f0e")
 substrate_colors <- c(
   "Dairy" = "#1f77b4", "Sugar" = "#ff7f0e", "Brine" = "#1b9e77",
   "Dairy alternate" = "#9467bd")
@@ -734,8 +734,7 @@ print(pcoa_plot)
 # meta <- meta[,c(1:5)]
 meta_2 <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/neuro_meta.csv")
 # data <- data_o
-# meta <- meta %>%
-#   mutate(Type = str_replace(Type, "Coconut mik", "Coconut milk"))
+# meta <- meta %>%mutate(Type = str_replace(Type, "Coconut mik", "Coconut milk"))
 ##################################
 ####################################
 ####################################
@@ -776,7 +775,8 @@ head(binary_data)  # Ensure 'id' is present
 # Calculate richness (number of detected metabolites per sample)
 binary_data$Richness <- rowSums(binary_data[, -1])  # Exclude only the first column ('id')
 
-
+meta <- meta %>% 
+  rename(id = Customer.ID)
 # Merge metadata with richness
 meta_richness <- merge(meta, binary_data[, c("id", "Richness")], by = "id")
 
@@ -803,7 +803,7 @@ meta_richness_long <- tidyr::pivot_longer(meta_richness,
                                           values_to = "Category")
 meta_richness$Substrate[meta_richness$Substrate == "Dairy alternate"] <- "Coconut Dairy"
 meta_richness_long <- meta_richness %>%
-  pivot_longer(cols = c("Substrate", "Status", "Type"), 
+  pivot_longer(cols = c("Substrate", "Status", "Fermentation_type"), 
                names_to = "Factor", values_to = "Category")
 substrate_colors <- c(
   "Dairy" = "#1f77b4",
@@ -856,7 +856,7 @@ status_colors <- c(
   "Fermented" = "#1f78b4",    # Dark blue
   "Unfermented" = "#a6cee3"   # Light blue
 )
-
+TOF_colors <- c("Spontaneous" = "#1b9e77", Starter = "#ff7f0e")
 P <- ggplot(meta_richness_long, aes(x = Category, y = Richness, fill = Category)) +
   geom_boxplot(alpha = 0.5, outlier.shape = NA) +
   geom_jitter(aes(x = Category, y = Richness), 
@@ -877,11 +877,13 @@ P <- ggplot(meta_richness_long, aes(x = Category, y = Richness, fill = Category)
   scale_fill_manual(
     values = c(
       substrate_colors,
-      type_colors,
+      TOF_colors,
       status_colors
     ),
     guide = guide_legend(override.aes = list(size = 6))
   )
+
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/richness_neuro.svg", plot = P, width = 12, height = 6, units = "in")
 
 # Convert categorical variables to factors
 meta_richness$Substrate <- as.factor(meta_richness$Substrate)
@@ -2244,6 +2246,7 @@ for (s in names(co_occurring_metabolites)) {
 }
 
 # Assign colors to each substrate
+library(RColorBrewer)
 num_substrates <- length(colnames(co_occurrence_matrix))
 substrate_colors <- brewer.pal(num_substrates, "Set2")  # Use Set2 color palette
 # Compute total number of metabolites per substrate
