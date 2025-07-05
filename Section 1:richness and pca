@@ -192,7 +192,7 @@ names(all) <- sapply(names(all), function(col) {
     col <- substr(col, 1, 6)
   }
   
-  # Remove trailing underscore
+  # Remove  underscore in the end
   col <- sub("_$", "", col)
   col <- sub("-$", "", col)
   return(col)
@@ -208,7 +208,6 @@ clean_meta_ids <- trimws(meta$ID)
 # Find columns that are not in meta$ID
 invalid_cols <- setdiff(clean_colnames, clean_meta_ids)
 
-# View them
 invalid_cols
 ##############################################################
 PA <- all
@@ -232,8 +231,7 @@ pa$ID <- gsub("\\.", "-", pa$ID)
 richness <- merge(pa, meta, by ="ID")
 
 ############################################################
-
-# Your custom substrate colors
+#keeping colors constant
 substrate_colors <- c(
   "Dairy" = "#1f77b4", "Sugar" = "#ff7f0e", "Brine" = "#1b9e77",
   "Soy" = "#d62728", "Coconut Dairy" = "#9467bd", "Cereal" = "#8c564b",
@@ -380,7 +378,7 @@ ggsave(filename = "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-si
 #ggboxplot(richness, x = "Substrate", y = "Richness", color = "Substrate", add = "jitter") +
 #stat_compare_means(method = "kruskal.test") 
 #######
-# Pairwise Wilcoxon test with p-value adjustment
+# Pairwise Wilcoxon test with p- adj
 pairwise_results <- richness %>%
   pairwise_wilcox_test(Richness ~ Substrate, p.adjust.method = "BH")
 write.csv(pairwise_results, "pairwise_result_effect_of_substrate_GBM.csv")
@@ -494,14 +492,13 @@ names(all) <- sapply(names(all), function(col) {
 
 colnames(all)
 ##############################
-# Trim whitespace from both column names and meta IDs
+# Trim empty spaces from  column names and meta IDs
 clean_colnames <- trimws(colnames(all))
 clean_meta_ids <- trimws(meta$ID)
 
 # Find columns that are not in meta$ID
 invalid_cols <- setdiff(clean_colnames, clean_meta_ids)
 
-# View them
 invalid_cols
 ########################################
 ########################################
@@ -663,7 +660,7 @@ y_max_data <- max(richness_clean$Richness, na.rm = TRUE)  # max value of actual 
 y_cap <- 90  # maximum y-axis limit (your preference)
 n_comparisons <- nrow(sig_pairs)
 
-# Dynamic spacing to fit all comparisons within y_cap
+#  space to fit all comparisons within y_cap
 spacing <- (y_cap - y_max_data - 1) / (n_comparisons + 1)  # 1 buffer
 
 sig_pairs <- sig_pairs %>%
@@ -786,14 +783,13 @@ names(all) <- sapply(names(all), function(col) {
 
 colnames(all)
 ##############################
-# Trim whitespace from both column names and meta IDs
+# Trim emptyspaces from both column names and meta IDs
 clean_colnames <- trimws(colnames(all))
 clean_meta_ids <- trimws(meta$ID)
 
 # Find columns that are not in meta$ID
 invalid_cols <- setdiff(clean_colnames, clean_meta_ids)
 
-# View them
 invalid_cols
 ##############################################################
 PA <- all
@@ -817,8 +813,7 @@ pa$ID <- gsub("\\.", "-", pa$ID)
 richness <- merge(pa, meta, by ="ID")
 
 ############################################################
-
-# Your custom substrate colors
+#const colors
 substrate_colors <- c(
   "Dairy" = "#1f77b4", "Sugar" = "#ff7f0e", "Brine" = "#1b9e77",
   "Soy" = "#d62728", "Coconut Dairy" = "#9467bd", "Cereal" = "#8c564b",
@@ -833,11 +828,11 @@ call <- t(call)
 colnames(call) <- call[1,]
 call <- call[-1,]
 #########################################
-# Make sure it's a data frame and numeric
+# double check if its a data frame and numeric
 call <- as.data.frame(call)
 call[] <- lapply(call, function(x) as.numeric(as.character(x)))  # force numeric
 
-# Replace NA with 0 (if needed)
+# Replace NA with 0 
 call[is.na(call)] <- 0
 
 
@@ -880,7 +875,7 @@ pca$State <- meta_filtered$State
 pca$TOF <- meta_filtered$Type.of.fermentation
 ##############################################
 #PLOTTY
-#temp fix until you decde what to do about fsob
+
 # Update the corresponding row in pca
 pca$ID <- rownames(pca)
 ###################################
@@ -913,21 +908,19 @@ loadings <- data.a.pca$rotation[, 1:2]
 loadings <- as.data.frame(loadings)
 loadings$Module <- rownames(loadings)
 
-# Select top 15 contributors to PC1 and PC2
+# show top contributors as pathways
 top_features <- loadings[order(abs(loadings$PC1) + abs(loadings$PC2), decreasing = TRUE), ]
 top_features <- head(top_features, 5)
 
-# Merge with annotation to get Pathway names
+# Merge wto obtain pathway names
 top_features <- merge(top_features, anno[, c("Module", "Pathway")], by = "Module", all.x = TRUE)
 
 # Scale loadings for plot clarity
 top_features$PC1 <- top_features$PC1 * 10
 top_features$PC2 <- top_features$PC2 * 10
 
-# Plot PCA with pathway arrows and labels
 
 
-# Updated PCA biplot with non-overlapping labels
 library(ggrepel)
 
 s1 <- s1 +
@@ -963,7 +956,7 @@ ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master
 ##############################
 ##############################
 #trying within sample jaccard
-#i want to ee if the samples within a group are similar or not and how best to represent this
+#i want to ee if the samples within a group are similar or not and jaccard +pcoa help me do so
 
 # Define custom colors for substrate categories
 substrate_colors <- c(
@@ -972,14 +965,12 @@ substrate_colors <- c(
   "Root and tuber" = "#e41a1c", "Seed" = "#7f7f7f", "Palm Tree" = "#17becf"
 )
 
-# 1. Filter meta to match PA samples
 meta_filtered <- meta[meta$ID %in% colnames(PA), ]
 meta_filtered <- meta_filtered[match(colnames(PA), meta_filtered$ID), ]
 
-# 2. Transpose PA (samples as rows)
+
 PA_t <- t(PA)
 
-# 3. Calculate Jaccard distances within each substrate
 samples_meta <- meta_filtered
 substrates <- unique(samples_meta$Substrate)
 jaccard_results <- list()
@@ -1005,7 +996,7 @@ for (sub in substrates) {
   }
 }
 
-# 4. Convert results to tidy data frame
+
 jaccard_df <- do.call(rbind, lapply(names(jaccard_results), function(sub) {
   dists <- jaccard_results[[sub]]
   if (!all(is.na(dists))) {
@@ -1014,12 +1005,12 @@ jaccard_df <- do.call(rbind, lapply(names(jaccard_results), function(sub) {
 })) %>% as.data.frame()
 jaccard_df$Substrate_category <- jaccard_df$Sample
 
-# 5. Add substrate category info
+
 sample_substrate_map <- meta_filtered[, c("ID", "Substrate")]
 jaccard_df <- merge(jaccard_df, sample_substrate_map, by.x = "Sample", by.y = "ID", all.x = TRUE)
 colnames(jaccard_df)[colnames(jaccard_df) == "Substrate"] <- "Substrate_category"
 jaccard_df <- jaccard_df[,-4]
-# 6. Plot
+
 t1 <- ggplot(jaccard_df, aes(x = Sample, y = Distance, color = Substrate_category)) +
   geom_boxplot(outlier.shape = NA) +
   geom_jitter(width = 0.2, alpha = 0.6, size = 0.9) +
@@ -1097,31 +1088,25 @@ pa_bin <- pa_bin[rownames(pa_bin) %in% meta_pa$ID, ]
 meta_pa <- meta_pa[match(rownames(pa_bin), meta_pa$ID), ]
 stopifnot(identical(rownames(pa_bin), meta_pa$ID))
 
-
-
-# 4. Jaccard distance
 jaccard_dist <- vegdist(pa_bin, method = "jaccard", binary = TRUE)
 
-# 5. PCoA (cmdscale)
+
 jaccard_pcoa <- cmdscale(jaccard_dist, eig = TRUE, k = 2)
-# Extract eigenvalues
+
 eig_vals <- jaccard_pcoa$eig
 
-# Calculate percentage of variance explained
+
 variance_explained <- eig_vals / sum(eig_vals[eig_vals > 0]) * 100
 
-# Round for clean axis labels
 pc1_var <- round(variance_explained[1], 2)
 pc2_var <- round(variance_explained[2], 2)
 jaccard_coords <- as.data.frame(jaccard_pcoa$points)
 colnames(jaccard_coords) <- c("PC1", "PC2")
 jaccard_coords$ID <- rownames(jaccard_coords)
 
-# 6. Merge with filtered meta
+
 pca_df <- left_join(jaccard_coords, meta_pa, by = "ID")
 
-
-# 7. Plot
 jac_gbm <- ggplot(pca_df, aes(x = PC1, y = PC2, fill = Substrate)) +
   geom_point(shape = 21, size = 3, alpha = 0.8, stroke = 0.7, color = "black") +
   scale_fill_manual(values = substrate_colors) +
@@ -1219,24 +1204,22 @@ names(all) <- sapply(names(all), function(col) {
 
 colnames(all)
 ##############################
-# Trim whitespace from both column names and meta IDs
+# Trim emptyspaces 
 clean_colnames <- trimws(colnames(all))
 clean_meta_ids <- trimws(meta$ID)
 
-# Find columns that are not in meta$ID
+
 invalid_cols <- setdiff(clean_colnames, clean_meta_ids)
 
-# View them
 invalid_cols
 #################################
-# Trim whitespace from both column names and meta IDs
+#remove emptyspcae
 clean_colnames <- trimws(colnames(all))
 clean_meta_ids <- trimws(meta$ID)
 
 # Find columns that are not in meta$ID
 invalid_cols <- setdiff(clean_colnames, clean_meta_ids)
 
-# View them
 invalid_cols
 ##############################################################
 PA <- all
@@ -1259,7 +1242,7 @@ pa$ID <- gsub("\\.", "-", pa$ID)
 
 richness <- merge(pa, meta, by ="ID")
 
-# Your custom substrate colors
+# substrate cols
 substrate_colors <- c(
   "Dairy" = "#1f77b4", "Sugar" = "#ff7f0e", "Brine" = "#1b9e77",
   "Soy" = "#d62728", "Coconut Dairy" = "#9467bd", "Cereal" = "#8c564b",
@@ -1274,11 +1257,11 @@ call <- t(call)
 colnames(call) <- call[1,]
 call <- call[-1,]
 #########################################
-# Make sure it's a data frame and numeric
+
 call <- as.data.frame(call)
 call[] <- lapply(call, function(x) as.numeric(as.character(x)))  # force numeric
 
-# Replace NA with 0 (if needed)
+
 call[is.na(call)] <- 0
 
 
@@ -1348,21 +1331,16 @@ s2 <-ggplot(pca, aes(x = PC1, y = PC2, color = Substrate)) +
 #########
 ##############################
 ##############################
-
-
-# Prepare loadings and annotate with Pathway info
+#finding the top pathways that explain the contributions
 loadings <- data.a.pca$rotation[, 1:2]
 loadings <- as.data.frame(loadings)
 loadings$Module <- rownames(loadings)
 
-# Select top 15 contributors to PC1 and PC2
 top_features <- loadings[order(abs(loadings$PC1) + abs(loadings$PC2), decreasing = TRUE), ]
 top_features <- head(top_features, 10)
 
-# Merge with annotation to get Pathway names
 top_features <- merge(top_features, anno[, c("Module", "Pathway")], by = "Module", all.x = TRUE)
 
-# Scale loadings for plot clarity
 top_features$PC1 <- top_features$PC1 * 15
 top_features$PC2 <- top_features$PC2 * 15
 
@@ -1405,21 +1383,17 @@ library(vegan)
 library(ggplot2)
 library(dplyr)
 
-# Define custom colors for substrate categories
 substrate_colors <- c(
   "Dairy" = "#1f77b4", "Sugar" = "#ff7f0e", "Brine" = "#1b9e77",
   "Soy" = "#d62728", "Coconut Dairy" = "#9467bd", "Cereal" = "#8c564b",
   "Root and tuber" = "#e41a1c", "Seed" = "#7f7f7f", "Palm Tree" = "#17becf"
 )
 
-# 1. Filter meta to match PA samples
 meta_filtered <- meta[meta$ID %in% colnames(PA), ]
 meta_filtered <- meta_filtered[match(colnames(PA), meta_filtered$ID), ]
 
-# 2. Transpose PA (samples as rows)
 PA_t <- t(PA)
 
-# 3. Calculate Jaccard distances within each substrate
 samples_meta <- meta_filtered
 substrates <- unique(samples_meta$Substrate)
 jaccard_results <- list()
@@ -1445,7 +1419,7 @@ for (sub in substrates) {
   }
 }
 
-# 4. Convert results to tidy data frame
+
 jaccard_df <- do.call(rbind, lapply(names(jaccard_results), function(sub) {
   dists <- jaccard_results[[sub]]
   if (!all(is.na(dists))) {
@@ -1454,12 +1428,12 @@ jaccard_df <- do.call(rbind, lapply(names(jaccard_results), function(sub) {
 })) %>% as.data.frame()
 jaccard_df$Substrate_category <- jaccard_df$Sample
 
-# 5. Add substrate category info
+
 sample_substrate_map <- meta_filtered[, c("ID", "Substrate")]
 jaccard_df <- merge(jaccard_df, sample_substrate_map, by.x = "Sample", by.y = "ID", all.x = TRUE)
 colnames(jaccard_df)[colnames(jaccard_df) == "Substrate"] <- "Substrate_category"
 jaccard_df <- jaccard_df[,-4]
-# 6. Plot
+
 p2 <- ggplot(jaccard_df, aes(x = Sample, y = Distance, color = Substrate_category)) +
   geom_boxplot(outlier.shape = NA) +
   geom_jitter(width = 0.2, alpha = 0.6, size = 0.9) +
@@ -1537,30 +1511,22 @@ pa_bin <- pa_bin[rownames(pa_bin) %in% meta_pa$ID, ]
 meta_pa <- meta_pa[match(rownames(pa_bin), meta_pa$ID), ]
 stopifnot(identical(rownames(pa_bin), meta_pa$ID))
 
-
-
-# 4. Jaccard distance
 jaccard_dist <- vegdist(pa_bin, method = "jaccard", binary = TRUE)
 
-# 5. PCoA (cmdscale)
 jaccard_pcoa <- cmdscale(jaccard_dist, eig = TRUE, k = 2)
-# Extract eigenvalues
+
 eig_vals <- jaccard_pcoa$eig
 
-# Calculate percentage of variance explained
 variance_explained <- eig_vals / sum(eig_vals[eig_vals > 0]) * 100
 
-# Round for clean axis labels
 pc1_var <- round(variance_explained[1], 2)
 pc2_var <- round(variance_explained[2], 2)
 jaccard_coords <- as.data.frame(jaccard_pcoa$points)
 colnames(jaccard_coords) <- c("PC1", "PC2")
 jaccard_coords$ID <- rownames(jaccard_coords)
 
-# 6. Merge with filtered meta
 pca_df <- left_join(jaccard_coords, meta_pa, by = "ID")
 
-# 7. Plot
 jac_gmm <- ggplot(pca_df, aes(x = PC1, y = PC2, fill = Substrate)) +
   geom_point(shape = 21, size = 3, alpha = 0.8, stroke = 0.7, color = "black") +
   scale_fill_manual(values = substrate_colors) +
