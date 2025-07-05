@@ -119,14 +119,12 @@ names(all) <- sapply(names(all), function(col) {
 
 colnames(all)
 ##############################
-# Trim whitespace from both column names and meta IDs
+# Trim whites
 clean_colnames <- trimws(colnames(all))
 clean_meta_ids <- trimws(meta$ID)
 
-# Find columns that are not in meta$ID
 invalid_cols <- setdiff(clean_colnames, clean_meta_ids)
 
-# View them
 invalid_cols
 ################################################################################
 all <- all[, !(colnames(all) %in% removed_samples)]#removing controls and replicates
@@ -148,30 +146,30 @@ call[ , -1] <- lapply(call[ , -1], function(x) as.numeric(trimws(x)))
 call <- merge(call, meta[, c("ID", "Substrate")], by = "ID")
 anno <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/annotation_gmm.csv")
 ############################################################
-# 1. Ensure all feature columns in `call` are numeric
+
 call_numeric <- call
 call_numeric[ , 2:(ncol(call_numeric)-1)] <- lapply(call_numeric[ , 2:(ncol(call_numeric)-1)], as.numeric)
 
-# 2. Convert to long format: one row per (Sample, Feature)
+
 call_long <- call_numeric %>%
   pivot_longer(cols = -c(ID, Substrate), names_to = "Module", values_to = "Abundance")
 
-# 3. Join with annotation (anno)
+# Join with anno
 call_long_annotated <- call_long %>%
   left_join(anno[, c("Module", "Superpathway")], by = "Module") %>%
   filter(!is.na(Superpathway))  # drop unmatched
 
-# 4. Compute relative abundance per sample
+# Compute RA
 call_long_relative <- call_long_annotated %>%
   group_by(ID) %>%
   mutate(RelativeAbundance = 100 * Abundance / sum(Abundance)) %>%
   ungroup()
 ################################################################
-# Create distinct colors for your Superpathways
+#  distinct colors for  Superpathways
 superpathways <- unique(call_long_relative$Superpathway)
 n_pathways <- length(superpathways)
 library(RColorBrewer)
-# Use Set3 and interpolate if needed
+
 super_cols <- setNames(colorRampPalette(brewer.pal(12, "Set3"))(n_pathways), superpathways)
 #no jitter
 ggplot(call_long_relative, aes(x = RelativeAbundance, y = Superpathway, fill = Superpathway)) +
@@ -190,7 +188,7 @@ ggplot(call_long_relative, aes(x = RelativeAbundance, y = Superpathway, fill = S
     legend.position = "none",
     panel.grid.major.y = element_line(color = "grey90")
   )
-#same color jitter and ascending order
+#ascending order
 # ---- REORDER SUPERPATHWAY BY MEDIAN ----
 
 superpathway_order <- call_long_relative %>%
@@ -201,14 +199,13 @@ superpathway_order <- call_long_relative %>%
 
 call_long_relative$Superpathway <- factor(call_long_relative$Superpathway, levels = superpathway_order)
 
-# ---- CREATE COLOR PALETTE ----
+
 
 super_cols <- setNames(
   colorRampPalette(brewer.pal(12, "Set3"))(length(superpathway_order)),
   superpathway_order
 )
 
-# ---- PLOT ----
 
 p1 <- ggplot(call_long_relative, aes(x = RelativeAbundance, y = Superpathway, fill = Superpathway)) +
   geom_boxplot(outlier.shape = NA, alpha = 0.6) +
@@ -265,7 +262,7 @@ summary_stats <- call_long_relative_clean %>%
     sd_abund = sd(RelativeAbundance, na.rm = TRUE),
     .groups = "drop"
   )
-# Kruskal-Wallis test per annotation
+# stats
 kruskal_results <- call_long_relative_clean %>%
   group_by(Superpathway) %>%
   summarise(
@@ -313,7 +310,7 @@ p1 <- ggplot(call_sig, aes(x = Substrate, y = RelativeAbundance, fill = Substrat
     legend.position = "none"
   )
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_2/JL_GMM_supplementary.svg", plot = p1, width = 8, height = 6, units = "in")
-# Run Dunn test per annotation
+# stats
 dunn_results <- call_long_relative_clean %>%
   group_by(Superpathway) %>%
   dunn_test(RelativeAbundance ~ Substrate, p.adjust.method = "BH") %>%
@@ -327,7 +324,7 @@ dunn_matrix <- dunn_results %>%
   mutate(pair = paste(group1, "vs", group2)) %>%
   select(Superpathway, pair, p.adj)
 
-# Spread to heatmap style
+# rep with heatmap
 library(tidyr)
 dunn_heat <- dunn_matrix %>%
   pivot_wider(names_from = pair, values_from = p.adj)
@@ -396,6 +393,7 @@ p4 <- ggplot(dunn_matrix, aes(x = Group1, y = Group2, fill = p.adj)) +
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_2/gmm_dunn_pg_4.svg", plot = p4, width = 8, height = 6, units = "in")
 #############################################################
 #john leech idea of lefse plots
+#better than individual box plots
 a1 <- sig_dunn %>%
   filter(!is.na(Superpathway) & Superpathway != "") %>%  # Remove blanks or NAs
   mutate(
@@ -574,7 +572,7 @@ names(all) <- sapply(names(all), function(col) {
     col <- substr(col, 1, 6)
   }
   
-  # Remove trailing underscore
+  # Remove  underscore at the end
   col <- sub("_$", "", col)
   col <- sub("-$", "", col)
   return(col)
@@ -583,14 +581,12 @@ names(all) <- sapply(names(all), function(col) {
 
 colnames(all)
 ##############################
-# Trim whitespace from both column names and meta IDs
+# remove white space
 clean_colnames <- trimws(colnames(all))
 clean_meta_ids <- trimws(meta$ID)
 
-# Find columns that are not in meta$ID
 invalid_cols <- setdiff(clean_colnames, clean_meta_ids)
 
-# View them
 invalid_cols
 ################################################################################
 ################################################################################
@@ -614,26 +610,26 @@ call <- merge(call, meta[, c("ID", "Substrate")], by = "ID")
 anno <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/annotation_gbm.csv")
 ################################################
 ################################################
-# 1. Ensure all feature columns in `call` are numeric
+#  `call` are numeric
 call_numeric <- call
 call_numeric[ , 2:(ncol(call_numeric)-1)] <- lapply(call_numeric[ , 2:(ncol(call_numeric)-1)], as.numeric)
 
-# 2. Convert to long format: one row per (Sample, Feature)
+
 call_long <- call_numeric %>%
   pivot_longer(cols = -c(ID, Substrate), names_to = "Module", values_to = "Abundance")
 
-# 3. Join with annotation (anno)
+# merging to get annotations incorporated
 call_long_annotated <- call_long %>%
   left_join(anno[, c("Module", "Annotation")], by = "Module") %>%
   filter(!is.na(Annotation))  # drop unmatched
 
-# 4. Compute relative abundance per sample
+# RA per sample
 call_long_relative <- call_long_annotated %>%
   group_by(ID) %>%
   mutate(RelativeAbundance = 100 * Abundance / sum(Abundance)) %>%
   ungroup()
 ################################################################
-# Create distinct colors for your Superpathways
+# distinct colors
 annotation <- unique(call_long_relative$Annotation)
 n_annotation <- length(annotation)
 
@@ -674,7 +670,7 @@ q <- ggplot(call_long_relative, aes(x = RelativeAbundance, y = Annotation, fill 
     panel.grid.major.y = element_line(color = "grey90")
   )
 ###############
-# Reorder Annotation factor levels by median relative abundance (ascending)
+# ascending pathway arrangement
 annotation_order <- call_long_relative %>%
   group_by(Annotation) %>%
   summarise(median_abund = median(RelativeAbundance, na.rm = TRUE)) %>%
@@ -733,7 +729,7 @@ summary_stats <- call_long_relative_clean %>%
     sd_abund = sd(RelativeAbundance, na.rm = TRUE),
     .groups = "drop"
   )
-# Kruskal-Wallis test per annotation
+# stat
 kruskal_results <- call_long_relative_clean %>%
   group_by(Annotation) %>%
   summarise(
@@ -781,7 +777,7 @@ q1 <- ggplot(call_sig, aes(x = Substrate, y = RelativeAbundance, fill = Substrat
     legend.position = "none"
   )
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_2/JL_GbM_supplementary.svg", plot = q1, width = 8, height = 6, units = "in")
-# Run Dunn test per annotation
+#stat
 dunn_results <- call_long_relative_clean %>%
   group_by(Annotation) %>%
   dunn_test(RelativeAbundance ~ Substrate, p.adjust.method = "BH") %>%
