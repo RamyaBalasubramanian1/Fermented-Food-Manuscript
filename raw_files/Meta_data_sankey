@@ -1,0 +1,1104 @@
+ID	Fermented food category	Substrate	State	Type of fermentation	Investigator
+FS0A	Wagashi rind	Dairy	Solid	Starter	JL
+FS0B	Wagashi core	Dairy	Solid	Starter	JL
+FS01	Bread kvass	Sugar	Liquid	Starter	JL
+FS02	Carrot kimchi	Brine	Solid	Spontaneous	JL
+FS03	Boza	Sugar	Liquid	Starter	JL
+FS05	Turnip	Brine	Solid	Spontaneous	JL
+FS06	Orange	Sugar	Solid	Spontaneous	JL
+FS07	Sauerkraut	Brine	Solid	Spontaneous	JL
+FS08	Tepache	Sugar	Liquid	Spontaneous	JL
+FS09	Ginger beer	Sugar	Liquid	Spontaneous	JL
+FS10	Tempeh	Soy	Solid	Starter	JL
+FS11	Cucumber	Brine	Solid	Spontaneous	JL
+FS12	Milk kefir	Dairy	Liquid	Starter	JL
+FS13	Water kefir	Sugar	Liquid	Starter	JL
+FS16	Tofu chili	Soy	Solid	Spontaneous	JL
+FS17	Daikon	Brine	Solid	Spontaneous	JL
+FS19	Pickled vegetables	Brine	Solid	Spontaneous	JL
+FS22	Sauerkraut	Brine	Solid	Spontaneous	JL
+FS23	Brown rice amazake	Brine	Solid	Spontaneous	JL
+FS24	Beetroot kvass	Brine	Liquid	Starter	JL
+FS25	Milk kefir	Dairy	Liquid	Starter	JL
+FS26	Mead	Sugar	Liquid	Spontaneous	JL
+FS27	Sauerkraut	Brine	Solid	Spontaneous	JL
+FS28	Sauerkraut	Brine	Solid	Spontaneous	JL
+FS29	Kimchi	Brine	Solid	Spontaneous	JL
+FS30	Sauerkraut	Brine	Solid	Spontaneous	JL
+FS31	Water kefir	Sugar	Liquid	Starter	JL
+FS32	Water kefir	Sugar	Liquid	Starter	JL
+FS33	Water kefir	Sugar	Liquid	Starter	JL
+FS34	Kombucha	Sugar	Liquid	Starter	JL
+FS35	Ryazhenka	Dairy	Liquid	Starter	JL
+FS36	Agousha	Dairy	Liquid	Starter	JL
+FS37	Rostagroèkport vorožnyj	Dairy	Solid	Starter	JL
+FS38	Ruž’a	Dairy	Solid	Starter	JL
+FS39	Sauerkraut	Brine	Solid	Spontaneous	JL
+FS40	Kombucha	Sugar	Liquid	Starter	JL
+FS41	Apple cider vinegar	Sugar	Liquid	Starter	JL
+FS42	Raw milk kefir	Dairy	Liquid	Starter	JL
+FS43	Pasteurized milk kefir	Dairy	Liquid	Starter	JL
+FS44	Water kefir	Sugar	Liquid	Starter	JL
+FS45	Water kefir	Sugar	Liquid	Starter	JL
+FS46	Dilly carrots	Brine	Solid	Spontaneous	JL
+FS47	Brussels sprout kimchi	Brine	Solid	Spontaneous	JL
+FS48	Kimchi	Brine	Solid	Spontaneous	JL
+FS49	Garlic kraut	Brine	Solid	Spontaneous	JL
+FS50	Dukkah kraut	Brine	Solid	Spontaneous	JL
+FS51	Ginger sliced in 2% brine	Brine	Solid	Spontaneous	JL
+FS52	Daikon radish in 2% brine	Brine	Solid	Spontaneous	JL
+FS53	Okra in 2% brine	Brine	Solid	Spontaneous	JL
+FS54	Tomatoes and mustard seeds in 2% brine	Brine	Solid	Spontaneous	JL
+FS55	Kombucha	Sugar	Liquid	Starter	JL
+FS56	Water kefir	Sugar	Liquid	Starter	JL
+FS57	Beet kvass	Brine	Liquid	Starter	JL
+FS58	Coconut kefir	Coconut_kefir	Liquid	Starter	JL
+FS59	Carrot sticks	Brine	Solid	Spontaneous	JL
+FS60	Labne	Dairy	Solid	Starter	JL
+FS61	Lemon and ginger fizz	Sugar	Liquid	Starter	JL
+FS62	Scallion kimchi	Brine	Solid	Spontaneous	JL
+AF01	Ogi-maize	Maize	Semi-solid	Spontaneous	JL
+AF02	Ogi baba - millet	Millet	Semi-solid	Spontaneous	JL
+AF03	Gari	Cassava	Solid	Spontaneous	JL
+AF04	Fufu	Cassava	Solid	Spontaneous	JL
+AF05	Kunun	Millet	Liquid	Spontaneous	JL
+AF06	Iru	Locust Bean	Solid	Spontaneous	JL
+AF07	Palm wine	Palm Tree	Liquid	Spontaneous	JL
+AF08	Ogi/Koko Sorghum	Sorghum	Semi-solid	Spontaneous	JL
+AF09	Ogiri	Melon seeds	Solid	Spontaneous	JL
+AF10	Iru 	Locust Bean	Solid	Spontaneous	JL
+AF11	Ugba	oil bean	Solid	Spontaneous	JL
+AF12	Ogi	Millet	Semi-solid	Spontaneous	JL
+AF14	Wara	Milk	Solid	Spontaneous	JL
+AF15	Ogiri	Melon seeds	Solid	Spontaneous	JL
+AF16	Lafun	Cassava	Solid	Spontaneous	JL
+AF17	Pito	Millet	Liquid	Backslopped	JL
+AF18	Otika	Millet	Liquid	Spontaneous	JL
+AF19	Palm wine	Palm Tree	Liquid	Spontaneous	JL
+AF20	Kunnun-zaki	Millet	Liquid	Spontaneous	JL
+AF21	Palm wine	Palm Tree	Liquid	Spontaneous	JL
+AF22	Nono	Milk	Liquid	Spontaneous	JL
+AF23	Palm wine	Palm Tree	Liquid	Spontaneous	JL
+AF24	Dawa Dawa	Locust Bean	Solid	Spontaneous	JL
+AF25	Kantong	Ceiba pentandra 	Solid	Spontaneous	JL
+AF26	Red millet Zankom	Millet	Liquid	Spontaneous	JL
+AF27	Wagashi	Milk	Solid	Spontaneous	JL
+AF28	Dagati Pito	Millet	Liquid	Backslopped	JL
+AF29	White Millet Zonkom	Millet	Liquid	Spontaneous	JL
+AF30	Brukina	Millet	Liquid	Spontaneous	JL
+AF31	Burukutu	guinea corn 	Solid	Spontaneous	JL
+AF32	Frafra Pito	Millet	Liquid	Backslopped	JL
+AF33	Kunun-zaki	Millet	Liquid	Spontaneous	JL
+AF34	Nono	Milk	Liquid	Spontaneous	JL
+AF35	Ogi	Millet	Semi-solid	Spontaneous	JL
+AF36	Maasa	Maize 	Semi-solid	Spontaneous	JL
+AF37	Ogi White	Millet	Semi-solid	Spontaneous	JL
+AF38	Agadagidi	Plantain	Liquid	Spontaneous	JL
+AF39	Emu	Palm Tree	Liquid	Spontaneous	JL
+AF40	Burukutu	Sorghum	Liquid	Spontaneous	JL
+AF41	Otika	Millet	Liquid	Spontaneous	JL
+AF42	Wara	Milk	Solid	Spontaneous	JL
+AF43	Ugba	oil bean	Solid	Spontaneous	JL
+AF44	Gari	Cassava	Solid	Spontaneous	JL
+AF45	Ogiri	Melon seeds	Solid	Spontaneous	JL
+AF46	Ogi 	Sorghum	Semi-solid	Spontaneous	JL
+AF47	Okpheye	Seeds	Solid	Spontaneous	JL
+AF48	Iru Pete	Locust Bean	Solid	Spontaneous	JL
+AF49	Fura	Millet	Solid	Spontaneous	JL
+AF50	Ogi	Millet	Semi-solid	Spontaneous	JL
+AF51	Fufu	Cassava	Solid	Spontaneous	JL
+AF52	Iru Woro	Locust Bean	Solid	Spontaneous	JL
+AF53	Lafun	Cassava	Solid	Spontaneous	JL
+AF54	Gari	Cassava	Solid	Spontaneous	JL
+AF55	Palm wine	Palm Tree	Liquid	Spontaneous	JL
+AF56	Iru	Locust Bean	Solid	Spontaneous	JL
+AF57	Ogiri	Melon seeds	Semi-solid	Spontaneous	JL
+AF58	Okpehe	Prosopis africana	Solid	Spontaneous/Backslopped	JL
+AF59	Ugba	oil bean	Solid	Spontaneous	JL
+AF60	Ogi maize	Maize	Solid	Spontaneous	JL
+AF61	Ogi baba  	Sorghum	Solid	Spontaneous	JL
+AF62	koko	Millet	Solid	Spontaneous	JL
+AF63	Otiru	Sphenostylis stenocarpa	Solid	Spontaneous	JL
+AF64	Nunu	Milk	Liquid	Backslopped	JL
+AF65	Wara	Milk	Solid	Spontaneous	JL
+AF66	Obiolor	Millet	Liquid	Backslopped	JL
+AF67	Burunkutu	Sorghum	Liquid	Backslopped	JL
+AF68	Sekete	Maize	Liquid	Backslopped	JL
+AF69	Gari	Cassava	Solid	Spontaneous	JL
+AF70	Lafun	Cassava	Solid	Spontaneous	JL
+AF71	Fufu	Cassava	Solid	Spontaneous	JL
+AF72	Agadagidi	Plantain	Liquid	Spontaneous	JL
+AF73	Ugi-finger millet	Millet	Semi-solid	Spontaneous	JL
+AF74	Ugi _sorghum and pearl millet	Millet	Semi-solid	Spontaneous	JL
+AF75	Ugi- finger millet and sorghum	Millet	Semi-solid	Spontaneous	JL
+AF76	Ugi - finger millet and pearl millet 	Millet	Semi-solid	Spontaneous	JL
+AF77	Dolo	Sorghum	Liquid	Backslopped	JL
+AF78	Massa	Millet	Liquid	Spontaneous	JL
+AF79	Foura	Millet	Solid	Spontaneous	JL
+AF80	Soumbala	Locust Bean	Solid	Spontaneous	JL
+AF81	Mou	Cassava	Solid	Spontaneous	JL
+AF82	Attieke	Cassava	Solid	Backslopped	JL
+AF83	Iru	Locust Bean	Solid	Spontaneous	JL
+AF84	Garri	Cassava	Solid	Spontaneous	JL
+AF86	Kunu - 3	Millet	Liquid	Spontaneous	JL
+AF87	Maize Ogi yellow	Maize	Semi-solid	Spontaneous	JL
+AF88	Sorghum Ogi (ogi baba)	Sorghum	Semi-solid	Spontaneous	JL
+AF89	Fufu	Cassava	Solid	Spontaneous	JL
+AF91	Palm wine	Palm Tree	Liquid	Spontaneous	JL
+AF92	Kunu - 2	Millet	Liquid	Spontaneous	JL
+AF93	Nono 	Milk	Liquid	Spontaneous	JL
+AF94	Kunu - 1	Millet	Liquid	Spontaneous	JL
+K1	Kombucha	Sugar	Liquid	Starter	JL
+K2	Kombucha	Sugar	Liquid	Starter	JL
+K3	Kombucha	Sugar	Liquid	Starter	JL
+K4	Kombucha	Sugar	Liquid	Starter	JL
+K5	Kombucha	Sugar	Liquid	Starter	JL
+K6	Kombucha	Sugar	Liquid	Starter	JL
+WKMedia-1-L-00h	Fg extract	Sugar	Liquid	Starter	SB
+WKMedia-1-L-08h	Fg extract	Sugar	Liquid	Starter	SB
+WKMedia-1-L-48h	Fg extract	Sugar	Liquid	Starter	SB
+WKMedia-2-L-00h	Fg extract	Sugar	Liquid	Starter	SB
+WKMedia-2-L-08h	Fg extract	Sugar	Liquid	Starter	SB
+WKMedia-2-L-48h	Fg extract	Sugar	Liquid	Starter	SB
+WKMedia-3-L-00h	Fg extract	Sugar	Liquid	Starter	SB
+WKMedia-3-L-08h	Fg extract	Sugar	Liquid	Starter	SB
+WKMedia-3-L-48h	Fg extract	Sugar	Liquid	Starter	SB
+WK001-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK001-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK001-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK001-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK001-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK002-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK002-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK002-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK002-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK002-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK003-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK003-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK003-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK003-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK003-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK004-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK004-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK004-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK004-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK004-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK005-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK005-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK005-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK005-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK005-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK006-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK006-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK006-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK006-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK006-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK007-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK007-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK007-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK007-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK007-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK008-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK008-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK008-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK008-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK008-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK009-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK009-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK009-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK009-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK009-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK010-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK010-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK010-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK010-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK010-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK011-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK011-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK011-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK011-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK011-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK012-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK012-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK012-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK012-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK012-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK013-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK013-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK013-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK013-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK013-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK014-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK014-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK014-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK014-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK014-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK015-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK015-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK015-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK015-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK015-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK016-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK016-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK016-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK016-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK016-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK017-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK017-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK017-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK017-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK017-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK018-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK018-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK018-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK018-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK018-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK019-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK019-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK019-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK019-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK019-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK020-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK020-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK020-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK020-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK020-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK021-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK021-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK021-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK021-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK021-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK022-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK022-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK022-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK022-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK022-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK023-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK023-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK023-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK023-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK023-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK024-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK024-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK024-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK024-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK024-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK025-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK025-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK025-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK025-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK025-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK026-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK026-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK026-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK026-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK026-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK027-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK027-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK027-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK027-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK027-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK028-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK028-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK028-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK028-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK028-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK029-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK029-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK029-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK029-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK029-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK030-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK030-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK030-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK030-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK030-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK031-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK031-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK031-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK031-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK031-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK032-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK032-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK032-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK032-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK032-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK033-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK033-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK033-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK033-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK033-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK034-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK034-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK034-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK034-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK034-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK035-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK035-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK035-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK035-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK035-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK036-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK036-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK036-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK036-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK036-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK037-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK037-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK037-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK037-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK037-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK038-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK038-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK038-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK038-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK038-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK039-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK039-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK039-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK039-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK039-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK040-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK040-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK040-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK040-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK040-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK041-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK041-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK041-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK041-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK041-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK042-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK042-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK042-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK042-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK042-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK043-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK043-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK043-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK043-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK043-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK044-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK044-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK044-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK044-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK044-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK045-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK045-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK045-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK045-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK045-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK046-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK046-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK046-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK046-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK046-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK047-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK047-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK047-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK047-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK047-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK048-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK048-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK048-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK048-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK048-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK049-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK049-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK049-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK049-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK049-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK050-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK050-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK050-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK050-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK050-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK051-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK051-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK051-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK051-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK051-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK052-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK052-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK052-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK052-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK052-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK053-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK053-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK053-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK053-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK053-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK054-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK054-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK054-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK054-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK054-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK055-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK055-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK055-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK055-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK055-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK056-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK056-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK056-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK056-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK056-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK057-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK057-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK057-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK057-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK057-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK058-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK058-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK058-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK058-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK058-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK059-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK059-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK059-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK059-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK060-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK060-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK060-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK060-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK060-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK061-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK061-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK061-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK061-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK061-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK062-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK062-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK062-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK062-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK062-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK063-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK063-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK063-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK063-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK063-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK064-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK064-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK064-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK064-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK064-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK065-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK065-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK065-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK065-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK065-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK066-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK066-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK066-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK066-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK066-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK067-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK067-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK067-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK067-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK067-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK068-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK068-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK068-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK068-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK068-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK069-1-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK069-1-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK069-2-G-48h	Water kefir	Sugar	Liquid	Starter	SB
+WK069-2-L-08h	Water kefir	Sugar	Liquid	Starter	SB
+WK069-2-L-48h	Water kefir	Sugar	Liquid	Starter	SB
+C2_S26	Water kefir	Sugar	Liquid	Starter	SB
+N1_S32	Water kefir	Sugar	Liquid	Starter	SB
+R2_S81	Milk Kefir	milk	Liquid	Starter	SB
+W2_S75	Milk Kefir	milk	Liquid	Starter	LW
+E6_S54	Milk Kefir	milk	Liquid	Starter	LW
+B6_S18	Milk Kefir	milk	Liquid	Starter	LW
+Q8_S75	Milk Kefir	milk	Liquid	Starter	LW
+G4_S76	Milk Kefir	milk	Liquid	Starter	LW
+T8_S11	Milk Kefir	milk	Liquid	Starter	LW
+U1_S11	Milk Kefir	milk	Liquid	Starter	LW
+P8_S63	Milk Kefir	milk	Liquid	Starter	LW
+T1_S10	Milk Kefir	milk	Liquid	Starter	LW
+W1_S74	Milk Kefir	milk	Liquid	Starter	LW
+C4_S28	Milk Kefir	milk	Liquid	Starter	LW
+D7_S43	Milk Kefir	milk	Liquid	Starter	LW
+A2_S2_	Milk Kefir	milk	Liquid	Starter	LW
+T5_S10	Milk Kefir	milk	Liquid	Starter	LW
+D4_S40	Milk Kefir	milk	Liquid	Starter	LW
+H8_S92	Milk Kefir	milk	Liquid	Starter	LW
+D12_S4	Milk Kefir	milk	Liquid	Starter	LW
+U-2-11	Milk Kefir	milk	Liquid	Starter	LW
+P3_S58	Milk Kefir	milk	Liquid	Starter	LW
+V4_S65	Milk Kefir	milk	Liquid	Starter	LW
+A4_S4_	Milk Kefir	milk	Liquid	Starter	LW
+B12_S2	Milk Kefir	milk	Liquid	Starter	LW
+O9_S52	Milk Kefir	milk	Liquid	Starter	LW
+Q9_S76	Milk Kefir	milk	Liquid	Starter	LW
+W9_S82	Milk Kefir	milk	Liquid	Starter	LW
+C7_S31	Milk Kefir	milk	Liquid	Starter	LW
+E9_S57	Milk Kefir	milk	Liquid	Starter	LW
+F11_S7	Milk Kefir	milk	Liquid	Starter	LW
+S9_S10	Milk Kefir	milk	Liquid	Starter	LW
+T12_S1	Milk Kefir	milk	Liquid	Starter	LW
+F2_S62	Milk Kefir	milk	Liquid	Starter	LW
+R1_S80	Milk Kefir	milk	Liquid	Starter	LW
+L8_S15	Milk Kefir	milk	Liquid	Starter	LW
+S5_S96	Milk Kefir	milk	Liquid	Starter	LW
+Q6_S73	Milk Kefir	milk	Liquid	Starter	LW
+L7_S14	Milk Kefir	milk	Liquid	Starter	LW
+I9_S10	Milk Kefir	milk	Liquid	Starter	LW
+L11_S1	Milk Kefir	milk	Liquid	Starter	LW
+I3_S99	Milk Kefir	milk	Liquid	Starter	LW
+U11_S5	Milk Kefir	milk	Liquid	Starter	LW
+k2_S12	Milk Kefir	milk	Liquid	Starter	LW
+P10_S6	Milk Kefir	milk	Liquid	Starter	LW
+C3_S27	Milk Kefir	milk	Liquid	Starter	LW
+S12_S1	Milk Kefir	milk	Liquid	Starter	LW
+R10_S8	Milk Kefir	milk	Liquid	Starter	LW
+Q11_S7	Milk Kefir	milk	Liquid	Starter	LW
+F4_S64	Milk Kefir	milk	Liquid	Starter	LW
+T4_S10	Milk Kefir	milk	Liquid	Starter	LW
+M8_S27	Milk Kefir	milk	Liquid	Starter	LW
+E11_S5	Milk Kefir	milk	Liquid	Starter	LW
+E7_S55	Milk Kefir	milk	Liquid	Starter	LW
+F6_S66	Milk Kefir	milk	Liquid	Starter	LW
+B10_S2	Milk Kefir	milk	Liquid	Starter	LW
+U12_S5	Milk Kefir	milk	Liquid	Starter	LW
+W11_S8	Milk Kefir	milk	Liquid	Starter	LW
+L6_S13	Milk Kefir	milk	Liquid	Starter	LW
+P9_S64	Milk Kefir	milk	Liquid	Starter	LW
+J4_S11	Milk Kefir	milk	Liquid	Starter	LW
+N7_S38	Milk Kefir	milk	Liquid	Starter	LW
+W5_S78	Milk Kefir	milk	Liquid	Starter	LW
+k3_S12	Milk Kefir	milk	Liquid	Starter	LW
+Q12_S7	Milk Kefir	milk	Liquid	Starter	LW
+T9_S11	Milk Kefir	milk	Liquid	Starter	LW
+M6_S25	Milk Kefir	milk	Liquid	Starter	LW
+P1_S56	Milk Kefir	milk	Liquid	Starter	LW
+k8_S3_	Milk Kefir	milk	Liquid	Starter	LW
+Q5_S72	Milk Kefir	milk	Liquid	Starter	LW
+R12_S9	Milk Kefir	milk	Liquid	Starter	LW
+H1_S85	Milk Kefir	milk	Liquid	Starter	LW
+S6_S97	Milk Kefir	milk	Liquid	Starter	LW
+O4_S47	Milk Kefir	milk	Liquid	Starter	LW
+B4_S16	Milk Kefir	milk	Liquid	Starter	LW
+U5_S12	Milk Kefir	milk	Liquid	Starter	LW
+A1_S1_	Milk Kefir	milk	Liquid	Starter	LW
+B3_S15	Milk Kefir	milk	Liquid	Starter	LW
+L10_S1	Milk Kefir	milk	Liquid	Starter	LW
+R3_S82	Milk Kefir	milk	Liquid	Starter	LW
+L2_S9_	Milk Kefir	milk	Liquid	Starter	LW
+S10_S1	Milk Kefir	milk	Liquid	Starter	LW
+E1_S49	Milk Kefir	milk	Liquid	Starter	LW
+U10_S5	Milk Kefir	milk	Liquid	Starter	LW
+N12_S4	Milk Kefir	milk	Liquid	Starter	LW
+C9_S33	Milk Kefir	milk	Liquid	Starter	LW
+G5_S77	Milk Kefir	milk	Liquid	Starter	LW
+C10_S3	Milk Kefir	milk	Liquid	Starter	LW
+V9_S70	Milk Kefir	milk	Liquid	Starter	LW
+F1_S61	Milk Kefir	milk	Liquid	Starter	LW
+G6_S78	Milk Kefir	milk	Liquid	Starter	LW
+D1_S37	Milk Kefir	milk	Liquid	Starter	LW
+N10_S4	Milk Kefir	milk	Liquid	Starter	LW
+L12_S1	Milk Kefir	milk	Liquid	Starter	LW
+I1_S97	Milk Kefir	milk	Liquid	Starter	LW
+E8_S56	Milk Kefir	milk	Liquid	Starter	LW
+M7_S26	Milk Kefir	milk	Liquid	Starter	LW
+N3_S34	Milk Kefir	milk	Liquid	Starter	LW
+I4_S10	Milk Kefir	milk	Liquid	Starter	LW
+Q4_S71	Milk Kefir	milk	Liquid	Starter	LW
+G3_S75	Milk Kefir	milk	Liquid	Starter	LW
+O6_S49	Milk Kefir	milk	Liquid	Starter	LW
+N8_S39	Milk Kefir	milk	Liquid	Starter	LW
+Q10_S7	Milk Kefir	milk	Liquid	Starter	LW
+C6_S30	Milk Kefir	milk	Liquid	Starter	LW
+L1_S8_	Milk Kefir	milk	Liquid	Starter	LW
+D5_S41	Milk Kefir	milk	Liquid	Starter	LW
+B8_S20	Milk Kefir	milk	Liquid	Starter	LW
+R8_S87	Milk Kefir	milk	Liquid	Starter	LW
+C12_S3	Milk Kefir	milk	Liquid	Starter	LW
+L5_S12	Milk Kefir	milk	Liquid	Starter	LW
+U12_S1	Milk Kefir	milk	Liquid	Starter	LW
+C11_S3	Milk Kefir	milk	Liquid	Starter	LW
+O7_S50	Milk Kefir	milk	Liquid	Starter	LW
+A6_S6_	Milk Kefir	milk	Liquid	Starter	LW
+C8_S32	Milk Kefir	milk	Liquid	Starter	LW
+H11_S9	Milk Kefir	milk	Liquid	Starter	LW
+G9_S81	Milk Kefir	milk	Liquid	Starter	LW
+Y2_S87	Milk Kefir	milk	Liquid	Starter	LW
+B2_S14	Milk Kefir	milk	Liquid	Starter	LW
+V7_S68	Milk Kefir	milk	Liquid	Starter	LW
+k1_S12	Milk Kefir	milk	Liquid	Starter	LW
+V12_S7	Milk Kefir	milk	Liquid	Starter	LW
+T2_S10	Milk Kefir	milk	Liquid	Starter	LW
+W12_S8	Milk Kefir	milk	Liquid	Starter	LW
+B11_S2	Milk Kefir	milk	Liquid	Starter	LW
+Y1_S86	Milk Kefir	milk	Liquid	Starter	LW
+M5_S24	Milk Kefir	milk	Liquid	Starter	LW
+Y3_S88	Milk Kefir	milk	Liquid	Starter	LW
+G12_S8	Milk Kefir	milk	Liquid	Starter	LW
+Q7_S74	Milk Kefir	milk	Liquid	Starter	LW
+G7_S79	Milk Kefir	milk	Liquid	Starter	LW
+T6_S10	Milk Kefir	milk	Liquid	Starter	LW
+k11_S6	Milk Kefir	milk	Liquid	Starter	LW
+I6_S10	Milk Kefir	milk	Liquid	Starter	LW
+M4_S23	Milk Kefir	milk	Liquid	Starter	LW
+U-2-10	Milk Kefir	milk	Liquid	Starter	LW
+Q2_S69	Milk Kefir	milk	Liquid	Starter	LW
+F12_S7	Milk Kefir	milk	Liquid	Starter	LW
+Q3_S70	Milk Kefir	milk	Liquid	Starter	LW
+N11_S4	Milk Kefir	milk	Liquid	Starter	LW
+R5_S84	Milk Kefir	milk	Liquid	Starter	LW
+S11_S1	Milk Kefir	milk	Liquid	Starter	LW
+M9_S28	Milk Kefir	milk	Liquid	Starter	LW
+A3_S3_	Milk Kefir	milk	Liquid	Starter	LW
+M3_S22	Milk Kefir	milk	Liquid	Starter	LW
+W3_S76	Milk Kefir	milk	Liquid	Starter	LW
+J8_S11	Milk Kefir	milk	Liquid	Starter	LW
+k4_S12	Milk Kefir	milk	Liquid	Starter	LW
+O3_S46	Milk Kefir	milk	Liquid	Starter	LW
+A5_S5_	Milk Kefir	milk	Liquid	Starter	LW
+S1_S92	Milk Kefir	milk	Liquid	Starter	LW
+U-2-9_	Milk Kefir	milk	Liquid	Starter	LW
+G1_S73	Milk Kefir	milk	Liquid	Starter	LW
+O11_S5	Milk Kefir	milk	Liquid	Starter	LW
+F7_S67	Milk Kefir	milk	Liquid	Starter	LW
+W8_S81	Milk Kefir	milk	Liquid	Starter	LW
+k5_S12	Milk Kefir	milk	Liquid	Starter	LW
+C5_S29	Milk Kefir	milk	Liquid	Starter	LW
+N2_S33	Milk Kefir	milk	Liquid	Starter	LW
+E2_S50	Milk Kefir	milk	Liquid	Starter	LW
+U11_S1	Milk Kefir	milk	Liquid	Starter	LW
+A7_S7_	Milk Kefir	milk	Liquid	Starter	LW
+L4_S11	Milk Kefir	milk	Liquid	Starter	LW
+E10_S5	Milk Kefir	milk	Liquid	Starter	LW
+H6_S90	Milk Kefir	milk	Liquid	Starter	LW
+Q1_S68	Milk Kefir	milk	Liquid	Starter	LW
+V10_S7	Milk Kefir	milk	Liquid	Starter	LW
+O8_S51	Milk Kefir	milk	Liquid	Starter	LW
+D6_S42	Milk Kefir	milk	Liquid	Starter	LW
+H12_S9	Milk Kefir	milk	Liquid	Starter	LW
+M11_S3	Milk Kefir	milk	Liquid	Starter	LW
+P11_S6	Milk Kefir	milk	Liquid	Starter	LW
+J3_S11	Milk Kefir	milk	Liquid	Starter	LW
+J5_S11	Milk Kefir	milk	Liquid	Starter	LW
+H7_S91	Milk Kefir	milk	Liquid	Starter	LW
+I11_S1	Milk Kefir	milk	Liquid	Starter	LW
+F8_S68	Milk Kefir	milk	Liquid	Starter	LW
+U6_S12	Milk Kefir	milk	Liquid	Starter	LW
+V1_S62	Milk Kefir	milk	Liquid	Starter	LW
+E12_S6	Milk Kefir	milk	Liquid	Starter	LW
+S7_S98	Milk Kefir	milk	Liquid	Starter	LW
+J10_S1	Milk Kefir	milk	Liquid	Starter	LW
+J7_S11	Milk Kefir	milk	Liquid	Starter	LW
+P6_S61	Milk Kefir	milk	Liquid	Starter	LW
+S3_S94	Milk Kefir	milk	Liquid	Starter	LW
+H10_S9	Milk Kefir	milk	Liquid	Starter	LW
+U3_S11	Milk Kefir	milk	Liquid	Starter	LW
+P7_S62	Milk Kefir	milk	Liquid	Starter	LW
+L3_S10	Milk Kefir	milk	Liquid	Starter	LW
+E5_S53	Milk Kefir	milk	Liquid	Starter	LW
+I2_S98	Milk Kefir	milk	Liquid	Starter	LW
+J6_S11	Milk Kefir	milk	Liquid	Starter	LW
+E3_S51	Milk Kefir	milk	Liquid	Starter	LW
+H3_S87	Milk Kefir	milk	Liquid	Starter	LW
+k6_S1_	Milk Kefir	milk	Liquid	Starter	LW
+L9_S16	Milk Kefir	milk	Liquid	Starter	LW
+G2_S74	Milk Kefir	milk	Liquid	Starter	LW
+R4_S83	Milk Kefir	milk	Liquid	Starter	LW
+J1_S10	Milk Kefir	milk	Liquid	Starter	LW
+N6_S37	Milk Kefir	milk	Liquid	Starter	LW
+I5_S10	Milk Kefir	milk	Liquid	Starter	LW
+U9_S51	Milk Kefir	milk	Liquid	Starter	LW
+A9_S9_	Milk Kefir	milk	Liquid	Starter	LW
+R6_S85	Milk Kefir	milk	Liquid	Starter	LW
+N4_S35	Milk Kefir	milk	Liquid	Starter	LW
+F9_S69	Milk Kefir	milk	Liquid	Starter	LW
+V8_S69	Milk Kefir	milk	Liquid	Starter	LW
+U4_S11	Milk Kefir	milk	Liquid	Starter	LW
+F3_S63	Milk Kefir	milk	Liquid	Starter	LW
+E4_S52	Milk Kefir	milk	Liquid	Starter	LW
+D9_S45	Milk Kefir	milk	Liquid	Starter	LW
+H3_S55	Milk Kefir	milk	Liquid	Starter	LW
+P12_S6	Milk Kefir	milk	Liquid	Starter	LW
+U10_S1	Milk Kefir	milk	Liquid	Starter	LW
+I12_S1	Milk Kefir	milk	Liquid	Starter	LW
+W6_S79	Milk Kefir	milk	Liquid	Starter	LW
+k12_S7	Milk Kefir	milk	Liquid	Starter	LW
+B5_S17	Milk Kefir	milk	Liquid	Starter	LW
+S8_S99	Milk Kefir	milk	Liquid	Starter	LW
+J9_S11	Milk Kefir	milk	Liquid	Starter	LW
+I10_S1	Milk Kefir	milk	Liquid	Starter	LW
+B7_S19	Milk Kefir	milk	Liquid	Starter	LW
+D10_S4	Milk Kefir	milk	Liquid	Starter	LW
+S4_S95	Milk Kefir	milk	Liquid	Starter	LW
+H2_S86	Milk Kefir	milk	Liquid	Starter	LW
+H9_S93	Milk Kefir	milk	Liquid	Starter	LW
+V2_S63	Milk Kefir	milk	Liquid	Starter	LW
+N9_S40	Milk Kefir	milk	Liquid	Starter	LW
+W7_S80	Milk Kefir	milk	Liquid	Starter	LW
+J11_S1	Milk Kefir	milk	Liquid	Starter	LW
+Y4_S89	Milk Kefir	milk	Liquid	Starter	LW
+U-2-12	Milk Kefir	milk	Liquid	Starter	LW
+k7_S2_	Milk Kefir	milk	Liquid	Starter	LW
+M12_S3	Milk Kefir	milk	Liquid	Starter	LW
+A10_S1	Milk Kefir	milk	Liquid	Starter	LW
+M10_S2	Milk Kefir	milk	Liquid	Starter	LW
+W10_S8	Milk Kefir	milk	Liquid	Starter	LW
+R11_S9	Milk Kefir	milk	Liquid	Starter	LW
+I7_S10	Milk Kefir	milk	Liquid	Starter	LW
+P5_S60	Milk Kefir	milk	Liquid	Starter	LW
+F5_S65	Milk Kefir	milk	Liquid	Starter	LW
+k10_S5	Milk Kefir	milk	Liquid	Starter	LW
+D11_S4	Milk Kefir	milk	Liquid	Starter	LW
+H4_S88	Milk Kefir	milk	Liquid	Starter	LW
+U-2-8_	Milk Kefir	milk	Liquid	Starter	LW
+M1_S20	Milk Kefir	milk	Liquid	Starter	LW
+S2_S93	Milk Kefir	milk	Liquid	Starter	LW
+R9_S88	Milk Kefir	milk	Liquid	Starter	LW
+C1_S25	Milk Kefir	milk	Liquid	Starter	LW
+O2_S45	Milk Kefir	milk	Liquid	Starter	LW
+P2_S57	Milk Kefir	milk	Liquid	Starter	LW
+T11_S1	Milk Kefir	milk	Liquid	Starter	LW
+T10_S1	Milk Kefir	milk	Liquid	Starter	LW
+V11_S7	Milk Kefir	milk	Liquid	Starter	LW
+G8_S80	Milk Kefir	milk	Liquid	Starter	LW
+A8_S8_	Milk Kefir	milk	Liquid	Starter	LW
+J2_S11	Milk Kefir	milk	Liquid	Starter	LW
+G10_S8	Milk Kefir	milk	Liquid	Starter	LW
+D8_S44	Milk Kefir	milk	Liquid	Starter	LW
+W4_S77	Milk Kefir	milk	Liquid	Starter	LW
+V6_S67	Milk Kefir	milk	Liquid	Starter	LW
+A11_S1	Milk Kefir	milk	Liquid	Starter	LW
+D2_S38	Milk Kefir	milk	Liquid	Starter	LW
+A12_S1	Milk Kefir	milk	Liquid	Starter	LW
+F10_S7	Milk Kefir	milk	Liquid	Starter	LW
+T3_S10	Milk Kefir	milk	Liquid	Starter	LW
+B9_S21	Milk Kefir	milk	Liquid	Starter	LW
+U-2-7_	Milk Kefir	milk	Liquid	Starter	LW
+H5_S89	Milk Kefir	milk	Liquid	Starter	LW
+N5_S36	Milk Kefir	milk	Liquid	Starter	LW
+I8_S10	Milk Kefir	milk	Liquid	Starter	LW
+k9_S4_	Milk Kefir	milk	Liquid	Starter	LW
+U9_S12	Milk Kefir	milk	Liquid	Starter	LW
+O5_S48	Milk Kefir	milk	Liquid	Starter	LW
+V3_S64	Milk Kefir	milk	Liquid	Starter	LW
+D3_S39	Milk Kefir	milk	Liquid	Starter	LW
+R7_S86	Milk Kefir	milk	Liquid	Starter	LW
+T7_S11	Milk Kefir	milk	Liquid	Starter	LW
+M2_S21	Milk Kefir	milk	Liquid	Starter	LW
+G11_S8	Milk Kefir	milk	Liquid	Starter	LW
+O1_S44	Milk Kefir	milk	Liquid	Starter	LW
+O10_S5	Milk Kefir	milk	Liquid	Starter	LW
+U2_S11	Milk Kefir	milk	Liquid	Starter	LW
+J12_S1	Milk Kefir	milk	Liquid	Starter	LW
+B1_S13	Milk Kefir	milk	Liquid	Starter	LW
+O12_S5	Milk Kefir	milk	Liquid	Starter	LW
+V5_S66	Milk Kefir	milk	Liquid	Starter	LW
+P4_S59	Milk Kefir	milk	Liquid	Starter	LW
+SRR11036331	Milk Kefir	milk	Liquid	Starter	LW
+SRR11036332	Milk Kefir	milk	Liquid	Starter	LW
+SRR14018896	Milk Kefir	milk	Liquid	Starter	LW
+PFG_k_B_24_CoM	Milk Kefir	milk	Liquid	Starter	LW
+PFG_k_B_24_SM	Milk Kefir	milk	Liquid	Starter	LW
+PFG_k_B_4_CoM	Milk Kefir	milk	Liquid	Starter	LW
+PFG_k_B_4_SM_S	Milk Kefir	milk	Liquid	Starter	LW
+PFG_k_B_p4_CoM	Milk Kefir	milk	Liquid	Starter	LW
+PFG_k_B_p4_SM	Milk Kefir	milk	Liquid	Starter	LW
+PFG_k_L_24_CoM	Milk Kefir	milk	Liquid	Starter	LW
+PFG_k_L_24_SM	Milk Kefir	milk	Liquid	Starter	LW
+PFG_k_L_4_CoM	Milk Kefir	milk	Liquid	Starter	LW
+PFG_k_L_4_SM_S	Milk Kefir	milk	Liquid	Starter	LW
+PFG_k_L_p4_CoM	Milk Kefir	milk	Liquid	Starter	LW
+PFG_k_L_p4_SM	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Milk Kefir	milk	Liquid	Starter	LW
+	Tempeh	soy	Solid	Starter	Project: PRJNA605305
+	Tempeh	soy	Solid	Starter	Project: PRJNA605305
+	Injera	plant	Solid	Spontaneous	PRJNA504891
+	Milk Kefir	coconut milk	liquid	Starter	PG
+	Milk Kefir	soy	liquid	Starter	PG
+	Milk Kefir	coconut milk	liquid	Starter	PG
+	Milk Kefir	soy milk	liquid	Starter	PG
+	Milk Kefir	coconut milk	liquid	Starter	PG
+	Milk Kefir	soy milk	liquid	Starter	PG
+	Milk Kefir	coconut milk	liquid	Starter	PG
+	Milk Kefir	soy milk	liquid	Starter	PG
+	Milk Kefir	cconut milk	liquid	Starter	PG
+	Milk Kefir	soy milk	liquid	Starter	PG
+	Milk Kefir	coconut milk	liquid	Starter	PG
+	Milk Kefir	coy milk	liquid	Starter	PG
