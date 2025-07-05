@@ -50,7 +50,7 @@ setwd("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_
 meta <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/meta_insilico.csv")
 meta <- meta[,-c(7,8)]
 #######################
-mk_remove <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/mk_to_Remove.csv")
+mk_remove <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/mk_to_Remove.csv")#removing technical and sequencing replicates
 removed_samples <- mk_remove %>%
   filter(tolower(Time) == "remove") %>%
   pull(Sample)
