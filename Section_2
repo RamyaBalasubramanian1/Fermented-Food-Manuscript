@@ -271,7 +271,10 @@ kruskal_results <- call_long_relative_clean %>%
   ) %>%
   mutate(p_adj = p.adjust(p_value, method = "BH"))  # adjust for multiple testing
 ##################################
-write.csv(kruskal_results, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/impact_of_substrate_GMM_RA.csv")
+write.csv(kruskal_results, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/impact_of_substrate_GMM_RA.csv")#from this we know that substrate has an effect on the abundance of these pathways
+#question arises: are these pathway(abundance) selected by substrates
+#this will tell us if the food selects for the pathways
+#john leech suggested it would be best to plot them as lefse plots
 ###################################
 summary_stats <- left_join(summary_stats, kruskal_results, by = "Annotation")
 
