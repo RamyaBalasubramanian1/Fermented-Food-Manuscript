@@ -175,10 +175,9 @@ all_edges <- all_edges %>%
   mutate(source_id = match(source, nodes$name) - 1,
          target_id = match(target, nodes$name) - 1)
 
-# Final check for NA
+
 stopifnot(!any(is.na(all_edges$source_id)), !any(is.na(all_edges$target_id)))
 
-# Step 6: Plot Sankey
 P <- sankeyNetwork(Links = all_edges,
                    Nodes = nodes,
                    Source = "source_id",
@@ -215,11 +214,11 @@ wk_long_annotated$Module <- NULL
 names(wk_long_annotated)[names(wk_long_annotated) == "Annotation"] <- "Module"
 
 ###########
-# Step 1: Filter data
+#  Filter data
 filtered_data <- wk_long_annotated %>%
   filter(Contribution > 0) 
 
-# Step 2: Keep only taxa with >3 unique annotations
+# Keep only taxa with >3 unique annotations
 taxa_to_keep <- filtered_data %>%
   group_by(Taxon) %>%
   summarise(n_annotations = n_distinct(Superpathway), .groups = "drop") %>%
@@ -229,7 +228,7 @@ taxa_to_keep <- filtered_data %>%
 filtered_data <- filtered_data %>%
   filter(Taxon %in% taxa_to_keep)
 
-# Step 3: Create edges
+# Create edges
 # Taxon → Annotation
 edges1 <- filtered_data %>%
   distinct(Taxon, Superpathway) %>%
@@ -249,17 +248,15 @@ edges2 <- filtered_data %>%
 # Combine edges
 all_edges <- bind_rows(edges1, edges2)
 
-# Step 4: Create node list and map to IDs
+# Create node list and map to IDs
 nodes <- data.frame(name = unique(c(all_edges$source, all_edges$target)), stringsAsFactors = FALSE)
 
 all_edges <- all_edges %>%
   mutate(source_id = match(source, nodes$name) - 1,
          target_id = match(target, nodes$name) - 1)
 
-# Final check for NA
 stopifnot(!any(is.na(all_edges$source_id)), !any(is.na(all_edges$target_id)))
 
-# Step 5: Plot Sankey
 P <- sankeyNetwork(Links = all_edges,
                    Nodes = nodes,
                    Source = "source_id",
@@ -268,8 +265,6 @@ P <- sankeyNetwork(Links = all_edges,
                    NodeID = "name",
                    fontSize = 12,
                    nodeWidth = 30)
-
-# View
 P
 #######################################
 #######apply a 30% prevalence threshold#
@@ -277,11 +272,11 @@ P
 library(dplyr)
 library(networkD3)
 
-# Step 1: Filter valid contributions and exclude unwanted annotations
+#  Filter  contributions 
 filtered_data <- wk_long_annotated %>%
   filter(Contribution > 0) 
 
-# Step 2: Keep taxa present in *all* samples (based on Contribution > 0)
+#  Keep taxa present in *all* samples (based on Contribution > 0)
 total_samples <- filtered_data %>%
   distinct(Sample) %>%
   nrow()
@@ -296,7 +291,7 @@ taxa_prevalent <- filtered_data %>%
 filtered_data <- filtered_data %>%
   filter(Taxon %in% taxa_prevalent)
 
-# Step 3: Keep only taxa with >3 unique annotations
+#  Keep only taxa with >3 unique annotations
 taxa_to_keep <- filtered_data %>%
   group_by(Taxon) %>%
   summarise(n_annotations = n_distinct(Superpathway), .groups = "drop") %>%
@@ -306,7 +301,7 @@ taxa_to_keep <- filtered_data %>%
 filtered_data <- filtered_data %>%
   filter(Taxon %in% taxa_to_keep)
 
-# Step 4: Create edges
+#  Create edges
 # Taxon → Annotation
 edges1 <- filtered_data %>%
   distinct(Taxon, Superpathway) %>%
@@ -323,7 +318,7 @@ edges2 <- filtered_data %>%
          target = as.character(Level_2)) %>%
   select(source, target, value)
 
-# Step 5: Combine edges and create node list
+#  Combine edges and create node list
 all_edges <- bind_rows(edges1, edges2)
 
 nodes <- data.frame(name = unique(c(all_edges$source, all_edges$target)), stringsAsFactors = FALSE)
@@ -331,11 +326,7 @@ nodes <- data.frame(name = unique(c(all_edges$source, all_edges$target)), string
 all_edges <- all_edges %>%
   mutate(source_id = match(source, nodes$name) - 1,
          target_id = match(target, nodes$name) - 1)
-
-# Final check for NA
 stopifnot(!any(is.na(all_edges$source_id)), !any(is.na(all_edges$target_id)))
-
-# Step 6: Plot Sankey
 P <- sankeyNetwork(Links = all_edges,
                    Nodes = nodes,
                    Source = "source_id",
@@ -345,6 +336,5 @@ P <- sankeyNetwork(Links = all_edges,
                    fontSize = 12,
                    nodeWidth = 30)
 
-# View
 P
 ##########################################
