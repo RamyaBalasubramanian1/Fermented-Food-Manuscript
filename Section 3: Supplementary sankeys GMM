@@ -13,7 +13,6 @@ library(pheatmap)
 library(ComplexHeatmap)
 install.packages("coloRamPalette")
 library(colorRampPalette)
-# Install the circlize package if not already installed
 if (!requireNamespace("circlize", quietly = TRUE)) {
   install.packages("circlize")
 }
@@ -54,9 +53,6 @@ library(ggplot2)
 library(patchwork)
 ########################
 
-
-########################################################
-########################################################
 
 mk_strat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/milk_kefir/gmm_strat/modules.tsv")
 mk_strat <- row_to_names(mk_strat, 1)
