@@ -167,11 +167,10 @@ pairwise_results_df <- bind_rows(pairwise_results)
 ##############################################################################
 ##############################################################################
 #########################################################################
-# Create a new column for substrate comparison
+# Create  new column for substrate comparison
 pairwise_results_df <- pairwise_results_df %>%
   mutate(Comparison = paste(Substrate1, "vs", Substrate2, sep=" "))
 
-# Categorize significance levels as numeric values for Y-axis
 pairwise_results_df <- pairwise_results_df %>%
   mutate(Significance_Stars = case_when(
     p_value < 0.001 ~ 3,  # "***"
@@ -180,10 +179,9 @@ pairwise_results_df <- pairwise_results_df %>%
     TRUE ~ 0         # "NS"
   ))
 
-# Define factor labels for the Y-axis
+
 significance_labels <- c("NS", "*", "**", "***")
 
-# Dynamically generate colors for all comparisons
 unique_comparisons <- unique(pairwise_results_df$Comparison)
 comparison_colors <- setNames(rainbow(length(unique_comparisons)), unique_comparisons)
 
@@ -223,24 +221,19 @@ comparison_summary
 write.csv(pairwise_results_df_filtered, "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/pairwise_global_metabolomics.csv")
 ##############################################################################
 
-# Ensure Significance_Stars is numeric
 pairwise_results_df_filtered <- pairwise_results_df_filtered %>%
   mutate(Significance_Stars = as.numeric(as.character(Significance_Stars)))
 
-# Convert data into wide format for heatmap
 heatmap_data <- pairwise_results_df_filtered %>%
   select(Metabolite, Comparison, Significance_Stars) %>%
   pivot_wider(names_from = Comparison, values_from = Significance_Stars, values_fill = 0)
 
-# Set Metabolites as row names
 heatmap_matrix <- as.data.frame(heatmap_data)  # Keep it a dataframe initially
 rownames(heatmap_matrix) <- heatmap_matrix$Metabolite  # Assign row names
 heatmap_matrix <- heatmap_matrix[,-1]  # Remove Metabolite column
 
-# Convert to a matrix after setting row names
 heatmap_matrix <- as.matrix(heatmap_matrix)
 
-# Define column annotation (Color for each comparison)
 unique_comparisons <- colnames(heatmap_matrix)
 comparison_colors <- setNames(rainbow(length(unique_comparisons)), unique_comparisons)
 
@@ -277,28 +270,22 @@ metabolites <- as.data.frame(metabolites)
 #############################
 metabolites <- read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/final/pairwise_df.csv")
 
-# Ensure metabolites are matched with the heatmap matrix row names
 metabolites_matched <- metabolites[match(rownames(heatmap_matrix), metabolites$metabolites), ]
 
-# Convert Category to a factor (optional but helps avoid issues)
 metabolites_matched$Category <- as.factor(metabolites_matched$Category)
 
-# Define unique colors for categories (ensure named vector)
 unique_categories <- levels(metabolites_matched$Category)
 library(viridis)
 category_colors <- setNames(viridis(length(unique_categories), option = "C"), unique_categories)
 
-# Generate enough colors dynamically
 category_colors <- setNames(colorRampPalette(brewer.pal(11, "Set3"))(length(unique_categories)), unique_categories)
 
-# Create a row annotation for Metabolite Category
 row_annotation <- rowAnnotation(
   Category = metabolites_matched$Category,
   col = list(Category = category_colors),  # Apply the updated color palette
   annotation_legend_param = list(title = "Metabolite Category")
 )
 
-# Define column annotation (Color for each comparison)
 unique_comparisons <- colnames(heatmap_matrix)
 comparison_colors <- setNames(colorRampPalette(brewer.pal(11, "Set1"))(length(unique_comparisons)), unique_comparisons)
 
@@ -308,10 +295,8 @@ column_annotation <- HeatmapAnnotation(
   annotation_legend_param = list(title = "Comparison")
 )
 
-# Define color scale for heatmap
 col_fun <- colorRamp2(c(0, 1, 2, 3), c("white", "yellow", "orange", "red"))
 
-# Create the heatmap with row annotation
 hmap <- Heatmap(heatmap_matrix, 
                 name = "Significance", 
                 col = col_fun, 
@@ -329,31 +314,26 @@ hmap <- Heatmap(heatmap_matrix,
                   labels = c("NS", "*", "**", "***"),
                   direction = "vertical")
 )
-# Draw the heatmap with legend repositioned
+
 draw(hmap, heatmap_legend_side = "left", annotation_legend_side = "right")
 ##########################################
 #trying to facet
 ######################################################
 
 
-# Ensure metabolites are matched with the heatmap matrix row names
 metabolites_matched <- metabolites[match(rownames(heatmap_matrix), metabolites$metabolites), ]
 
-# Convert Category to a factor with a fixed order
 metabolites_matched$Category <- factor(metabolites_matched$Category, levels = unique(metabolites$Category))
 
-# Sort rows by Category
 sorted_indices <- order(metabolites_matched$Category)
 heatmap_matrix <- heatmap_matrix[sorted_indices, ]
 metabolites_matched <- metabolites_matched[sorted_indices, ]
 
-# Define unique colors for categories
 category_colors <- setNames(colorRampPalette(brewer.pal(8, "Set3"))(length(unique(metabolites_matched$Category))), unique(metabolites_matched$Category))
 
-# Define color scale for heatmap
+
 col_fun <- colorRamp2(c(0, 1, 2, 3), c("white", "yellow", "orange", "red"))
 
-# Split data by category
 heatmap_list <- lapply(split(heatmap_matrix, metabolites_matched$Category), function(mat) {
   Heatmap(as.matrix(mat), 
           name = "Significance", 
@@ -374,33 +354,27 @@ heatmap_list <- lapply(split(heatmap_matrix, metabolites_matched$Category), func
   )
 })
 
-# Create layout for multiple heatmaps (Faceting)
 grid.newpage()  # Clear previous plots
 do.call(grid.arrange, c(heatmap_list, ncol = 2))  # Arrange in 2 columns
 
-# Ensure metabolites are matched with the heatmap matrix row names
 metabolites_matched <- metabolites[match(rownames(heatmap_matrix), metabolites$metabolites), ]
 
-# Convert Category to a factor with a fixed order
 metabolites_matched$Category <- factor(metabolites_matched$Category, levels = unique(metabolites$Category))
 
-# Sort the heatmap matrix rows based on Category
+
 sorted_indices <- order(metabolites_matched$Category)  # Get sorting order
 heatmap_matrix <- heatmap_matrix[sorted_indices, ]  # Reorder matrix
 metabolites_matched <- metabolites_matched[sorted_indices, ]  # Reorder metadata accordingly
 
-# Define unique colors for categories (ensure named vector)
 unique_categories <- levels(metabolites_matched$Category)
 category_colors <- setNames(rainbow(length(unique_categories)), unique_categories)
 
-# Create a row annotation for Metabolite Category
 row_annotation <- rowAnnotation(
   Category = metabolites_matched$Category,
   col = list(Category = category_colors),  # Fixed: now a named vector
   annotation_legend_param = list(title = "Metabolite Category")
 )
 
-# Define column annotation (Color for each comparison)
 unique_comparisons <- colnames(heatmap_matrix)
 comparison_colors <- setNames(rainbow(length(unique_comparisons)), unique_comparisons)
 
@@ -410,10 +384,8 @@ column_annotation <- HeatmapAnnotation(
   annotation_legend_param = list(title = "Comparison")
 )
 
-# Define color scale for heatmap
 col_fun <- colorRamp2(c(0, 1, 2, 3), c("white", "yellow", "orange", "red"))
 
-# Create the heatmap with row annotation and category-based clustering
 hmap <- Heatmap(heatmap_matrix, 
                 name = "Significance", 
                 col = col_fun, 
