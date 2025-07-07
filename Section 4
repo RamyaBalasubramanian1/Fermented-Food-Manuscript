@@ -232,7 +232,6 @@ pca_kombucha <- pca_data %>% filter(Type %in% c("Kombucha", "Unfermented tea", "
 pca_milk <- pca_data %>% filter(Type %in% c("Unfermented Milk", "Milk Kefir"))
 pca_sauerkraut <- pca_data %>% filter(Type %in% c("Sauerkraut", "Sauerkraut Broth", "Kvass", "Kimchi"))
 
-# Updated PCA plotting function using Substrate for fill
 create_pca_plot <- function(pca_subset, title) {
   ggplot(pca_subset, aes(x = PC1, y = PC2, fill = Substrate, shape = Status, size = Status)) +
     geom_point(color = "black", stroke = 0.5) +
@@ -258,13 +257,11 @@ create_pca_plot <- function(pca_subset, title) {
     )
 }
 
-# Create individual plots using updated function
 p1 <- create_pca_plot(pca_coconut, "PCA - Coconut Milk Kefir & Unfermented Coconut Milk")
 p2 <- create_pca_plot(pca_kombucha, "PCA - Kombucha, Water Kefir, Unfermented Tea & Fig")
 p3 <- create_pca_plot(pca_milk, "PCA - Milk & Milk Kefir")
 p4 <- create_pca_plot(pca_sauerkraut, "PCA - Sauerkraut, Kvass, Kimchi & Sauerkraut Broth")
 
-# Combine all plots in a 2x2 layout using patchwork
 N <- (p1 | p2) /
   (p3 | p4)
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/pca_global_split.svg", plot = N, width = 12, height = 6, units = "in")
@@ -286,10 +283,9 @@ adonis_results <- adonis2(
 #including binaries in the same script
 #towards binaries
 
-# Extract the LOD row (assumed to be the last row)
 lod <- data[nrow(data), -1]  # Remove the first column (Customer.ID)
 
-# Remove the LOD row from the original data to focus on samples only
+
 data_samples <- data[-nrow(data), ]
 
 # Apply the condition: if value > LOD, set to 1; otherwise, set to 0
@@ -299,10 +295,9 @@ binary_data <- lapply(2:ncol(data_samples), function(i) {
   ifelse(data_samples[[i]] > lod[[i - 1]], 1, 0)
 })
 
-# Convert to data frame
+
 binary_df <- as.data.frame(do.call(cbind, binary_data))
 
-# Preserve column and row names
 colnames(binary_df) <- colnames(data_samples)[-1]
 rownames(binary_df) <- rownames(data_samples)
 ###########################################
@@ -359,7 +354,7 @@ meta_richness_long <- meta_richness %>%
     values_to = "Category"
   )
 
-# Plot
+
 library(ggplot2)
 
 P <- ggplot(meta_richness_long, aes(x = Category, y = Richness, fill = Category)) +
@@ -468,7 +463,6 @@ pcoa_plot <- ggplot(pcoa_df, aes(x = PC1, y = PC2, fill = Substrate, shape = Sta
     axis.title.y = element_text(size = 16, face = "bold")
   )
 
-# Display the plot
 print(pcoa_plot)
 
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/global_pca_jaccard.svg", plot = pcoa_plot, width = 12, height = 6, units = "in")
