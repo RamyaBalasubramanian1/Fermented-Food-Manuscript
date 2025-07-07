@@ -66,18 +66,15 @@ data <- data[,-1]
 ################################################
 
 
-# Apply CLR transformation
 clr_transformed_data <- clr(data)
 clr_transformed_data <- as.data.frame(clr_transformed_data)
 anyNA(clr_transformed_data)
 
-# View the transformed data
 head(clr_transformed_data)
 set.seed(101)
 # Perform PCA
 pca_results <- prcomp(data, scale. = TRUE)
 
-# Define a distinct color palette
 custom_colors_distinct <- c(
   "#FF5733", "#92A1CF", "#3357FF", "#FF33A8", "#FFD700",
   "#8B4513", "#40E0D0", "#FF6347", "#6A5ACD", "#7FFF00",
@@ -85,7 +82,6 @@ custom_colors_distinct <- c(
   "#2E8B57", "#DA70D6", "#9ACD32", "#FF1493", "#000080"
 )
 
-# Create PCA data frame with meta information
 pca_data <- as.data.frame(pca_results$x)
 pca_data <- pca_data[-37,]
 pca_data$Type <- meta$Type
@@ -101,7 +97,7 @@ explained_variance_labels <- paste0("PC", 1:length(explained_variance), " (", ex
 # Plot PCA with shape for Substrate and size for Status
 
 #######################################
-# Assign colors based on Substrate
+
 meta$Color <- substrate_colors[meta$Substrate]
 ############################################################################
 m <- ggplot(pca_data, aes(x = PC1, y = PC2, fill = Type, shape = Status, size = Status)) +
@@ -130,7 +126,7 @@ m <- ggplot(pca_data, aes(x = PC1, y = PC2, fill = Type, shape = Status, size = 
   )
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/pca_global.svg", plot = m, width = 8, height = 6, units = "in")
 #################################################################
-#aligning with the color palette
+
 
 m <- ggplot(pca_data, aes(x = PC1, y = PC2, fill = Substrate, shape = Status, size = Status)) +
   geom_point(color = "black", stroke = 1.5) +
@@ -178,13 +174,13 @@ m <- ggplot(pca_data, aes(x = PC1, y = PC2, fill = Substrate, shape = Status, si
   )
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/pca_global.svg", plot = m, width = 8, height = 6, units = "in")
 #################################################################
-# Define subsets
+
 pca_coconut <- pca_data %>% filter(Type %in% c("Coconut milk kefir", "Unfermented Coconut milk"))
 pca_kombucha <- pca_data %>% filter(Type %in% c("Kombucha", "Unfermented tea", "Water kefir", "Unfermented fig"))
 pca_milk <- pca_data %>% filter(Type %in% c("Unfermented Milk", "Milk Kefir"))
 pca_sauerkraut <- pca_data %>% filter(Type %in% c("Sauerkraut", "Sauerkraut Broth", "Kvass", "Kimchi"))
 
-# Function to create PCA plot
+# Function for PCA plot
 create_pca_plot <- function(pca_subset, title) {
   ggplot(pca_subset, aes(x = PC1, y = PC2, fill = Type, shape = Status, size = Status)) +
     geom_point(color = "black", stroke = 1.5) +
@@ -210,13 +206,12 @@ create_pca_plot <- function(pca_subset, title) {
     )
 }
 
-# Create individual plots
+
 p1 <- create_pca_plot(pca_coconut, "PCA - Coconut Milk Kefir & Unfermented Coconut Milk")
 p2 <- create_pca_plot(pca_kombucha, "PCA - Kombucha, Water Kefir, Unfermented Tea & Fig")
 p3 <- create_pca_plot(pca_milk, "PCA - Milk & Milk Kefir")
 p4 <- create_pca_plot(pca_sauerkraut, "PCA - Sauerkraut, Kvass, Kimchi & Sauerkraut Broth")
 
-# Combine all plots in a 2x2 layout
 n <- (p1 | p2) /
   (p3 | p4)
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/pca_global_split.svg", plot = n, width = 12, height = 6, units = "in")
@@ -226,7 +221,7 @@ ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master
 meta$Substrate[meta$Type %in% c("Coconut milk kefir", "Unfermented Coconut milk")] <- "Coconut Dairy"
 pca_data$Substrate <- meta$Substrate  # Refresh with the updated Substrate column
 
-# Define subsets by Type (keep this as is)
+
 pca_coconut <- pca_data %>% filter(Type %in% c("Coconut milk kefir", "Unfermented Coconut milk"))
 pca_kombucha <- pca_data %>% filter(Type %in% c("Kombucha", "Unfermented tea", "Water kefir", "Unfermented fig"))
 pca_milk <- pca_data %>% filter(Type %in% c("Unfermented Milk", "Milk Kefir"))
@@ -310,14 +305,14 @@ meta_richness <- merge(meta, binary_df[, c("id", "Richness")], by.x = "Customer.
 
 print(unique(meta_richness$Substrate))
 
-# Shapiro-Wilk test for normality of Richness
+# Shapiro-Wilk test for normality 
 shapiro_test <- shapiro.test(meta_richness$Richness)
 print(shapiro_test)
-# Convert categorical variables to factors
+
 meta_richness$Substrate <- as.factor(meta_richness$Substrate)
 meta_richness$Fermentation_type <- as.factor(meta_richness$Fermentation_type)
 
-# Ensure 'Richness' is numeric
+
 meta_richness$Richness <- as.numeric(meta_richness$Richness)
 
 print(str(meta_richness))  # Ensure proper structure
@@ -327,10 +322,9 @@ kruskal.test(Richness ~ Fermentation_type, data = meta_richness)
 kruskal.test(Richness ~ Status, data = meta_richness)
 
 ##########################
-# Fix label for coconut samples
+# Fix label for coconut 
 meta_richness$Substrate[meta_richness$Substrate == "Dairy alternate"] <- "Coconut Dairy"
 
-# Combine all relevant color palettes
 substrate_colors <- c(
   "Dairy" = "#1f77b4", "Sugar" = "#ff7f0e", "Brine" = "#1b9e77",
   "Coconut Dairy" = "#9467bd")
@@ -346,7 +340,6 @@ status_colors <- c("Fermented" = "#1f78b4", "Unfermented" = "#a6cee3")
 
 all_colors <- c(substrate_colors, type_colors, status_colors, TOF_colors)
 
-# Pivot to long format for faceting
 meta_richness_long <- meta_richness %>%
   tidyr::pivot_longer(
     cols = c("Substrate", "Status", "Fermentation_type"),
@@ -390,20 +383,20 @@ data <-  read.csv("C:/Users/ramya.Balasubramania/Desktop/paper_1/metabolomics/le
 data <- data[,-2]
 data <- data[-38,]
 
-# Extract the LOD row (assumed to be the last row)
+# Extract the LOD which is last row
 lod <- data[nrow(data), -1]  # Remove the first column (Customer.ID)
 
-# Remove the LOD row from the original data to focus on samples only
+
 data_samples <- data[-nrow(data), ]
 
 # Apply the condition: if value > LOD, set to 1; otherwise, set to 0
 binary_data <- data_samples
 binary_data[-1] <- lapply(2:ncol(data_samples), function(i) ifelse(data_samples[[i]] > lod[[i-1]], 1, 0))
-# Remove the Customer.ID column for calculations
+
 binary_matrix <- binary_data[, -1]
-# Calculate Jaccard distance
+
 jaccard_dist <- vegdist(binary_matrix, method = "jaccard")
-# Perform Principal Coordinates Analysis (PCoA)
+
 pcoa_result <- cmdscale(jaccard_dist, eig = TRUE, k = 2)  # k=2 for 2D plot
 
 pcoa_df <- data.frame(
@@ -413,13 +406,11 @@ pcoa_df <- data.frame(
 )
 
 colnames(pcoa_df)[colnames(pcoa_df) == "SampleID"] <- "Customer.ID"
-# Calculate variance explained for each axis
+
 variance_explained <- round(100 * pcoa_result$eig / sum(pcoa_result$eig), 2)
 
-# Merge the PCoA results with metadata based on Customer.ID
 pcoa_df <- merge(pcoa_df, metadata, by = "Customer.ID")
 
-# Plot with color by 'Type', shape by 'Status', and increased dot size
 x<- ggplot(pcoa_df, aes(x = PC1, y = PC2, color = Type, shape = Status)) +
   geom_point(size = 5) +  # Increased dot size
   labs(
@@ -435,7 +426,7 @@ pcoa_df$Substrate[pcoa_df$Substrate == "Coconut mik kefir"] <- "Coconut milk kef
 substrate_colors <- c(
   "Dairy" = "#1f77b4", "Sugar" = "#ff7f0e", "Brine" = "#1b9e77",
   "Dairy alternate" = "#9467bd")
-# Create PCoA plot with customized aesthetics
+
 pcoa_plot <- ggplot(pcoa_df, aes(x = PC1, y = PC2, fill = Substrate, shape = Status, size = Status)) +
   geom_point(color = "black", stroke = 1.5) +  # black border for points
   scale_fill_manual(
@@ -589,7 +580,7 @@ create_pca_plot <- function(pca_subset, title) {
           axis.title.y = element_text(size = 8, face = "bold")
     )
 }
-# Define subsets by Type (keep this as is)
+
 pca_coconut <- pca_data %>% filter(Type %in% c("Coconut milk kefir", "Unfermented Coconut milk"))
 pca_kombucha <- pca_data %>% filter(Type %in% c("Kombucha", "Unfermented tea", "Water kefir", "Unfermented fig"))
 pca_milk <- pca_data %>% filter(Type %in% c("Unfermented Milk", "Milk Kefir"))
@@ -625,7 +616,7 @@ filtered_metabolites <- meta_neuro %>%
 filtered_data <- data %>%
   select(id, `Study group`, all_of(filtered_metabolites))
 
-# Display the first few rows of the filtered dataset
+
 head(filtered_data)
 ######################################
 #sanity check to see only level 122b metabolites are reained in the data and meta_neuro
@@ -640,10 +631,8 @@ filtered_meta_neuro_metabolites <- meta_neuro %>%
 # Check if meta_neuro$Metabolite matches the column names in filtered_data
 matching_metabolites <- filtered_meta_neuro_metabolites %in% filtered_data_metabolites
 
-# Print mismatches
 mismatched_metabolites <- filtered_meta_neuro_metabolites[!matching_metabolites]
 
-# Display results
 if (length(mismatched_metabolites) > 0) {
   cat("Metabolites in meta_neuro that do NOT match column names in filtered_data:\n")
   print(mismatched_metabolites)
@@ -652,10 +641,9 @@ if (length(mismatched_metabolites) > 0) {
 }
 #################################################################################
 data <- filtered_data[,-2]
-# Extract the LOD row (assumed to be the last row)
+# Extract the LOD row 
 lod <- data[nrow(data), -1]  # Remove the first column (Customer.ID)
 
-# Remove the LOD row from the original data to focus on samples only
 data_samples <- data[-nrow(data), ]
 
 # Apply the condition: if value > LOD, set to 1; otherwise, set to 0
@@ -665,9 +653,9 @@ binary_data[-1] <- lapply(2:ncol(data_samples), function(i) ifelse(data_samples[
 #######################################
 # Remove the Customer.ID column for calculations
 binary_matrix <- binary_data[, -1]
-# Calculate Jaccard distance
+
 jaccard_dist <- vegdist(binary_matrix, method = "jaccard")
-# Perform Principal Coordinates Analysis (PCoA)
+
 pcoa_result <- cmdscale(jaccard_dist, eig = TRUE, k = 2)  # k=2 for 2D plot
 
 pcoa_df <- data.frame(
@@ -676,17 +664,16 @@ pcoa_df <- data.frame(
   PC2 = pcoa_result$points[, 2]
 )
 colnames(pcoa_df)[colnames(pcoa_df) == "SampleID"] <- "Customer.ID"
-# Calculate variance explained for each axis
+#calc variance
 variance_explained <- round(100 * pcoa_result$eig / sum(pcoa_result$eig), 2)
 
-# Merge the PCoA results with metadata based on Customer.ID
 pcoa_df <- merge(pcoa_df, meta, by = "Customer.ID")
 pcoa_df$Substrate[pcoa_df$Substrate == "Coconut mik kefir"] <- "Coconut milk kefir"
 TOF_colors <- c("Spontaneous" = "#1b9e77", Starter = "#ff7f0e")
 substrate_colors <- c(
   "Dairy" = "#1f77b4", "Sugar" = "#ff7f0e", "Brine" = "#1b9e77",
   "Dairy alternate" = "#9467bd")
-# Create PCoA plot with customized aesthetics
+
 pcoa_plot <- ggplot(pcoa_df, aes(x = PC1, y = PC2, fill = Substrate, shape = Status, size = Status)) +
   geom_point(color = "black", stroke = 1.5) +  # black border for points
   scale_fill_manual(
@@ -714,7 +701,6 @@ pcoa_plot <- ggplot(pcoa_df, aes(x = PC1, y = PC2, fill = Substrate, shape = Sta
     axis.title.y = element_text(size = 16, face = "bold")
   )
 
-# Display the plot
 print(pcoa_plot)
 
 
@@ -745,25 +731,20 @@ data_o <- data_o %>%
 #including binaries in the same script
 #towards binaries
 
-# Extract the LOD row (assumed to be the last row)
 lod <- data_o[nrow(data_o), -1]  # Remove the first column (Customer.ID)
-
-# Remove the LOD row from the original data to focus on samples only
 data_samples <- data_o[-nrow(data_o), ]
 
 # Apply the condition: if value > LOD, set to 1; otherwise, set to 0
 binary_data <- data_samples
 binary_data[,-1] <- lapply(2:ncol(data_samples), function(i) ifelse(data_samples[[i]] > lod[[i-1]], 1, 0))
-# Remove the Customer.ID column for calculations
+
 rownames(binary_data) <- NULL
 binary_data <- column_to_rownames(binary_data, var = "id")
 binary_matrix <- binary_data
 ############################################################################################################
 ############################################################################################################
-# Convert row names to a column named "id" if needed
-binary_data <- data.frame(id = rownames(binary_data), binary_data, row.names = NULL)
 
-# Check if 'id' column exists
+binary_data <- data.frame(id = rownames(binary_data), binary_data, row.names = NULL)
 head(binary_data)  # Ensure 'id' is present
 
 # Calculate richness (number of detected metabolites per sample)
@@ -810,7 +791,7 @@ substrate_colors <- c(
   "Seed" = "#7f7f7f",
   "Palm Tree" = "#B565A7"
 )
-# Create ggplot with boxed facet panels
+
 P <- ggplot(meta_richness_long, aes(x = Category, y = Richness, fill = Category)) +
   geom_boxplot(alpha = 0.5, outlier.shape = NA) +  # Boxplot without outlier dots
   geom_jitter(width = 0.2, size = 3, alpha = 0.7) +  # Scatter points for individual samples
@@ -879,11 +860,9 @@ P <- ggplot(meta_richness_long, aes(x = Category, y = Richness, fill = Category)
 
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/richness_neuro.svg", plot = P, width = 12, height = 6, units = "in")
 
-# Convert categorical variables to factors
 meta_richness$Substrate <- as.factor(meta_richness$Substrate)
 meta_richness$Fermentation_type <- as.factor(meta_richness$Fermentation_type)
 
-# Ensure 'Richness' is numeric
 meta_richness$Richness <- as.numeric(meta_richness$Richness)
 
 print(str(meta_richness))  # Ensure proper structure
@@ -963,7 +942,7 @@ all_long <- all_data %>%
 #   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 #maybe split between pages
-#prev plor only will show the global p
+#prev plot only will show the global p
 #effect of metabolite er substate
 
 # # Function to generate paginated plots
@@ -1025,7 +1004,7 @@ for (met in unique(all_long$Metabolite)) {
   
   pairwise_results[[met]] <- test_df
 }
-#the bove code applies t test whereever normal other wise applied pairwise wilcox
+#the above code applies t test whereever normal other wise applied pairwise wilcox
 #need to depo this resultas a csv?
 pairwise_results_df <- bind_rows(pairwise_results)
 
@@ -1033,11 +1012,11 @@ pairwise_results_df <- bind_rows(pairwise_results)
 ##############################################################################
 ##############################################################################
 #########################################################################
-# Create a new column for substrate comparison
+# Create  new column for comp
 pairwise_results_df <- pairwise_results_df %>%
   mutate(Comparison = paste(Substrate1, "vs", Substrate2, sep=" "))
 
-# Categorize significance levels as numeric values for Y-axis
+
 pairwise_results_df <- pairwise_results_df %>%
   mutate(Significance_Stars = case_when(
     p_value < 0.001 ~ 3,  # "***"
@@ -1046,14 +1025,11 @@ pairwise_results_df <- pairwise_results_df %>%
     TRUE ~ 0         # "NS"
   ))
 
-# Define factor labels for the Y-axis
 significance_labels <- c("NS", "*", "**", "***")
 
-# Dynamically generate colors for all comparisons
 unique_comparisons <- unique(pairwise_results_df$Comparison)
 comparison_colors <- setNames(rainbow(length(unique_comparisons)), unique_comparisons)
 
-# Create the plot
 ggplot(pairwise_results_df, aes(x = Metabolite, y = Significance_Stars, color = Comparison)) +
   geom_jitter(width = 0.3, height = 0.2, size = 3, alpha = 0.7) +  # Jitter to avoid overlap
   scale_y_continuous(breaks = 0:3, labels = significance_labels) +  # Set significance levels
@@ -1177,7 +1153,7 @@ sig_metabolites <- unique(c(top_sugar_metabolites, top_dairy_metabolites, top_da
 heatmap_data <- all_data %>%
   select(Status, Substrate, all_of(sig_metabolites))
 
-# Create a unique row identifier
+# Create unique row id
 heatmap_data <- heatmap_data %>%
   mutate(Sample_ID = paste(Status, Substrate, row_number(), sep = "_")) %>%
   column_to_rownames(var = "Sample_ID")
@@ -1252,7 +1228,7 @@ metabolite_levels <- levels[1, ]  # Extract first row (metabolite levels)
 metabolite_levels <- as.numeric(metabolite_levels)  # Convert to numeric, introducing NAs for non-numeric
 names(metabolite_levels) <- colnames(levels)  # Assign metabolite names as keys
 
-# Remove  NAs (non-numeric entries)
+# Remove  NAs 
 metabolite_levels <- metabolite_levels[!is.na(metabolite_levels)]
 
 
@@ -1420,10 +1396,8 @@ lod_values <- data[nrow(data), ]
 lod_values <- data[nrow(data), ]
 data <- data[-nrow(data), ]  # Remove the last row to keep only the data
 
-# Identify common columns in `data` and `lod_values`, excluding the first column in `data`
 common_cols <- intersect(names(data)[-c(1,2)], names(lod_values))
 
-# Apply the LOD replacement for each column in `data` that has a corresponding LOD in `lod_values`
 for (col in common_cols) {
   data[[col]] <- ifelse(as.numeric(data[[col]]) < as.numeric(lod_values[[col]]), 
                         as.numeric(lod_values[[col]]), 
@@ -1432,23 +1406,20 @@ for (col in common_cols) {
 data <- data[,-c(1,2)]
 set.seed(123)
 ############################
-# Apply CLR transformation
+
 clr_transformed_data <- clr(data)
 clr_transformed_data <- as.data.frame(clr_transformed_data)
 anyNA(clr_transformed_data)
 
-# View the transformed data
+
 head(clr_transformed_data)
 set.seed(101)
 #################################################
 #################################################
-# Load necessary libraries
+
 library(pheatmap)
 library(dplyr)
 
-# Assuming clr_transformed_data and meta are already loaded as data frames
-
-# Ensure row names of clr_transformed_data match meta for annotation
 rownames(meta) <- meta$Customer.ID
 meta <- meta %>% select(-Customer.ID)  # Remove redundant column
 meta <- meta %>%
@@ -1562,26 +1533,25 @@ for (col in common_cols) {
 data <- data[,-c(1,2)]
 
 ############################
-# Apply CLR transformation
+
 clr_transformed_data <- clr(data)
 clr_transformed_data <- as.data.frame(clr_transformed_data)
 anyNA(clr_transformed_data)
 
-# View the transformed data
 head(clr_transformed_data)
 set.seed(101)
 #######################################
-# Calculate Aitchison distance
+
 aitchison_distance <- as.matrix(dist(clr_transformed_data, method = "euclidean"))
 
-# Convert the distance matrix to a `dist` object if not already
+
 aitchison_dist <- as.dist(aitchison_distance)
 # Ensure meta table rownames match the sample IDs in the distance matrix
 rownames(meta) <- meta$Customer.ID
 meta <- meta[rownames(aitchison_distance), ]  # Align meta with distance matrix
-# Perform hierarchical clustering
+# Perform h clust
 hclust_result <- hclust(aitchison_dist, method = "ward.D2")
-# Convert hclust to a dendrogram
+# Convert hclust to a dendro
 dendro <- as.dendrogram(hclust_result)
 # Compute silhouette scores for a range of cluster numbers
 sil_scores <- lapply(2:10, function(k) {
@@ -1589,13 +1559,12 @@ sil_scores <- lapply(2:10, function(k) {
   silhouette(cluster_labels, dist = aitchison_dist)  # Compute silhouette
 })
 
-# Extract the average silhouette width for each number of clusters
+# Extract  average silhouette width for cluster (each)
 avg_sil <- sapply(sil_scores, function(s) mean(s[, 3]))  # Silhouette width is in the third column
 
-# Increase plot margins
+#  plot margins
 par(mar = c(5, 5, 4, 2))  # Adjust bottom, left, top, and right margins
 
-# Recreate the silhouette plot
 plot(2:10, avg_sil, type = "b", pch = 19, col = "blue",
      main = "Silhouette Analysis for Optimal Clusters",
      xlab = "Number of Clusters", ylab = "Average Silhouette Width")
@@ -1616,10 +1585,9 @@ meta <- meta[rownames(aitchison_distance), ]  # Align metadata
 # Replace sample IDs with substrates in tree labels
 phylo_tree$tip.label <- meta$Substrate[match(phylo_tree$tip.label, meta$Customer.ID)]
 
-# Assign colors for clusters (halo effect)
 cluster_colors <- setNames(rainbow(num_clusters), unique(meta$Cluster))
 cluster_map <- setNames(meta$Cluster, rownames(meta))
-# Create the circular dendrogram **with legend for cluster colors**
+
 p <- ggtree(phylo_tree, layout = "circular", branch.length = "none") + 
   geom_tiplab(aes(label = label), 
               size = 4, fontface = "bold", align = TRUE, hjust = 0.5, offset = 1.5) +  # Move labels outward
@@ -1629,10 +1597,7 @@ p <- ggtree(phylo_tree, layout = "circular", branch.length = "none") +
   scale_fill_manual(name = "Cluster", values = cluster_colors, labels = unique(meta$Cluster))+
   labs(title = "Clustering of foods based on neuromodultory content", fill = "Cluster") +
   theme(legend.position = "right")  # Legend
-
-
-# Display the plot
-print(p) 
+p
 ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_5/ggtree.svg", plot = p, width = 12, height = 6, units = "in")
 
 meta$Cluster <- clusters  
@@ -1696,7 +1661,7 @@ status_colors <- c(
 # Use only selected columns for annotation (excluding Customer.ID)
 annotation_df <- meta[, c("Type", "Status", "Substrate", "Cluster")]
 
-# Add cluster colors (if needed)
+# Add cluster colors 
 annotation_colors$Cluster <- setNames(RColorBrewer::brewer.pal(4, "Set2"), unique(annotation_df$Cluster))
 # Define consistent cluster colors (adjust `Set2` or `rainbow` if needed)
 cluster_levels <- sort(unique(meta$Cluster))  # Ensure consistent order
@@ -1783,7 +1748,6 @@ clusters_2 <- cutree(hclust_result, k = num_clusters)  # Cut into 4 clusters
 meta$Cluster <- clusters_2[meta$Customer.ID]
 #############################################################################
 #############################################################################
-
 #we want this as a phyloseq object
 #trying new ways to merge tables
 clr_data <- t(clr_transformed_data)
@@ -1867,7 +1831,7 @@ metabolite_analysis <- data %>%
 #Tests whether cluster affects each metabolite individually
 # this is different from the above as we check if the cluser affects the abundance of all metabolites together
 
-# Adjust p-values for multiple testing (optional)
+
 metabolite_analysis <- metabolite_analysis %>%
   mutate(adjusted_p_value = p.adjust(p_value, method = "BH"))
 
@@ -1877,7 +1841,7 @@ key_metabolites <- metabolite_analysis %>%
   arrange(OTU, adjusted_p_value)
 #need to clean as i get as factor in the cluster column
 
-# Clean up the Cluster column
+#cleaning for aesthetics
 key_metabolites <- key_metabolites %>%
   mutate(Cluster = str_replace(Cluster, "as.factor\\(Cluster\\)", "Cluster"))
 #however this considers the first metabolite as the reference metabolite
@@ -1966,6 +1930,7 @@ pheatmap(presence_absence_matrix,
 
 ################################################################################
 # Create a list of OTUs for each cluster
+#otu here is metab
 metabolites_by_cluster <- key_metabolites_zero %>%
   group_by(Cluster) %>%
   summarise(metabolites = list(unique(OTU))) %>%
@@ -2019,7 +1984,7 @@ upset(fromList(metabolites_by_cluster),
       nsets = length(metabolites_by_cluster), 
       order.by = "freq")
 
-#again this doent tell me much
+#again this doesnt tell me much
 
 
 ################################################################################
@@ -2140,8 +2105,7 @@ filter_by_co_occurrence <- function(df, metadata, column = "Substrate") {
 
 # Get list of metabolites that are present in all samples for each Substrate
 co_occurring_metabolites <- filter_by_co_occurrence(binary_data, meta, column = "Substrate")
-
-# Generate Jaccard similarity matrices per Substrate & count unique metabolites
+#generat a PA plot
 substrate_metabolite_counts <- data.frame(Substrate = character(), Metabolite_Count = integer(), stringsAsFactors = FALSE)
 
 for (s in names(co_occurring_metabolites)) {
@@ -2149,24 +2113,21 @@ for (s in names(co_occurring_metabolites)) {
   if (length(metabolites) < 2) next  # Skip if not enough metabolites for comparison
   
   subset_data <- binary_data[rownames(meta[meta$Substrate == s, ]), metabolites, drop = FALSE]
-  
-  # Compute Jaccard similarity
+
   jaccard_matrix <- vegdist(t(subset_data), method = "jaccard")
   
-  # Convert distance to similarity
   jaccard_similarity <- 1 - as.matrix(jaccard_matrix)
   
-  # Convert to long format
+
   jaccard_long <- as.data.frame(as.table(jaccard_similarity))
   colnames(jaccard_long) <- c("Metabolite1", "Metabolite2", "Jaccard_Similarity")
   
   # Filter strong co-occurrences (Jaccard similarity > 0.7)
   network_data <- jaccard_long %>% filter(Jaccard_Similarity > 0.7)
   
-  # Count unique metabolites in the co-occurrence network
-  unique_metabolites <- unique(c(network_data$Metabolite1, network_data$Metabolite2))
   
-  # Store the results
+  unique_metabolites <- unique(c(network_data$Metabolite1, network_data$Metabolite2))
+
   substrate_metabolite_counts <- rbind(substrate_metabolite_counts, 
                                        data.frame(Substrate = s, Metabolite_Count = length(unique_metabolites)))
 }
@@ -2174,7 +2135,7 @@ for (s in names(co_occurring_metabolites)) {
 # Display results sorted by most co-occurring metabolites
 substrate_metabolite_counts <- substrate_metabolite_counts %>% arrange(desc(Metabolite_Count))
 
-# Print the table
+
 print(substrate_metabolite_counts)
 ##########################################################################################
 ##########################################################################################
@@ -2186,12 +2147,10 @@ co_occurrence_matrix <- as.data.frame(matrix(0, nrow = length(unique(unlist(co_o
 colnames(co_occurrence_matrix) <- names(co_occurring_metabolites)
 rownames(co_occurrence_matrix) <- unique(unlist(co_occurring_metabolites))
 
-# Fill in presence data
 for (s in names(co_occurring_metabolites)) {
   co_occurrence_matrix[co_occurring_metabolites[[s]], s] <- 1
 }
 
-# Plot Upset
 upset(co_occurrence_matrix, sets = colnames(co_occurrence_matrix), 
       order.by = "freq", mainbar.y.label = "Metabolite Overlap", 
       sets.x.label = "Number of Metabolites")
@@ -2204,46 +2163,41 @@ co_occurrence_matrix <- as.data.frame(matrix(0,
 colnames(co_occurrence_matrix) <- names(co_occurring_metabolites)
 rownames(co_occurrence_matrix) <- unique(unlist(co_occurring_metabolites))
 
-# Fill in presence data
+
 for (s in names(co_occurring_metabolites)) {
   co_occurrence_matrix[co_occurring_metabolites[[s]], s] <- 1
 }
 
-# Convert to long format for UpSet analysis
 co_occurrence_long <- co_occurrence_matrix %>%
   mutate(Metabolite = rownames(.)) %>%
   pivot_longer(-Metabolite, names_to = "Substrate", values_to = "Presence")
 
-# Identify unique and shared metabolites across substrates
+
 shared_metabolites <- co_occurrence_long %>%
   group_by(Metabolite) %>%
   summarise(Shared_Substrates = paste(Substrate[Presence == 1], collapse = ", "),
             Count = sum(Presence)) %>%
   arrange(desc(Count))
 
-# Display the result as a table
 print(shared_metabolites)
 shared_metabolites <- as.data.frame(shared_metabolites)
 ######################################################################################################
 ######################################################################################################
 
-# Create a binary matrix of co-occurring metabolites per substrate
 co_occurrence_matrix <- as.data.frame(matrix(0, 
                                              nrow = length(unique(unlist(co_occurring_metabolites))),
                                              ncol = length(co_occurring_metabolites)))
 colnames(co_occurrence_matrix) <- names(co_occurring_metabolites)
 rownames(co_occurrence_matrix) <- unique(unlist(co_occurring_metabolites))
 
-# Fill in presence data
 for (s in names(co_occurring_metabolites)) {
   co_occurrence_matrix[co_occurring_metabolites[[s]], s] <- 1
 }
 
-# Assign colors to each substrate
 library(RColorBrewer)
 num_substrates <- length(colnames(co_occurrence_matrix))
 substrate_colors <- brewer.pal(num_substrates, "Set2")  # Use Set2 color palette
-# Compute total number of metabolites per substrate
+
 total_metabolites_per_substrate <- colSums(co_occurrence_matrix)
 # Generate UpSet plot with colors and exact metabolite counts
 upset(co_occurrence_matrix, 
