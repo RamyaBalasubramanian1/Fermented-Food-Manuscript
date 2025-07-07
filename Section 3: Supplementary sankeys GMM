@@ -52,7 +52,7 @@ library(ggraph)
 library(ggplot2)
 library(patchwork)
 ########################
-
+#core biome per substrate
 
 mk_strat <- read.table("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/milk_kefir/gmm_strat/modules.tsv")
 mk_strat <- row_to_names(mk_strat, 1)
