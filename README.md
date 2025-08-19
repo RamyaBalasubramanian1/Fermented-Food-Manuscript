@@ -1,3 +1,2 @@
 # Manuscript
-Section-wise breakdown of final scripts
-codes to make the plots of each section
+Section-wise breakdown of final scripts employed to make plots depicted in the manuscript
