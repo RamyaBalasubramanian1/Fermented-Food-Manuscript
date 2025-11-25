@@ -1493,6 +1493,11 @@ print(adonis_result)
 ##########################################
 #nuance within milk kefir and water kefir
 #############################
+
+library(tidyr)
+library(ggplot2)
+library(dplyr)
+library(stringr)
 meta <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/meta_insilico.csv")
 meta <- meta[,-c(7,8)]
 meta <- meta[meta$Type.of.fermentation != "Not applicable",]
@@ -1615,13 +1620,14 @@ mk3 <- mk2 %>%
   filter(!is.na(geo))                  # keep only rows with geo present
 mk3 <- mk3 %>% mutate(geo = trimws(geo))
 
-ggplot(mk3, aes(x = reorder(geo, Richness, FUN = median, na.rm = TRUE), y = Richness)) +
+mk_country <- ggplot(mk3, aes(x = reorder(geo, Richness, FUN = median, na.rm = TRUE), y = Richness)) +
   geom_boxplot(outlier.shape = NA) +
   geom_jitter(width = 0.2, height = 0, alpha = 0.5, size = 1.8) +
-  labs(x = "Geography", y = "Richness") +
+  labs(x = "Geography", y = "Richness of GBM pathways") +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ###################
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_1/mk_country_richness_gbm.svg", plot = mk_country, width = 8, height = 6, units = "in")
 ###################
 mk_species <- read.csv("C:/Users/Ramya.Balasubramania/Desktop/paper_1/drafts/science of food/liam walsh milk kefir species.csv")
 mk_species <- mk_species[-1,]
@@ -1760,9 +1766,8 @@ ids <- unique(wk3$original_id)
 wk_species_keep <- wk_species %>%
   mutate(sample = as.character(sample)) %>%
   filter(sample %in% ids)
-library(dplyr)
-library(tidyr)
-library(ggplot2)
+
+
 
 ## 0) Map samples → geo and richness group
 loc_map <- wk3 %>%
@@ -1812,3 +1817,120 @@ ggplot(sp_country, aes(x = geo, y = abundance, fill = Species2)) +
   scale_y_continuous(labels = scales::percent_format()) +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+##########################
+##########################
+dairy <- richness_clean %>% 
+  filter(
+    Substrate == "Dairy")
+
+dairy_sub <- dairy %>%
+  mutate(
+    # clean names a bit
+    Fermented.food.category = Fermented.food.category |>
+      str_trim() |>
+      str_replace("(?i)^wagashi (rind|core)$", "Wagashi"),
+    
+    # collapse kefir types into one subtype
+    Dairy_subtype = if_else(
+      Fermented.food.category %in% c("Dairy Kefir",
+                                     "Dairy kefir",
+                                     "Raw Dairy kefir",
+                                     "Pasteurized Dairy kefir"),
+      "Dairy kefir",
+      "Other dairy"
+    ),
+    
+    # color variable: all kefirs -> "Kefir", others keep their name
+    product_colour = case_when(
+      Fermented.food.category %in% c("Dairy Kefir",
+                                     "Dairy kefir",
+                                     "Raw Dairy kefir",
+                                     "Pasteurized Dairy kefir") ~ "Kefir",
+      TRUE ~ Fermented.food.category
+    )
+  )
+#######################################
+########################################
+p_dairy <- ggplot(dairy_sub, aes(x = Dairy_subtype, y = Richness)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(
+    aes(color = product_colour),
+    width = 0.15,
+    height = 0,
+    size = 2,
+    alpha = 0.7
+  ) +
+  theme_bw() +
+  labs(
+    x = "",
+    y = "Functional richness",
+    color = "Fermented food subtype"
+  )
+
+ggsave(
+  "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_1/within_dairy_richness_comparison.svg",
+  plot = p_dairy,
+  width = 8,
+  height = 6,
+  units = "in"
+)
+################################
+sugar <- richness_clean %>% 
+  filter(
+    Substrate == "Sugar")
+unique(sugar$Fermented.food.category)
+head(sugar)
+library(dplyr)
+library(ggplot2)
+
+# subset sugar ferments
+sugar <- richness_clean %>% 
+  filter(Substrate == "Sugar")
+
+# create subtype and colour variable
+sugar_sub <- sugar %>%
+  mutate(
+    # collapse to 2 groups for x-axis
+    Sugar_subtype = if_else(
+      Fermented.food.category == "Water kefir",
+      "Water kefir",
+      "Other sugar"
+    ),
+    # colour: all Water kefir same, others keep their own label
+    product_colour = if_else(
+      Fermented.food.category == "Water kefir",
+      "Water kefir",
+      Fermented.food.category
+    )
+  )
+
+# check
+table(sugar_sub$Sugar_subtype)
+unique(sugar_sub$product_colour)
+
+# plot: boxplot + jitter
+p_sugar <- ggplot(sugar_sub, aes(x = Sugar_subtype, y = Richness)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(
+    aes(color = product_colour),
+    width = 0.15,
+    height = 0,
+    size = 2,
+    alpha = 0.7
+  ) +
+  theme_bw() +
+  labs(
+    x = "",
+    y = "Functional richness",
+    color = "Fermented food subtype"
+  )
+
+p_sugar
+ggsave(
+  "C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_1/within_sugar_richness_comparison.svg",
+  plot = p_sugar,
+  width = 8,
+  height = 6,
+  units = "in"
+)
+
