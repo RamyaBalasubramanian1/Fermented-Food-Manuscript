@@ -1933,4 +1933,121 @@ ggsave(
   height = 6,
   units = "in"
 )
+#############
+call <- all
+call <- t(call)
+colnames(call) <- call[1,]
+call <- call[-1,]
+#########################################
+
+call <- as.data.frame(call)
+call[] <- lapply(call, function(x) as.numeric(as.character(x)))  # force numeric
+
+
+call[is.na(call)] <- 0
+
+
+n_zeroes <- rowSums(call == 0)
+call <- call[n_zeroes <= round(ncol(call) * 0.90),]
+
+call <- clr_c(call)
+rownames(call) <- gsub("\\.", "-", rownames(call))
+data.a.pca <- prcomp(call)
+################################
+# overlap
+overlap <- intersect(rownames(call), meta$ID)
+
+# filtered + ordered metadata
+meta_keep <- meta %>%
+  filter(ID %in% overlap) %>%
+  arrange(match(ID, rownames(call)))
+
+# (optional) align call to the kept meta, just in case
+call_keep <- call[meta_keep$ID, , drop = FALSE]
+# PCA on CLR matrix `call`; facet by Substrate; color by Fermented.food.category
+library(dplyr)
+library(ggplot2)
+
+# 1) Align meta and CLR matrix
+stopifnot(all(c("ID","Substrate","Fermented.food.category") %in% names(meta_keep)))
+ids_overlap <- intersect(rownames(call), meta_keep$ID)
+meta_pca <- meta_keep %>%
+  dplyr::filter(ID %in% ids_overlap) %>%
+  dplyr::arrange(match(ID, ids_overlap))
+X <- as.matrix(call[meta_pca$ID, , drop = FALSE])
+
+# 2) Drop zero-variance features (if any)
+keep_cols <- apply(X, 2, function(z) stats::var(z, na.rm = TRUE) > 0)
+X <- X[, keep_cols, drop = FALSE]
+
+# 3) PCA (CLR: center=TRUE, scale=FALSE)
+pc <- prcomp(X, center = TRUE, scale. = FALSE)
+var_exp <- (pc$sdev^2) / sum(pc$sdev^2)
+pct1 <- round(100 * var_exp[1], 1)
+pct2 <- round(100 * var_exp[2], 1)
+
+# 4) Scores + metadata
+scores <- as.data.frame(pc$x[, 1:2, drop = FALSE]) %>%
+  mutate(
+    ID = meta_pca$ID,
+    Substrate = meta_pca$Substrate,
+    TOF = meta_pca$Type.of.fermentation,
+    Fermented.food.category = meta_pca$Fermented.food.category
+  )
+# Case-insensitive filter (recommended)
+scores_sugar <- scores %>%
+  filter(str_detect(Substrate, regex("^sugar$", ignore_case = TRUE)))
+pca_sugar<- ggplot(scores_sugar, aes(PC1, PC2, fill = Fermented.food.category)) +
+  geom_point(shape = 21, size = 2.8, stroke = 0.7, color = "black") +
+  facet_wrap(~ Substrate, scales = "free") +
+  labs(x = paste0("PC1 (", pct1, "%)"),
+       y = paste0("PC2 (", pct2, "%)"),
+       fill = "Fermented food") +
+  theme_minimal()
+scores_dairy <- scores %>%
+  filter(str_detect(Substrate, regex("^dairy$", ignore_case = TRUE)))
+scores_dairy <- scores_dairy %>%
+  mutate(
+    Fermented.food.category =
+      Fermented.food.category %>%
+      stringr::str_trim() %>%
+      # Kefir variants → "Dairy Kefir"
+      stringr::str_replace(stringr::regex("^raw\\s*dairy\\s*kefir$", ignore_case = TRUE), "Dairy Kefir") %>%
+      stringr::str_replace(stringr::regex("^dairy\\s*kefir$",        ignore_case = TRUE), "Dairy Kefir") %>%
+      stringr::str_replace(stringr::regex("^pasteuri[sz]ed\\s+dairy\\s+kefir$", ignore_case = TRUE), "Dairy Kefir") %>%
+      # Wagashi rind/core → "Wagashi"
+      stringr::str_replace(stringr::regex("^wagashi\\s+(rind|core)$", ignore_case = TRUE), "Wagashi")
+  )
+pca_dairy<- ggplot(scores_dairy, aes(PC1, PC2, fill = Fermented.food.category)) +
+  geom_point(shape = 21, size = 2.8, stroke = 0.7, color = "black") +
+  facet_wrap(~ Substrate, scales = "free") +
+  labs(x = paste0("PC1 (", pct1, "%)"),
+       y = paste0("PC2 (", pct2, "%)"),
+       fill = "Fermented food") +
+  theme_minimal()
+scores_brine <- scores %>%
+  filter(str_detect(Substrate, regex("^brine$", ignore_case = TRUE)))
+pca_brine <- ggplot(scores_brine, aes(PC1, PC2, fill = Fermented.food.category)) +
+  geom_point(shape = 21, size = 2.8, stroke = 0.7, color = "black") +
+  facet_wrap(~ Substrate, scales = "free") +
+  labs(x = paste0("PC1 (", pct1, "%)"),
+       y = paste0("PC2 (", pct2, "%)"),
+       fill = "Fermented food") +
+  theme_minimal()
+all_sub <- ggplot(scores, aes(PC1, PC2, color = TOF)) +
+  geom_point(size = 2, alpha = 0.9) +
+  facet_wrap(~ Substrate, scales = "free") +
+  labs(
+    x = paste0("PC1 (", pct1, "%)"),
+    y = paste0("PC2 (", pct2, "%)"),
+    color = "Fermented food",
+    title = "PCA of CLR-transformed profiles",
+    subtitle = "Faceted by Substrate; colored by Fermented food category"
+  ) +
+  theme_bw() +
+  theme(legend.position = "bottom")
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_1/withinsubrine.svg", plot = pca_brine, width = 8, height = 6, units = "in")
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_1/withinsubsug.svg", plot = pca_sugar, width = 8, height = 6, units = "in")
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_1/withinsubdairy.svg", plot = pca_dairy, width = 12, height = 6, units = "in")
+ggsave("C:/Users/Ramya.Balasubramania/Desktop/paper_1/IN-SILICO/in-silico_master_file/final_figs/section_1/withinsubpca.svg", plot = all_sub, width = 12, height = 6, units = "in")
 
