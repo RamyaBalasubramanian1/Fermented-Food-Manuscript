@@ -458,8 +458,7 @@ r2
 emm_sub  <- emmeans(m_nb, ~ Substrate,               type="response")
 emm_type <- emmeans(m_nb, ~ Type.of.fermentation,    type="response")
 emm_state<- emmeans(m_nb, ~ State,                    type="response")
-
-# Pairwise 
+ 
 pw_sub   <- pairs(emm_sub,   adjust="tukey", type="response")
 pw_type  <- pairs(emm_type,  adjust="tukey", type="response")
 pw_state <- pairs(emm_state, adjust="tukey", type="response")
@@ -718,7 +717,7 @@ loadings <- data.a.pca$rotation[, 1:2]
 loadings <- as.data.frame(loadings)
 loadings$Module <- rownames(loadings)
 
-# show top contributors as pathways
+# show top contributor
 top_features <- loadings[order(abs(loadings$PC1) + abs(loadings$PC2), decreasing = TRUE), ]
 top_features <- head(top_features, 5)
 
@@ -770,7 +769,7 @@ call <- t(call)
 colnames(call) <- call[1,]
 call <- call[-1,]
 #########################################
-# double check if its a data frame and numeric
+# double check
 call <- as.data.frame(call)
 call[] <- lapply(call, function(x) as.numeric(as.character(x)))  # force numeric
 
@@ -820,7 +819,7 @@ meta_aln$State                <- factor(meta_aln$State)
 libsize <- rowSums(Y)
 off <- log(pmax(libsize, 1))
 
-# Fit multivariate GLM (Negative Binomial)
+# Fit multivariate GLM (Neg Bin)
 fit <- manyglm(Y ~ Type.of.fermentation + Substrate + State,
                data   = meta_aln,
                family = "negative.binomial",
@@ -1619,7 +1618,7 @@ mk3 <- mk2 %>%
          geo = na_if(geo, "#N/A")) %>% # turn "#N/A" into real NA
   filter(!is.na(geo))                  # keep only rows with geo present
 mk3 <- mk3 %>% mutate(geo = trimws(geo))
-
+#this is from liam cfmd
 mk_country <- ggplot(mk3, aes(x = reorder(geo, Richness, FUN = median, na.rm = TRUE), y = Richness)) +
   geom_boxplot(outlier.shape = NA) +
   geom_jitter(width = 0.2, height = 0, alpha = 0.5, size = 1.8) +
@@ -1662,7 +1661,6 @@ samples <- intersect(sample_map_unique$Sample, names(mk_species2))
 sp_sub <- mk_species2 %>%
   dplyr::select(Species, dplyr::any_of(samples))
 
-# 3) Long format + numeric abundance + join group & geo
 sp_long <- sp_sub %>%
   tidyr::pivot_longer(-Species, names_to = "Sample", values_to = "abundance") %>%
   dplyr::mutate(
@@ -1671,20 +1669,17 @@ sp_long <- sp_sub %>%
   ) %>%
   dplyr::left_join(sample_map_unique, by = "Sample")
 
-# 4) Choose top taxa across selected data
 top_taxa <- sp_long %>%
   dplyr::group_by(Species) %>%
   dplyr::summarise(total = sum(abundance, na.rm = TRUE), .groups = "drop") %>%
   dplyr::slice_max(total, n = top_n) %>%
   dplyr::pull(Species)
 
-# 5) Collapse to "Other" and aggregate BY COUNTRY
 sp_country <- sp_long %>%
   dplyr::mutate(Species2 = ifelse(Species %in% top_taxa, Species, "Other")) %>%
   dplyr::group_by(group, geo, Species2) %>%
   dplyr::summarise(abundance = sum(abundance, na.rm = TRUE), .groups = "drop")
 
-# 6) Order countries left->right by median richness within each group (optional)
 geo_levels <- sample_map_unique %>%
   dplyr::group_by(group, geo) %>%
   dplyr::summarise(medR = median(Richness, na.rm = TRUE), .groups = "drop") %>%
@@ -1699,7 +1694,7 @@ sp_country <- sp_country %>%
   )
 ##############################################################
 ###############################################################
-# 7) Plot: X = country (geo)
+
 ggplot(sp_country, aes(x = geo, y = abundance, fill = Species2)) +
   geom_col(position = "fill") +    # use "stack" for raw totals instead of relative
   facet_grid(~ group, scales = "free_x", space = "free_x") +
@@ -1769,7 +1764,7 @@ wk_species_keep <- wk_species %>%
 
 
 
-## 0) Map samples → geo and richness group
+
 loc_map <- wk3 %>%
   dplyr::select(original_id, location, Richness) %>%
   dplyr::filter(!is.na(location), !is.na(Richness)) %>%
@@ -1781,7 +1776,7 @@ loc_map <- wk3 %>%
   dplyr::filter(!is.na(group)) %>%
   dplyr::rename(geo = location)
 
-## 1) Keep only samples with a geo + group, convert to relative abundance
+
 abund <- wk_species_keep %>%
   dplyr::inner_join(loc_map, by = c("sample" = "original_id"))
 
@@ -1789,7 +1784,6 @@ species_cols <- setdiff(names(abund), c("sample","geo","Richness","group"))
 row_tot <- rowSums(abund[species_cols], na.rm = TRUE); row_tot[row_tot == 0] <- 1
 abund[species_cols] <- abund[species_cols] / row_tot
 
-## 2) Optional: keep top 20 taxa globally, lump the rest as "Other"
 top20 <- abund %>%
   dplyr::summarise(dplyr::across(dplyr::all_of(species_cols), mean, na.rm = TRUE)) %>%
   tidyr::pivot_longer(dplyr::everything(), names_to = "Species2", values_to = "mean_prop") %>%
@@ -1797,7 +1791,6 @@ top20 <- abund %>%
   dplyr::slice(1:20) %>%
   dplyr::pull(Species2)
 
-## 3) Long format and average per geo × group (so one bar per geo within each facet)
 sp_country <- abund %>%
   tidyr::pivot_longer(dplyr::all_of(species_cols), names_to = "Species2", values_to = "prop") %>%
   dplyr::mutate(Species2 = ifelse(Species2 %in% top20, Species2, "Other")) %>%
@@ -1807,7 +1800,6 @@ sp_country <- abund %>%
   dplyr::mutate(abundance = abundance / sum(abundance)) %>%   # re-normalize to 1 per bar
   dplyr::ungroup()
 
-## 4) Plot — matches your style
 ggplot(sp_country, aes(x = geo, y = abundance, fill = Species2)) +
   geom_col(position = "fill") +   # relative abundances
   facet_grid(~ group, scales = "free_x", space = "free_x") +
@@ -1883,11 +1875,10 @@ head(sugar)
 library(dplyr)
 library(ggplot2)
 
-# subset sugar ferments
+
 sugar <- richness_clean %>% 
   filter(Substrate == "Sugar")
 
-# create subtype and colour variable
 sugar_sub <- sugar %>%
   mutate(
     # collapse to 2 groups for x-axis
@@ -1908,7 +1899,6 @@ sugar_sub <- sugar %>%
 table(sugar_sub$Sugar_subtype)
 unique(sugar_sub$product_colour)
 
-# plot: boxplot + jitter
 p_sugar <- ggplot(sugar_sub, aes(x = Sugar_subtype, y = Richness)) +
   geom_boxplot(outlier.shape = NA) +
   geom_jitter(
@@ -1962,13 +1952,11 @@ meta_keep <- meta %>%
   filter(ID %in% overlap) %>%
   arrange(match(ID, rownames(call)))
 
-# (optional) align call to the kept meta, just in case
 call_keep <- call[meta_keep$ID, , drop = FALSE]
 # PCA on CLR matrix `call`; facet by Substrate; color by Fermented.food.category
 library(dplyr)
 library(ggplot2)
 
-# 1) Align meta and CLR matrix
 stopifnot(all(c("ID","Substrate","Fermented.food.category") %in% names(meta_keep)))
 ids_overlap <- intersect(rownames(call), meta_keep$ID)
 meta_pca <- meta_keep %>%
@@ -1976,17 +1964,15 @@ meta_pca <- meta_keep %>%
   dplyr::arrange(match(ID, ids_overlap))
 X <- as.matrix(call[meta_pca$ID, , drop = FALSE])
 
-# 2) Drop zero-variance features (if any)
 keep_cols <- apply(X, 2, function(z) stats::var(z, na.rm = TRUE) > 0)
 X <- X[, keep_cols, drop = FALSE]
 
-# 3) PCA (CLR: center=TRUE, scale=FALSE)
 pc <- prcomp(X, center = TRUE, scale. = FALSE)
 var_exp <- (pc$sdev^2) / sum(pc$sdev^2)
 pct1 <- round(100 * var_exp[1], 1)
 pct2 <- round(100 * var_exp[2], 1)
 
-# 4) Scores + metadata
+
 scores <- as.data.frame(pc$x[, 1:2, drop = FALSE]) %>%
   mutate(
     ID = meta_pca$ID,
@@ -1994,7 +1980,7 @@ scores <- as.data.frame(pc$x[, 1:2, drop = FALSE]) %>%
     TOF = meta_pca$Type.of.fermentation,
     Fermented.food.category = meta_pca$Fermented.food.category
   )
-# Case-insensitive filter (recommended)
+
 scores_sugar <- scores %>%
   filter(str_detect(Substrate, regex("^sugar$", ignore_case = TRUE)))
 pca_sugar<- ggplot(scores_sugar, aes(PC1, PC2, fill = Fermented.food.category)) +
